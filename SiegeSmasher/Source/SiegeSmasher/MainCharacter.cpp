@@ -2,12 +2,10 @@
 
 
 #include "MainCharacter.h"
-#include "GameFramework/Controller.h" 
-#include "DrawDebugHelpers.h"
+#include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h" 
 
-#define PlacingSurface ECC_GameTraceChannel1
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -15,21 +13,13 @@ AMainCharacter::AMainCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	
-
-    
 }
 
 // Called when the game starts or when spawned
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	camera = GetComponentByClass<UCameraComponent>(); 
-	World = GetWorld();
-	InitialiseTowers();
-	TraceParams = FCollisionQueryParams();
-	TraceParams.AddIgnoredActor(this);
-	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"),(int)(camera == nullptr)));
+	
 	//Adding the input mapping context to the main character
 	/*A reference to the player controller class is being cast to the controller that is currently controlling this actor*/
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -48,11 +38,6 @@ void AMainCharacter::BeginPlay()
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	FVector camForward = camera->GetForwardVector();
- //   GEngine->AddOnScreenDebugMessage(-1,5.0f,FColor::Blue,FString::Printf(TEXT("Cam forward vector X:%f Y:%f Z:%f"),	camForward.X,camForward.Y,camForward.Z));
-	//GLog->Log(FString::Printf(TEXT("Cam forward vector X:%f Y:%f Z:%f"), camForward.X, camForward.Y, camForward.Z));
-
-	HandleTowerPlacement();
 
 }
 
@@ -118,76 +103,5 @@ void AMainCharacter::Look(const FInputActionValue& Value)
 void AMainCharacter::Jumping()
 {
 	Jump();
-}
-
-void AMainCharacter::DisplaySelected()
-{
-	Selected->SetActorHiddenInGame(false); 
-	
-
-}
-
-
-void AMainCharacter::HideSelected()
-{
-	Selected->SetActorHiddenInGame(true);
-	Selected->SetActorEnableCollision(false);
-
-}
-
-void AMainCharacter::HandleTowerPlacement()
-{
-	
-	FVector PlayerCameForward = camera->GetForwardVector();
-
-	FHitResult PlacementSurfaceResult = FHitResult();
-   
-	FVector start = camera->GetComponentLocation() + PlayerCameForward; 
-
-	FVector end = start + PlayerCameForward * PlayerPlacementDistances;
-	DrawDebugLine(World, start, end, FColor::Blue);
-	DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
-
-	if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams)) 
-	{
-		FVector SurfaceExtents = PlacementSurfaceResult.GetComponent()->GetCollisionShape().GetBox();
-		FVector SurfaceOrigin = PlacementSurfaceResult.GetComponent()->GetComponentLocation();
-
-		Selected->ResolvePlacement(SurfaceExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward);
-	};
-
-	
-}
-
-void AMainCharacter::InitialiseTowers()
-{
-
-	ATowerBase* currentInstance = nullptr;
-	UWorld* world = GetWorld();
-	FTransform SpawnTransForm = FTransform();
-	FActorSpawnParameters SpawnParameters = FActorSpawnParameters(); 
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	GLog->Log(FString::Printf(TEXT("towers types to spawn count:%d"), TowerTypesToSpawn.Num()));
-	for (TSubclassOf<ATowerBase>& towerType : TowerTypesToSpawn) {
-
-		currentInstance = world->SpawnActor<ATowerBase>(towerType, SpawnTransForm, SpawnParameters); 
-		TowersToSpawn.Add(currentInstance);
-		currentInstance-> SetActorHiddenInGame(true); 
-		currentInstance->SetActorEnableCollision(false); 
-		currentInstance->SetActorTickEnabled(false);
-
-	}
-
-
-	if (TowersToSpawn.Num() > 0) {
-
-		Selected = TowersToSpawn[0]; 
-		DisplaySelected();
-
-	}
-
-
-
-
 }
 
