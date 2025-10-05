@@ -72,6 +72,21 @@
     <ClCompile Include="..\..\Source\SiegeSmasher\Enemies\EnemyInheritTest1.h">
       <Filter>Source\SiegeSmasher\Enemies</Filter>
     </ClCompile>
+    <Filter Include="Source\SiegeSmasher\Towers">
+      <UniqueIdentifier>{0D78426C-EC07-3D70-BFEA-DA713D31F327}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Towers\TowerBase.cpp">
+      <Filter>Source\SiegeSmasher\Towers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Towers\TowerBase.h">
+      <Filter>Source\SiegeSmasher\Towers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Towers\TowerTest.cpp">
+      <Filter>Source\SiegeSmasher\Towers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Towers\TowerTest.h">
+      <Filter>Source\SiegeSmasher\Towers</Filter>
+    </ClCompile>
     <Filter Include="Source\SiegeSmasher\WaveGen">
       <UniqueIdentifier>{3A4E3FAF-B504-3C2B-8473-F8C0FF6BF573}</UniqueIdentifier>
     </Filter>

@@ -1,0 +1,21 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\richa\\onedrive\\desktop\\siegesmasher\\siegesmasher\\siegesmasher\\source\\siegesmasher\\towers\\towertest.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\richa\\onedrive\\desktop\\siegesmasher\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\x64\\siegesmashereditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "c:\\users\\richa\\onedrive\\desktop\\siegesmasher\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\siegesmasher\\definitions.siegesmasher.h",
+            "c:\\users\\richa\\onedrive\\desktop\\siegesmasher\\siegesmasher\\siegesmasher\\source\\siegesmasher\\towers\\towertest.h",
+            "c:\\users\\richa\\onedrive\\desktop\\siegesmasher\\siegesmasher\\siegesmasher\\source\\siegesmasher\\towers\\towerbase.h",
+            "c:\\program files\\epic games\\ue_5.5\\engine\\source\\runtime\\engine\\classes\\components\\boxcomponent.h",
+            "c:\\program files\\epic games\\ue_5.5\\engine\\source\\runtime\\engine\\classes\\components\\shapecomponent.h",
+            "c:\\program files\\epic games\\ue_5.5\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\shapecomponent.generated.h",
+            "c:\\program files\\epic games\\ue_5.5\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\boxcomponent.generated.h",
+            "c:\\users\\richa\\onedrive\\desktop\\siegesmasher\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\unrealeditor\\inc\\siegesmasher\\uht\\towerbase.generated.h",
+            "c:\\users\\richa\\onedrive\\desktop\\siegesmasher\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\unrealeditor\\inc\\siegesmasher\\uht\\towertest.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
