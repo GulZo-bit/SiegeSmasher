@@ -269,6 +269,12 @@
     <ClCompile Include="..\..\Source\SiegeSmasher\MyGameModeBase.h">
       <AdditionalIncludeDirectories>$(ClCompile_AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\MyMainCharacterTest.cpp">
+      <AdditionalIncludeDirectories>$(ClCompile_AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\MyMainCharacterTest.h">
+      <AdditionalIncludeDirectories>$(ClCompile_AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
     <None Include="..\..\Source\SiegeSmasher\SiegeSmasher.Build.cs"/>
     <ClCompile Include="..\..\Source\SiegeSmasher\SiegeSmasher.cpp">
       <AdditionalIncludeDirectories>$(ClCompile_AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

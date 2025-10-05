@@ -42,6 +42,12 @@
     <ClCompile Include="..\..\Source\SiegeSmasher\MyGameModeBase.h">
       <Filter>Source\SiegeSmasher</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\MyMainCharacterTest.cpp">
+      <Filter>Source\SiegeSmasher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\MyMainCharacterTest.h">
+      <Filter>Source\SiegeSmasher</Filter>
+    </ClCompile>
     <None Include="..\..\Source\SiegeSmasher\SiegeSmasher.Build.cs">
       <Filter>Source\SiegeSmasher</Filter>
     </None>
