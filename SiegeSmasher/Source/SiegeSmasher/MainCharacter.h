@@ -3,10 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h" 
-#include "Camera/CameraComponent.h"
-#include "InputActionValue.h" 
-#include "Towers/TowerBase.h"
+#include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
@@ -21,8 +19,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-
 
 public:	
 	// Called every frame
@@ -46,41 +42,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowersTypesToSpawn"); 
-	TArray<TSubclassOf<ATowerBase>> TowerTypesToSpawn;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Placement distances"); 
-	FVector PlayerPlacementDistances;
-	
-	
-
-
 	//Calling for movement input
 	void Move(const FInputActionValue& Value);
 
 	//Calling for look input
 	void Look(const FInputActionValue& Value);
 
-	void Jumping(); 
-
-
-private:
-	
-	UCameraComponent* camera; 
-	TArray<ATowerBase*> TowersToSpawn;
-	ATowerBase* Selected; 
-	UWorld* World;
-
-
-private: 
-
-
-	FCollisionQueryParams TraceParams;
-	void DisplaySelected(); 
-	void HideSelected(); 
-
-	void HandleTowerPlacement();
-	void InitialiseTowers();
-
-
+	void Jumping();
 };
