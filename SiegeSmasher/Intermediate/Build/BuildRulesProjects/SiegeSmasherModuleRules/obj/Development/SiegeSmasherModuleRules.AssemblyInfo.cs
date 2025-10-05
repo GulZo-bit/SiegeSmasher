@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SiegeSmasherModuleRules")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Development")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1e1ec51d8fb5a3cca87e47c1dfdaa7554beeac2e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b94764f5648e3aaffced2b12c9cc7a2cf166d84b")]
 [assembly: System.Reflection.AssemblyProductAttribute("SiegeSmasherModuleRules")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SiegeSmasherModuleRules")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

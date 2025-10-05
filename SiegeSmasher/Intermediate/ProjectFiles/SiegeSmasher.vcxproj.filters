@@ -72,6 +72,36 @@
     <ClCompile Include="..\..\Source\SiegeSmasher\Enemies\EnemyInheritTest1.h">
       <Filter>Source\SiegeSmasher\Enemies</Filter>
     </ClCompile>
+    <Filter Include="Source\SiegeSmasher\Private">
+      <UniqueIdentifier>{E1D52063-FDC4-3CE8-B5AA-36F131DE9C3A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\SiegeSmasher\Private\AI">
+      <UniqueIdentifier>{0AC4B022-A9B1-3B2D-8F15-27BE17EEE269}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Private\AI\AICharTest.cpp">
+      <Filter>Source\SiegeSmasher\Private\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Private\AI\CheckpointTest.cpp">
+      <Filter>Source\SiegeSmasher\Private\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Private\AI\MyAIController.cpp">
+      <Filter>Source\SiegeSmasher\Private\AI</Filter>
+    </ClCompile>
+    <Filter Include="Source\SiegeSmasher\Public">
+      <UniqueIdentifier>{7CB5D0F0-5BA2-3239-82CA-C04CE447A9D7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\SiegeSmasher\Public\AI">
+      <UniqueIdentifier>{A294BBB2-7BF5-3449-B252-3B8C31E1B1D2}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Public\AI\AICharTest.h">
+      <Filter>Source\SiegeSmasher\Public\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Public\AI\CheckpointTest.h">
+      <Filter>Source\SiegeSmasher\Public\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Public\AI\MyAIController.h">
+      <Filter>Source\SiegeSmasher\Public\AI</Filter>
+    </ClCompile>
     <Filter Include="Source\SiegeSmasher\WaveGen">
       <UniqueIdentifier>{3A4E3FAF-B504-3C2B-8473-F8C0FF6BF573}</UniqueIdentifier>
     </Filter>

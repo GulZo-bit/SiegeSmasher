@@ -1,0 +1,32 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-SiegeSmasher-6600.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\SiegeSmasherEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\CheckpointTest.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\EnemyBase.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\EnemyInheritTest.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\EnemyInheritTest1.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\MainCharacter.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\MyAIController.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\MyGameModeBase.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\SiegeSmasher.init.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\SpawnPoint.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\WaveManager.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\MainCharacter.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\MyGameModeBase.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\SiegeSmasher.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\EnemyBase.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\EnemyInheritTest.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\EnemyInheritTest1.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\SpawnPoint.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\WaveManager.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\PerModuleInline.gen.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\CheckpointTest.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\MyAIController.cpp.obj"
+"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\Default.rc2.res"
+/OUT:"G:\Unreal Projects\SiegeSmasher\SiegeSmasher\Intermediate\Build\Win64\x64\UnrealEditor\Development\SiegeSmasher\UnrealEditor-SiegeSmasher-6600.lib"
