@@ -35,13 +35,13 @@ void AMainCharacterTest::BeginPlay()
 	if (SpringArmComponent != nullptr)
 	{
 		//Set Location and Rotation
-		SpringArmComponent->SetRelativeLocation(FVector(0.0f, 70.0f, 100.0f));
+		SpringArmComponent->SetRelativeLocation(FVector(0.0f, 80.0f, 100.0f));
 		SpringArmComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 		// Set How far away from character
 		SpringArmComponent->TargetArmLength = 250.0f;
 		// Set camera lag behaviour
 		SpringArmComponent->bEnableCameraLag = true;
-		SpringArmComponent->CameraLagSpeed = 10.0f;
+		SpringArmComponent->CameraLagSpeed = 20.0f;
 	}
 	if (TPSCameraComponent != nullptr)
 	{
