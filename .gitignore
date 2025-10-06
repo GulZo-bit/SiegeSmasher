@@ -109,3 +109,15 @@ SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/p
 SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/project.nuget.cache
 
 SiegeSmasher/Saved/Logs/SiegeSmasher.log
+SiegeSmasher/Binaries/Win64/SiegeSmasherEditor.target
+SiegeSmasher/Binaries/Win64/UnrealEditor-SiegeSmasher.exp
+SiegeSmasher/Binaries/Win64/UnrealEditor-SiegeSmasher.pdb
+SiegeSmasher/Binaries/Win64/UnrealEditor.modules
+SiegeSmasher/Intermediate/Build/BuildRules/SiegeSmasherModuleRules.pdb
+SiegeSmasher/Intermediate/Build/BuildRules/SiegeSmasherModuleRulesManifest.json
+SiegeSmasher/Intermediate/Build/SourceFileCache.bin
+SiegeSmasher/Intermediate/Build/Win64/ActionHistory.bin
+SiegeSmasher/Intermediate/Build/Win64/SiegeSmasherEditor/Development/SiegeSmasherEditor.uhtmanifest
+SiegeSmasher/Intermediate/Build/Win64/SiegeSmasherEditor/Development/SiegeSmasherEditor.uhtpath
+/SiegeSmasher/Intermediate
+/SiegeSmasher/Intermediate/Build
