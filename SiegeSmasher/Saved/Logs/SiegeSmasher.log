@@ -1441,9 +1441,3 @@ LogConfig: CVar [[D3D12.Bindless.ResourceDescriptorHeapSize:32768]] deferred - d
 [2025.10.06-11.07.56:511][ 19]LogFab: Display: User client id: xyza7891REBVsEqSJRRNXmlS7EQHM459
 [2025.10.06-11.07.56:997][ 21]LogEOSSDK: Warning: LogEOS: Error response received from backend. ServiceName=[Friend], OperationName=[GetBlockList], Url=[<Redacted>], HttpStatus=[403], ErrorCode=[errors.com.epicgames.common.insufficient_scopes], NumericErrorCode=[1056], ErrorMessage=[Insufficient access scopes. Expected: [friends_list]], CorrId=[EOS-9fgmfkbXGkicXtdBoX6rMA-4L1ad23Gp0-mrLpk2QQjkQ]
 [2025.10.06-11.09.38:621][536]LogDerivedDataCache: C:/Users/richa/AppData/Local/UnrealEngine/Common/DerivedDataCache: Maintenance finished in +00:00:00.095 and deleted 0 files with total size 0 MiB and 0 empty folders. Scanned 353 files in 655 folders with total size 2 MiB.
-[2025.10.06-11.13.04:547][153]LogEOSSDK: LogEOS: Updating Product SDK Config, Time: 320.206787
-[2025.10.06-11.13.05:548][156]LogEOSSDK: LogEOS: SDK Config Product Update Request Completed - No Change
-[2025.10.06-11.13.05:548][156]LogEOSSDK: LogEOS: ScheduleNextSDKConfigDataUpdate - Time: 320.874115, Update Interval: 342.677704
-[2025.10.06-11.18.50:929][192]LogEOSSDK: LogEOS: Updating Product SDK Config, Time: 666.589478
-[2025.10.06-11.18.51:928][195]LogEOSSDK: LogEOS: SDK Config Product Update Request Completed - No Change
-[2025.10.06-11.18.51:928][196]LogEOSSDK: LogEOS: ScheduleNextSDKConfigDataUpdate - Time: 667.255981, Update Interval: 343.596924
