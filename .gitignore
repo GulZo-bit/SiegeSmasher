@@ -1,3 +1,26 @@
+
+*.modules 
+*.cs
+*CrashReportClient.ini
+*.target 
+*.log
+*.exp 
+*.sarif
+*.generated.cpp
+*.generated.h
+*.gen.cpp
+*.Cpp20.h  
+*.dat
+*.Cpp20.cpp
+*.vcxproj
+*.gen.h
+*.cache 
+*.props
+*.bin
+*.rsp 
+*.json 
+*.pdb
+
 # Visual Studio 2015 user specific files
 .vs/
 
@@ -39,8 +62,10 @@
 *.opensdf
 *.sdf
 *.VC.db
-*.VC.opendb
-.vsconfig
+*.VC.opendb 
+
+.vsconfig 
+
 
 # Precompiled Assets
 SourceArt/**/*.png
@@ -82,3 +107,18 @@ SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/S
 SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/SiegeSmasherModuleRules.csproj.nuget.g.props
 SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/project.assets.json
 SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/project.nuget.cache
+
+SiegeSmasher/Saved/Logs/SiegeSmasher.log
+SiegeSmasher/Binaries/Win64/SiegeSmasherEditor.target
+SiegeSmasher/Binaries/Win64/UnrealEditor-SiegeSmasher.exp
+SiegeSmasher/Binaries/Win64/UnrealEditor-SiegeSmasher.pdb
+SiegeSmasher/Binaries/Win64/UnrealEditor.modules
+SiegeSmasher/Intermediate/Build/BuildRules/SiegeSmasherModuleRules.pdb
+SiegeSmasher/Intermediate/Build/BuildRules/SiegeSmasherModuleRulesManifest.json
+SiegeSmasher/Intermediate/Build/SourceFileCache.bin
+SiegeSmasher/Intermediate/Build/Win64/ActionHistory.bin
+SiegeSmasher/Intermediate/Build/Win64/SiegeSmasherEditor/Development/SiegeSmasherEditor.uhtmanifest
+SiegeSmasher/Intermediate/Build/Win64/SiegeSmasherEditor/Development/SiegeSmasherEditor.uhtpath
+/SiegeSmasher/Intermediate
+/SiegeSmasher/Intermediate/Build
+SiegeSmasher/Saved/Logs/SiegeSmasher.log
