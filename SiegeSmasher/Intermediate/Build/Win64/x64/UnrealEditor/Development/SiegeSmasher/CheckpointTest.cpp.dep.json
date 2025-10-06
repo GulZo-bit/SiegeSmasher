@@ -1,13 +1,13 @@
 {
     "Version": "1.2",
     "Data": {
-        "Source": "g:\\unreal projects\\siegesmasher\\siegesmasher\\source\\siegesmasher\\private\\ai\\checkpointtest.cpp",
+        "Source": "c:\\github\\siegesmasher\\siegesmasher\\source\\siegesmasher\\private\\ai\\checkpointtest.cpp",
         "ProvidedModule": "",
-        "PCH": "g:\\unreal projects\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\x64\\siegesmashereditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "PCH": "c:\\github\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\x64\\siegesmashereditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
         "Includes": [
-            "g:\\unreal projects\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\siegesmasher\\definitions.siegesmasher.h",
-            "g:\\unreal projects\\siegesmasher\\siegesmasher\\source\\siegesmasher\\public\\ai\\checkpointtest.h",
-            "g:\\unreal projects\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\unrealeditor\\inc\\siegesmasher\\uht\\checkpointtest.generated.h"
+            "c:\\github\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\siegesmasher\\definitions.siegesmasher.h",
+            "c:\\github\\siegesmasher\\siegesmasher\\source\\siegesmasher\\public\\ai\\checkpointtest.h",
+            "c:\\github\\siegesmasher\\siegesmasher\\intermediate\\build\\win64\\unrealeditor\\inc\\siegesmasher\\uht\\checkpointtest.generated.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

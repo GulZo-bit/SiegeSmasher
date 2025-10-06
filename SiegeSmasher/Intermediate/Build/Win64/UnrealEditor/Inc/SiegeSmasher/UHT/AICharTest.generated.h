@@ -14,7 +14,7 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define SIEGESMASHER_AICharTest_generated_h
 
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_INCLASS_NO_PURE_DECLS \
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesAAICharTest(); \
 	friend struct Z_Construct_UClass_AAICharTest_Statics; \
@@ -23,7 +23,7 @@ public: \
 	DECLARE_SERIALIZER(AAICharTest)
 
 
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_ENHANCED_CONSTRUCTORS \
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	AAICharTest(AAICharTest&&); \
@@ -35,12 +35,12 @@ public: \
 	NO_API virtual ~AAICharTest();
 
 
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_9_PROLOG
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_GENERATED_BODY \
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_9_PROLOG
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_INCLASS_NO_PURE_DECLS \
-	FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_ENHANCED_CONSTRUCTORS \
+	FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_INCLASS_NO_PURE_DECLS \
+	FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_12_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -48,7 +48,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> SIEGESMASHER_API UClass* StaticClass<class AAICharTest>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h
+#define CURRENT_FILE_ID FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

@@ -77,14 +77,14 @@ AAICharTest::~AAICharTest() {}
 // End Class AAICharTest
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_Statics
+struct Z_CompiledInDeferFile_FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
 		{ Z_Construct_UClass_AAICharTest, AAICharTest::StaticClass, TEXT("AAICharTest"), &Z_Registration_Info_UClass_AAICharTest, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AAICharTest), 345197410U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_1121586047(TEXT("/Script/SiegeSmasher"),
-	Z_CompiledInDeferFile_FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_1121586047(TEXT("/Script/SiegeSmasher"),
+	Z_CompiledInDeferFile_FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_Public_AI_AICharTest_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

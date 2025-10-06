@@ -84,6 +84,9 @@
     <ClCompile Include="..\..\Source\SiegeSmasher\Private\AI\CheckpointTest.cpp">
       <Filter>Source\SiegeSmasher\Private\AI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Private\AI\CheckPointTrigger.cpp">
+      <Filter>Source\SiegeSmasher\Private\AI</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\SiegeSmasher\Private\AI\MyAIController.cpp">
       <Filter>Source\SiegeSmasher\Private\AI</Filter>
     </ClCompile>
@@ -99,8 +102,26 @@
     <ClCompile Include="..\..\Source\SiegeSmasher\Public\AI\CheckpointTest.h">
       <Filter>Source\SiegeSmasher\Public\AI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Public\AI\CheckPointTrigger.h">
+      <Filter>Source\SiegeSmasher\Public\AI</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\SiegeSmasher\Public\AI\MyAIController.h">
       <Filter>Source\SiegeSmasher\Public\AI</Filter>
+    </ClCompile>
+    <Filter Include="Source\SiegeSmasher\Towers">
+      <UniqueIdentifier>{0D78426C-EC07-3D70-BFEA-DA713D31F327}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Towers\TowerBase.cpp">
+      <Filter>Source\SiegeSmasher\Towers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Towers\TowerBase.h">
+      <Filter>Source\SiegeSmasher\Towers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Towers\TowerTest.cpp">
+      <Filter>Source\SiegeSmasher\Towers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SiegeSmasher\Towers\TowerTest.h">
+      <Filter>Source\SiegeSmasher\Towers</Filter>
     </ClCompile>
     <Filter Include="Source\SiegeSmasher\WaveGen">
       <UniqueIdentifier>{3A4E3FAF-B504-3C2B-8473-F8C0FF6BF573}</UniqueIdentifier>

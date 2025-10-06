@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "CheckpointTest.h"
+#include "CheckPointTrigger.h"
 #include "MyAIController.generated.h"
 
 /**
@@ -22,6 +23,8 @@ protected:
 	TArray<AActor*> CheckpointStore;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "MyVariables");
 	int32 IndexStart = 0;
+	//AActor CheckpointTrigger;
+	UCheckPointTrigger* CheckpointTrigger;
 public:
 	virtual void Tick(float DeltaSeconds) override;
 };
