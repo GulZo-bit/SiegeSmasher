@@ -39,8 +39,30 @@
 *.opensdf
 *.sdf
 *.VC.db
-*.VC.opendb
-.vsconfig
+*.VC.opendb 
+*.modules 
+*.cs
+*CrashReportClient.ini
+*.target 
+*.log
+*.exp 
+*.sarif
+*.generated.cpp
+*.generated.h
+*.gen.cpp
+*.Cpp20.h  
+*.dat
+*.Cpp20.cpp
+*.vcxproj
+*.gen.h
+*.cache 
+*.props
+*.bin
+*.rsp 
+*.json 
+*.pdb
+.vsconfig 
+
 
 # Precompiled Assets
 SourceArt/**/*.png
@@ -82,3 +104,4 @@ SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/S
 SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/SiegeSmasherModuleRules.csproj.nuget.g.props
 SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/project.assets.json
 SiegeSmasher/Intermediate/Build/BuildRulesProjects/SiegeSmasherModuleRules/obj/project.nuget.cache
+
