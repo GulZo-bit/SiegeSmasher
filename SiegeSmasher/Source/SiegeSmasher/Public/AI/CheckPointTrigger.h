@@ -32,6 +32,7 @@ public:
 
 	//Getters
 	int32 getIndexTrigger();
+	bool getBDone();
 private:
 	UPROPERTY(EditAnywhere, Category = "CheckpointTriggers")
 	ATriggerVolume* TriggerVol;

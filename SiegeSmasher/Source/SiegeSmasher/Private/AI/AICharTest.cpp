@@ -32,3 +32,8 @@ void AAICharTest::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
+TArray<AActor*> AAICharTest::getCheckpoints()
+{
+	return CheckpointStore;
+}
+

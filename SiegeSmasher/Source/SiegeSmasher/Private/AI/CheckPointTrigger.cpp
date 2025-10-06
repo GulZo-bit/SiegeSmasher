@@ -57,13 +57,20 @@ void UCheckPointTrigger::GetAllValidActors(float DeltaTime)
 	}
 }
 
+//Setters
 void UCheckPointTrigger::setIndexTrigger(int32 TriggerIndexStore)
 {
 	TriggerIndex = TriggerIndexStore;
 }
 
+//Getters
 int32 UCheckPointTrigger::getIndexTrigger()
 {
 	return TriggerIndex;
+}
+
+bool UCheckPointTrigger::getBDone()
+{
+	return bDone;
 }
 

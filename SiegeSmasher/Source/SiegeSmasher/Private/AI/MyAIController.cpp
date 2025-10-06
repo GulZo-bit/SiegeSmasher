@@ -7,33 +7,47 @@
 void AMyAIController::BeginPlay()
 {
 	Super::BeginPlay();
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACheckpointTest::StaticClass(), CheckpointStore);
-	CheckpointStore.Sort();
 
+	AEnemy = UGameplayStatics::GetActorOfClass(GetWorld(), AAICharTest::StaticClass());
+	AEnemyCast = Cast<AAICharTest>(AEnemy);
+	for (int i = 0; i < AEnemyCast->getCheckpoints().Num(); i++)
+	{
+		TriggerStore.Add(AEnemyCast->getCheckpoints()[i]->FindComponentByClass<UCheckPointTrigger>());
+	}
 }
 
 void AMyAIController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	CheckpointTrigger = CheckpointStore[IndexStart]->FindComponentByClass<UCheckPointTrigger>();
-
-	int32 IndexTemp = IndexStart + 1;
-	if (IndexTemp == CheckpointStore.Num())
+	if (IndexStart >= AEnemyCast->getCheckpoints().Num())
 	{
-		IndexTemp = CheckpointStore.Num() - 1;
+		IndexStart = AEnemyCast->getCheckpoints().Num() - 1;
 	}
-	CheckpointTrigger->setIndexTrigger(IndexTemp);
 
-	if (CheckpointTrigger->getIndexTrigger() == CheckpointStore.Num())
+	if (TriggerStore[IndexStart]->getIndexTrigger() >= AEnemyCast->getCheckpoints().Num())
 	{
-		CheckpointTrigger->setIndexTrigger(CheckpointStore.Num() - 1);
+		TriggerStore[IndexStart]->setIndexTrigger(AEnemyCast->getCheckpoints().Num() - 1);
 	}
-	MoveToLocation(CheckpointStore[CheckpointTrigger->getIndexTrigger()]->GetActorLocation());
-	IndexStart += 1;
+	/*GLog->Log(FString::Printf(TEXT("IndexStart: %d"), IndexStart));
+	GLog->Log(FString::Printf(TEXT("TriggerIndex: %d"), TriggerStore[IndexStart]->getIndexTrigger()));*/
+	MoveToLocation(AEnemyCast->getCheckpoints()[TriggerStore[IndexStart]->getIndexTrigger()]->GetActorLocation());
 
-	if (IndexStart == CheckpointStore.Num())
+	if (TriggerStore[IndexStart]->getBDone() == true)
 	{
-		IndexStart = CheckpointStore.Num() - 1;
+		IndexStart += 1;
+
+		if (IndexStart >= AEnemyCast->getCheckpoints().Num())
+		{
+			IndexStart = AEnemyCast->getCheckpoints().Num() - 1;
+		}
+
+		TriggerStore[IndexStart]->setIndexTrigger(TriggerStore[IndexStart - 1]->getIndexTrigger());
+
+		if (TriggerStore[IndexStart]->getIndexTrigger() >= AEnemyCast->getCheckpoints().Num())
+		{
+			TriggerStore[IndexStart]->setIndexTrigger(AEnemyCast->getCheckpoints().Num() - 1);
+		}
 	}
+
 }
