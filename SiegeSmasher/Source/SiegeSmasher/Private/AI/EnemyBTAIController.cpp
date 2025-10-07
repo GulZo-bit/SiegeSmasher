@@ -23,6 +23,8 @@ void AEnemyBTAIController::BeginPlay()
 		AEnemy = UGameplayStatics::GetActorOfClass(GetWorld(), AAICharTest::StaticClass());
 		AEnemyCast = Cast<AAICharTest>(AEnemy);//Cast the Actor reference to AAICharTest.
 
+		GetBlackboardComponent()->SetValueAsObject(TEXT("EnemyActor"), AEnemyCast);
+
 		//Go through each index in the checkpoint array to add the Actor Componenet of each checkpoint to a dynamic array called TriggerStore.
 		for (int i = 0; i < AEnemyCast->getCheckpoints().Num(); i++)
 		{
@@ -43,6 +45,7 @@ void AEnemyBTAIController::Tick(float DeltaTime)
 	else
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
+		ClearFocus(EAIFocusPriority::Gameplay);
 	}
 
 	//if to make sure IndexStart doesn't go above the size of the array to crash the game.
@@ -59,8 +62,8 @@ void AEnemyBTAIController::Tick(float DeltaTime)
 	/*GLog->Log(FString::Printf(TEXT("IndexStart: %d"), IndexStart));
 	GLog->Log(FString::Printf(TEXT("TriggerIndex: %d"), TriggerStore[IndexStart]->getIndexTrigger()));*/
 
-	//Moves the actor to a checkpoint which is dictated by the TriggerIndex.
-	MoveToLocation(AEnemyCast->getCheckpoints()[TriggerStore[IndexStart]->getIndexTrigger()]->GetActorLocation());
+	//Moves the actor to a checkpoint which is dictated by the TriggerIndex. In the behaviour tree,
+	GetBlackboardComponent()->SetValueAsVector(TEXT("CheckpointLocation"), AEnemyCast->getCheckpoints()[TriggerStore[IndexStart]->getIndexTrigger()]->GetActorLocation());
 
 	//Once the actor reaches a trigger the TriggerIndex gets incremented and bDone gets switched to true.
 	if (TriggerStore[IndexStart]->getBDone() == true)
