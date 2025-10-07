@@ -84,4 +84,28 @@ void AEnemyBTAIController::Tick(float DeltaTime)
 			TriggerStore[IndexStart]->setIndexTrigger(AEnemyCast->getCheckpoints().Num() - 1);
 		}
 	}
+
+	CheckDistanceToPlayer();
+}
+
+void AEnemyBTAIController::CheckDistanceToPlayer()
+{
+	FVector PlayerLocStore;
+	FVector EnemyLocStore;
+	float DistStore;
+	PlayerLocStore = PlayerPawn->GetActorLocation();
+	EnemyLocStore = AEnemyCast->GetActorLocation();
+	DistStore = FMath::Sqrt(((PlayerLocStore.X - EnemyLocStore.X) * (PlayerLocStore.X - EnemyLocStore.X)) + ((PlayerLocStore.Y - EnemyLocStore.Y) * (PlayerLocStore.Y - EnemyLocStore.Y)) + ((PlayerLocStore.Z - EnemyLocStore.Z) * (PlayerLocStore.Z - EnemyLocStore.Z)));
+	
+	if ( DistStore >= 0 && DistStore <= 200)
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), true);
+		SetFocus(PlayerPawn);
+	}
+
+	else
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), false);
+		ClearFocus(EAIFocusPriority::Gameplay);
+	}
 }

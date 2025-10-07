@@ -7,6 +7,7 @@
 #include "CheckpointTest.h"
 #include "CheckPointTrigger.h"
 #include "AICharTest.h"
+#include "SiegeSmasher/MainCharacter.h"
 #include "EnemyBTAIController.generated.h"
 
 /**
@@ -20,6 +21,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void CheckDistanceToPlayer();
 public:
 	virtual void Tick(float DeltaTime) override;
 	APawn* PlayerPawn;
