@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "SiegeSmasher/MainCharacter.h"
 #include "Sword.generated.h"
 
 UCLASS()
@@ -23,13 +24,25 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "default")
+	USceneComponent* Root;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "default")
+	UStaticMeshComponent* Mesh;
+
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-private:
-	UPROPERTY(VisibleAnywhere)
-	USceneComponent* Root;
+	void setCollisionEnemy();
+	void setCollisionDefault();
 
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* Mesh;
+	UPROPERTY(EditAnywhere)
+	float Damage = 10;
+
+	bool bHitDetected;
+	FTimerHandle TimerHandle;
+	FString ColStore = "";
+	void ResetHit();
+private:
+	
 };

@@ -4,6 +4,7 @@
 #include "AI/AttackBTTaskNode.h"
 #include "AIController.h"
 #include "SiegeSmasher/MainCharacter.h"
+#include "AI/Sword.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -16,7 +17,19 @@ EBTNodeResult::Type UAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Failed;
 	}
 
+	/*ASword* Sword = Cast<ASword>(OwnerComp.GetClass());
+	if (Sword == nullptr)
+	{
+		GLog->Log(FString::Printf(TEXT("Failed PlayerChar")));
+		return EBTNodeResult::Failed;
+	}
 
+	else
+	{
+		Sword->setCollisionEnemy();
+		GLog->Log("Collision set to enemy");
+	}*/
+	
 	AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	AMainCharacter* PlayerCharacter = Cast<AMainCharacter>(Player);
 

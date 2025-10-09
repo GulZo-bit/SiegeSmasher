@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AI/Sword.h"
-#include "SiegeSmasher/MainCharacter.h"
+
 
 // Sets default values
 ASword::ASword()
@@ -14,10 +14,12 @@ ASword::ASword()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 
-	Mesh->SetCollisionResponseToAllChannels(ECR_Block);
+	Mesh->BodyInstance.SetCollisionProfileName(TEXT("Enemy"));
+	//Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Mesh->BodyInstance.SetInstanceNotifyRBCollision(true);
-	Mesh->SetupAttachment(Root);
+	Mesh->AttachToComponent(Root, FAttachmentTransformRules::KeepRelativeTransform);
 
+	Mesh->SetupAttachment(Root);
 	Mesh->OnComponentHit.AddDynamic(this, &ASword::OnHit);
 }
 
@@ -37,10 +39,33 @@ void ASword::Tick(float DeltaTime)
 
 void ASword::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	GLog->Log("In hit");
 	if (Cast<AMainCharacter>(OtherActor))
 	{
-		GLog->Log("Character Hit Detected");
+		GetWorldTimerManager().ClearTimer(TimerHandle);
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &ASword::ResetHit, 1.0f, false, 0.1f);
+
+		if (bHitDetected == false)
+		{
+			AMainCharacter* MainChar = Cast<AMainCharacter>(OtherActor);
+			MainChar->setHealth(MainChar->getHealth() - Damage);
+			GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
+			//GLog->Log(FString::SanitizeFloat(MainChar->GetVelocity().Length()));
+		}
+		
 	}
 }
 
+void ASword::ResetHit()
+{
+	bHitDetected = false;
+}
+
+void ASword::setCollisionEnemy()
+{
+	Mesh->BodyInstance.SetCollisionProfileName(TEXT("Enemy"));
+}
+
+void ASword::setCollisionDefault()
+{
+	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+}
