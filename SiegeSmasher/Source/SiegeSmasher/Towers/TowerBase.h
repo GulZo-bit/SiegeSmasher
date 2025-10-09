@@ -5,7 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
-#include "Math/MathFwd.h"
+#include "Math/MathFwd.h" 
+#include "Math/Vector.h"
 #include "TowerBase.generated.h"
 
 UCLASS()
@@ -18,7 +19,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
 	FVector GetPlacementColliderHalfExtents();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
-	void ResolvePlacement(FVector SurfaceHalfExtents, FVector SurfacePos, FVector PlacementPosition, FVector CamDir);
+	void ResolvePlacement(FVector SurfaceHalfExtents, FVector SurfacePos, FVector PlacementPosition, FVector CamDir,FVector CamPos, FTransform surfaceTransform);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

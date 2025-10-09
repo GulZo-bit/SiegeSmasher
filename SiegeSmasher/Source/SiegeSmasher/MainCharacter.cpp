@@ -145,15 +145,19 @@ void AMainCharacter::HandleTowerPlacement()
 	FVector start = camera->GetComponentLocation() + PlayerCameForward;
 
 	FVector end = start + PlayerCameForward * PlayerPlacementDistances;
-	DrawDebugLine(World, start, end, FColor::Blue);
-	DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
+	
 
 	if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
 	{
-		FVector SurfaceExtents = PlacementSurfaceResult.GetComponent()->GetCollisionShape().GetBox();
-		FVector SurfaceOrigin = PlacementSurfaceResult.GetComponent()->GetComponentLocation();
-
-		Selected->ResolvePlacement(SurfaceExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward);
+		UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
+		
+		FVector SurfaceOrigin = HitComponent->GetComponentLocation(); 
+		FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
+		FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
+    
+		DrawDebugLine(World, start, end, FColor::Blue);
+		DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
+		Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint,PlayerCameForward, camera->GetComponentLocation(), SurfaceTransform);
 	};
 
 
