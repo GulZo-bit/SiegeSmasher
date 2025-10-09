@@ -63,7 +63,9 @@ public:
 
 	void Jumping();
 
+	void setHealth(float HealthStore);
 
+	float getHealth();
 private:
 
 	UCameraComponent* camera;
@@ -71,6 +73,7 @@ private:
 	ATowerBase* Selected;
 	UWorld* World;
 
+	float Health = 100.0f;
 
 private:
 

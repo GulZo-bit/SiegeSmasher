@@ -191,3 +191,12 @@ void AMainCharacter::InitialiseTowers()
 
 }
 
+void AMainCharacter::setHealth(float HealthStore)
+{
+	Health = HealthStore;
+}
+
+float AMainCharacter::getHealth()
+{
+	return Health;
+}
