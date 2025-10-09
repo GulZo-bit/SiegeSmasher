@@ -16,10 +16,11 @@ EBTNodeResult::Type UAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Failed;
 	}
 
+
 	AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	AMainCharacter* PlayerCharacter = Cast<AMainCharacter>(Player);
 
-	if (PlayerCharacter == nullptr)
+	/*if (PlayerCharacter == nullptr)
 	{
 		GLog->Log(FString::Printf(TEXT("Failed PlayerChar")));
 		return EBTNodeResult::Failed;
@@ -29,6 +30,6 @@ EBTNodeResult::Type UAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& Owner
 	{
 		PlayerCharacter->setHealth(PlayerCharacter->getHealth() - Damage);
 		GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), PlayerCharacter->getHealth()));
-	}
+	}*/
 	return EBTNodeResult::Succeeded;
 }

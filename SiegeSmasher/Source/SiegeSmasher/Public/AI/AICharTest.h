@@ -7,6 +7,8 @@
 #include "CheckPointTest.h"
 #include "AICharTest.generated.h"
 
+class ASword;
+
 UCLASS()
 class SIEGESMASHER_API AAICharTest : public ACharacter
 {
@@ -29,4 +31,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	TArray<AActor*> getCheckpoints();
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ASword> SwordClass;
+
+	UPROPERTY()
+	ASword* Sword;
 };

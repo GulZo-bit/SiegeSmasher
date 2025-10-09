@@ -20,4 +20,5 @@ protected:
 public:
 	UPROPERTY(EditAnywhere)
 	float Damage;
+	TArray<AActor*> OverlappingActors;
 };

@@ -2,6 +2,7 @@
 
 
 #include "AI/AICharTest.h"
+#include "AI/Sword.h"
 
 // Sets default values
 AAICharTest::AAICharTest()
@@ -15,6 +16,15 @@ AAICharTest::AAICharTest()
 void AAICharTest::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	//Sword Stuff
+	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);
+
+	if (Sword != nullptr)
+	{
+		Sword->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SwordSocket"));
+		Sword->SetOwner(this);
+	}
 	
 }
 
