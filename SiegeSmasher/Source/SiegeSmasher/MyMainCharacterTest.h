@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "PlayerArrow.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
@@ -57,4 +58,18 @@ public:
 	void Look(const FInputActionValue& Value);
 
 	void Jumping();
+
+	//input for triggering the shooting action
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputAction* ShootAction;
+	//Offset of the bow from the camera
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+	FVector BowOffset;
+
+	//Projectile class to spawn.
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class APlayerArrow> ArrowClass;
+
+	//function that handles shooting
+	void Shoot();
 };

@@ -90,6 +90,8 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::Look);
 
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::Shoot);
+
 	}
 }
 
@@ -132,5 +134,39 @@ void AMainCharacterTest::Look(const FInputActionValue& Value)
 void AMainCharacterTest::Jumping()
 {
 	Jump();
+}
+
+void AMainCharacterTest::Shoot()
+{
+	//Attempt to shoot a projectile.
+	if (ArrowClass)
+	{
+		// Get the camera transform.
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetActorEyesViewPoint(CameraLocation, CameraRotation);
+		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
+		BowOffset.Set(0.0f, 0.0f, 50.0f);
+		// Transform MuzzleOffset from camera space to world space.
+		FVector BowLocation = CameraLocation + FTransform(CameraRotation).TransformVector(BowOffset);
+		FRotator BowRotation = CameraRotation;
+
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+
+			APlayerArrow* Arrow = World->SpawnActor<APlayerArrow>(ArrowClass, BowLocation, CameraRotation, SpawnParams);
+
+			if (Arrow)
+			{
+				FVector LaunchDirection = BowRotation.Vector();
+				Arrow->FireInDirection(LaunchDirection);
+
+			}
+		}
+	}
 }
 
