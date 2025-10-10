@@ -25,6 +25,13 @@ AMainCharacterTest::AMainCharacterTest()
 	//Attach CameraComponent as a child of Spring Arm
 	TPSCameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 
+	static ConstructorHelpers::FObjectFinder<UAnimBlueprint>PlayerAnim(TEXT("/Game/MainCharacter/ABP_MainCharacter.ABP_MainCharacter"));
+	if (PlayerAnim.Succeeded()) 
+	{
+		PlayerAnimBP = PlayerAnim.Object;
+	}
+
+	PlayerAnimBP->execBoolVariable(,)
 }
 
 // Called when the game starts or when spawned
@@ -169,4 +176,14 @@ void AMainCharacterTest::Shoot()
 		}
 	}
 }
+
+//bool AMainCharacterTest::GetArrowDrawn()
+//{
+//	return ArrowDrawn;
+//}
+//
+//void AMainCharacterTest::SetArrowDrawn(bool isArrowDrawn)
+//{
+//	ArrowDrawn = isArrowDrawn;
+//}
 

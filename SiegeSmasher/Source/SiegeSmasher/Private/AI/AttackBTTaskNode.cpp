@@ -25,10 +25,10 @@ EBTNodeResult::Type UAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Failed;
 	}
 
-	else
+	/*else
 	{
 		PlayerCharacter->setHealth(PlayerCharacter->getHealth() - Damage);
 		GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), PlayerCharacter->getHealth()));
-	}
+	}*/
 	return EBTNodeResult::Succeeded;
 }

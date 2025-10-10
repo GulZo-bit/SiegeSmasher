@@ -36,6 +36,12 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComponent;
 
+	UPROPERTY()
+	UAnimBlueprint* PlayerAnimBP;
+
+	//UPROPERTY(VisibleAnywhere, Category = "Input");
+	//bool ArrowDrawn;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputMappingContext* DefaultContext; //The defult input mapping context. This will change depending on what context the player is in such as driving.
 
@@ -72,4 +78,11 @@ public:
 
 	//function that handles shooting
 	void Shoot();
+
+	//UFUNCTION(BlueprintCallable)
+	//bool GetArrowDrawn();
+
+	//UFUNCTION(BlueprintCallable)
+	//void SetArrowDrawn(bool isArrowDrawn);
+
 };
