@@ -30,18 +30,25 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "default")
 	UStaticMeshComponent* Mesh;
 
+	/*UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);*/
+
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverLapEnd(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	void setCollisionEnemy();
 	void setCollisionDefault();
 
 	UPROPERTY(EditAnywhere)
-	float Damage = 10;
+	float Damage = 5;
 
 	bool bHitDetected;
 	FTimerHandle TimerHandle;
 	FString ColStore = "";
+	bool bHit = false;
 	void ResetHit();
 private:
 	
