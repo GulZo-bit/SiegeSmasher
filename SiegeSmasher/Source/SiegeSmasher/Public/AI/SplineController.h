@@ -26,6 +26,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SplineController")
 	USplineComponent* Spline;
 
+	//Controls the speed that an actor takes the spline. Lower values = faster. Larger = slower.
 	UPROPERTY(EditAnywhere, Category = "SplineController")
 	float TotalPathTimeController;
 
