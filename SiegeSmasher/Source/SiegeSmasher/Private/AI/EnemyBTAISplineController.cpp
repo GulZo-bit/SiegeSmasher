@@ -14,17 +14,34 @@ void AEnemyBTAISplineController::BeginPlay()
 	{
 		RunBehaviorTree(AIBehavior);
 		
-		//Get the actors attached to the spline.
-		TArray<AActor*> TempActorStore;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASplineMovementActor::StaticClass(), TempActorStore);
+		AIController = this;
+		APawn* ControlledPawn = AIController->GetPawn();
 
-		for (int i = 0; i < TempActorStore.Num(); i++)
+		if (ControlledPawn != nullptr)
 		{
-			SplineMovementActorStore.Add(Cast<ASplineMovementActor>(TempActorStore[i]));
-		}
+			GLog->Log("Controlled Pawn Found");
+			ChildActor = ControlledPawn->FindComponentByClass<UChildActorComponent>();
 
-		//Assign which spline to follow randomly to create variation.
-		GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), SplineMovementActorStore[FMath::RandRange(0, SplineMovementActorStore.Num() - 1)]);
+			if (ChildActor != nullptr)
+			{
+				GLog->Log("Child Pawn Found");
+				CubeStore = ChildActor->GetChildActor();
+				GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+			}
+		}
+		
+		//Get the actors attached to the spline.
+		//TArray<AActor*> TempActorStore;
+		//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASplineMovementActor::StaticClass(), TempActorStore);
+
+		//for (int i = 0; i < TempActorStore.Num(); i++)
+		//{
+		//	SplineMovementActorStore.Add(Cast<ASplineMovementActor>(TempActorStore[i]));
+		//}
+
+		////Assign which spline to follow randomly to create variation.
+		//GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), SplineMovementActorStore[FMath::RandRange(0, SplineMovementActorStore.Num() - 1)]);
+
 	}
 }
 

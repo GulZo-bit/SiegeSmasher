@@ -24,6 +24,9 @@ public:
 
 	ASplineMovementActor* SplineMovementActor;
 	TArray<ASplineMovementActor*> SplineMovementActorStore;
+	AAIController* AIController;
+	UChildActorComponent* ChildActor;
+	AActor* CubeStore;
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
