@@ -29,18 +29,6 @@ void AEnemyBTAISplineController::BeginPlay()
 				GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
 			}
 		}
-		
-		//Get the actors attached to the spline.
-		//TArray<AActor*> TempActorStore;
-		//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASplineMovementActor::StaticClass(), TempActorStore);
-
-		//for (int i = 0; i < TempActorStore.Num(); i++)
-		//{
-		//	SplineMovementActorStore.Add(Cast<ASplineMovementActor>(TempActorStore[i]));
-		//}
-
-		////Assign which spline to follow randomly to create variation.
-		//GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), SplineMovementActorStore[FMath::RandRange(0, SplineMovementActorStore.Num() - 1)]);
 
 	}
 }

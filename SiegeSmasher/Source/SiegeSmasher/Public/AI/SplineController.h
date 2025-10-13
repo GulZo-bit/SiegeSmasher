@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "AI/AICharTest.h"
 #include "Components/SplineComponent.h"
 #include "SplineController.generated.h"
 
@@ -44,12 +43,10 @@ public:
 	void setTotalPathTimeController(float TotalPathTimeStore);
 	float getTotalPathTimeController();
 
-	AAICharTest* EnemyStore;
 	UChildActorComponent* ChildActor;
 	AActor* CubeStore;
 	
 	TArray<AActor*> EnemyActorStore;
-	TArray<AAICharTest*> EnemyStoreArray;
 	TArray<UChildActorComponent*> ChildActorArray;
 	TArray<AActor*> CubeStoreArray;
 

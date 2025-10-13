@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CheckPointTest.h"
+#include "AI/SplineController.h"
 #include "AICharTest.generated.h"
 
 class ASword;
@@ -37,4 +38,10 @@ public:
 
 	UPROPERTY()
 	ASword* Sword;
+
+	FName Tag = FName(TEXT("SplineMovementActor")); //Tag used to find the correct child actor.
+	TArray<ASplineController*> SplineControllerStore; //Stores the multiple splines in the scene
+	AActor* CubeStore; //Stores the cube of the enmey.
+	int32 SplineNum; //Number that will be set randomly based on how many splines are in the scene.
+	float StartTime;
 };
