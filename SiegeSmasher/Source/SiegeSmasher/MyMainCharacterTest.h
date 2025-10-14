@@ -33,14 +33,15 @@ public:
 	//Camera and Spring arm components
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	UCameraComponent* TPSCameraComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	USpringArmComponent* SpringArmComponent;
 
-	UPROPERTY()
-	UAnimBlueprint* PlayerAnimBP;
 
-	//UPROPERTY(VisibleAnywhere, Category = "Input");
-	//bool ArrowDrawn;
+	UPROPERTY(VisibleAnywhere, Category = "Input");
+	bool ArrowDrawn;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input");
+	bool ArrowFired;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputMappingContext* DefaultContext; //The defult input mapping context. This will change depending on what context the player is in such as driving.
@@ -68,6 +69,12 @@ public:
 	//input for triggering the shooting action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* ShootAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputAction* DrawAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputAction* StopAimAction;
 	//Offset of the bow from the camera
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
 	FVector BowOffset;
@@ -79,10 +86,19 @@ public:
 	//function that handles shooting
 	void Shoot();
 
-	//UFUNCTION(BlueprintCallable)
-	//bool GetArrowDrawn();
+	void DrawBow();
 
-	//UFUNCTION(BlueprintCallable)
-	//void SetArrowDrawn(bool isArrowDrawn);
+	void StopAim();
 
+	UFUNCTION(BlueprintCallable)
+	bool GetArrowDrawn();
+
+	UFUNCTION(BlueprintCallable)
+	void SetArrowDrawn(bool isArrowDrawn);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetArrowFired();
+
+	UFUNCTION(BlueprintCallable)
+	void SetArrowFired(bool isArrowDrawn);
 };

@@ -25,13 +25,7 @@ AMainCharacterTest::AMainCharacterTest()
 	//Attach CameraComponent as a child of Spring Arm
 	TPSCameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 
-	static ConstructorHelpers::FObjectFinder<UAnimBlueprint>PlayerAnim(TEXT("/Game/MainCharacter/ABP_MainCharacter.ABP_MainCharacter"));
-	if (PlayerAnim.Succeeded()) 
-	{
-		PlayerAnimBP = PlayerAnim.Object;
-	}
-
-	PlayerAnimBP->execBoolVariable(,)
+	
 }
 
 // Called when the game starts or when spawned
@@ -99,6 +93,10 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::Shoot);
 
+		EnhancedInputComponent->BindAction(DrawAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::DrawBow);
+
+		EnhancedInputComponent->BindAction(StopAimAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::StopAim);
+
 	}
 }
 
@@ -153,7 +151,7 @@ void AMainCharacterTest::Shoot()
 		FRotator CameraRotation;
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
 		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		BowOffset.Set(0.0f, 0.0f, 50.0f);
+		BowOffset.Set(0.0f, 10.0f, 0.0f);
 		// Transform MuzzleOffset from camera space to world space.
 		FVector BowLocation = CameraLocation + FTransform(CameraRotation).TransformVector(BowOffset);
 		FRotator BowRotation = CameraRotation;
@@ -171,19 +169,43 @@ void AMainCharacterTest::Shoot()
 			{
 				FVector LaunchDirection = BowRotation.Vector();
 				Arrow->FireInDirection(LaunchDirection);
-
+				SetArrowDrawn(false);
+				SetArrowFired(true);
 			}
 		}
 	}
 }
 
-//bool AMainCharacterTest::GetArrowDrawn()
-//{
-//	return ArrowDrawn;
-//}
-//
-//void AMainCharacterTest::SetArrowDrawn(bool isArrowDrawn)
-//{
-//	ArrowDrawn = isArrowDrawn;
-//}
+void AMainCharacterTest::DrawBow()
+{
+	SetArrowFired(false);
+	SetArrowDrawn(true);
+	//UE_LOG(LogTemp, Warning, TEXT("bIsActive: %s"), ArrowDrawn ? TEXT("true") : TEXT("false"));
+}
+
+bool AMainCharacterTest::GetArrowDrawn()
+{
+	return ArrowDrawn;
+}
+
+void AMainCharacterTest::SetArrowDrawn(bool isArrowDrawn)
+{
+	ArrowDrawn = isArrowDrawn;
+}
+
+bool AMainCharacterTest::GetArrowFired()
+{
+	return ArrowFired;
+}
+
+void AMainCharacterTest::SetArrowFired(bool wasArrowShot)
+{
+	ArrowFired = wasArrowShot;
+}
+
+void AMainCharacterTest::StopAim()
+{
+	SetArrowDrawn(false);
+	SetArrowFired(true);
+}
 
