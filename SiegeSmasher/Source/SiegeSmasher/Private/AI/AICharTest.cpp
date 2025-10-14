@@ -2,6 +2,7 @@
 
 
 #include "AI/AICharTest.h"
+#include "AIController.h"
 #include "AI/Sword.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -18,6 +19,16 @@ void AAICharTest::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Begin play called")));
+	PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+
+	Controller = Cast<AController*> (AEnemyBTAISplineController());
+	//AEnemyBTAISplineController* Temp = Cast<AEnemyBTAISplineController>(GetController());
+	if (GetController() == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Controller null")));
+	}
+
 	//Sword Stuff
 	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);
 
@@ -90,6 +101,8 @@ void AAICharTest::Tick(float DeltaTime)
 	FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
 	FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
 	CubeStore->SetActorRotation(Rotator);
+	
+	
 }
 
 // Called to bind functionality to input
@@ -97,6 +110,30 @@ void AAICharTest::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+float AAICharTest::CheckDistanceToPlayer()
+{
+	FVector PlayerLocStore;
+	FVector EnemyLocStore;
+	float DistStore;
+	PlayerLocStore = PlayerPawn->GetActorLocation();
+	EnemyLocStore = this->GetActorLocation();
+	DistStore = FMath::Sqrt(((PlayerLocStore.X - EnemyLocStore.X) * (PlayerLocStore.X - EnemyLocStore.X)) + ((PlayerLocStore.Y - EnemyLocStore.Y) * (PlayerLocStore.Y - EnemyLocStore.Y)) + ((PlayerLocStore.Z - EnemyLocStore.Z) * (PlayerLocStore.Z - EnemyLocStore.Z)));
+
+	/*if (DistStore >= 0 && DistStore <= 200)
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), true);
+		SetFocus(PlayerPawn);
+	}
+
+	else
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), false);
+		ClearFocus(EAIFocusPriority::Gameplay);
+	}*/
+
+	return DistStore;
 }
 
 TArray<AActor*> AAICharTest::getCheckpoints()

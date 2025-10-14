@@ -17,11 +17,15 @@ class SIEGESMASHER_API AEnemyBTAISplineController : public AAIController
 public:
 
 protected:
-	virtual void BeginPlay() override;
-
+	
+	void CheckDistanceToPlayer();
+	void CheckPlayerDirection();
 public:
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	APawn* PlayerPawn;
+	APawn* ControlledPawn;
 	ASplineMovementActor* SplineMovementActor;
 	TArray<ASplineMovementActor*> SplineMovementActorStore;
 	AAIController* AIController;

@@ -6,12 +6,14 @@
 #include "GameFramework/Character.h"
 #include "CheckPointTest.h"
 #include "AI/SplineController.h"
+#include "EnemyBTAISplineController.h"
+#include "../Enemies/EnemyBase.h"
 #include "AICharTest.generated.h"
 
 class ASword;
 
 UCLASS()
-class SIEGESMASHER_API AAICharTest : public ACharacter
+class SIEGESMASHER_API AAICharTest : public AEnemyBase
 {
 	GENERATED_BODY()
 
@@ -24,6 +26,7 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, Category = "Checkpoints")
 	TArray<AActor*> CheckpointStore;
+	float CheckDistanceToPlayer();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -38,6 +41,8 @@ public:
 
 	UPROPERTY()
 	ASword* Sword;
+
+	APawn* PlayerPawn;
 
 	FName Tag = FName(TEXT("SplineMovementActor")); //Tag used to find the correct child actor.
 	TArray<ASplineController*> SplineControllerStore; //Stores the multiple splines in the scene
