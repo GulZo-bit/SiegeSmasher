@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Checkpoints")
 	TArray<AActor*> CheckpointStore;
 	float CheckDistanceToPlayer();
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	TSubclassOf<class AAIController> AIControllerClass;*/
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -49,4 +52,5 @@ public:
 	AActor* CubeStore; //Stores the cube of the enmey.
 	int32 SplineNum; //Number that will be set randomly based on how many splines are in the scene.
 	float StartTime;
+
 };

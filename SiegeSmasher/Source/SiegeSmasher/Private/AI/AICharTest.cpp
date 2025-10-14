@@ -12,22 +12,25 @@ AAICharTest::AAICharTest()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//AIControllerClass = AEnemyBTAISplineController::StaticClass();
+
+	//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 // Called when the game starts or when spawned
 void AAICharTest::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Begin play called")));
-	PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-	Controller = Cast<AController*> (AEnemyBTAISplineController());
-	//AEnemyBTAISplineController* Temp = Cast<AEnemyBTAISplineController>(GetController());
-	if (GetController() == nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Controller null")));
-	}
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Begin play called")));
+	//PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+
+	////Controller = Cast<AController*> (AEnemyBTAISplineController());
+	////AEnemyBTAISplineController* Temp = Cast<AEnemyBTAISplineController>(GetController());
+	//if (GetController() == nullptr)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Controller null")));
+	//}
 
 	//Sword Stuff
 	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);

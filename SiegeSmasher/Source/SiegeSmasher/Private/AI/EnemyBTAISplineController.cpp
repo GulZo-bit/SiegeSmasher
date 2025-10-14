@@ -12,24 +12,9 @@ void AEnemyBTAISplineController::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Begin play called")));
 	if (AIBehavior != nullptr)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Found Behaviour tree")));
 		RunBehaviorTree(AIBehavior);
 		PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-
-		AIController = this;
-		ControlledPawn = AIController->GetPawn();
-
-		if (ControlledPawn != nullptr)
-		{
-			GLog->Log("Controlled Pawn Found");
-			ChildActor = ControlledPawn->FindComponentByClass<UChildActorComponent>();
-
-			if (ChildActor != nullptr)
-			{
-				GLog->Log("Child Pawn Found");
-				CubeStore = ChildActor->GetChildActor();
-				GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
-			}
-		}
 
 	}
 }
@@ -38,24 +23,9 @@ void AEnemyBTAISplineController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CheckDistanceToPlayer();
-}
+	GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
 
-void AEnemyBTAISplineController::CheckPlayerDirection()
-{
-
-}
-
-void AEnemyBTAISplineController::CheckDistanceToPlayer()
-{
-	FVector PlayerLocStore;
-	FVector EnemyLocStore;
-	float DistStore;
-	PlayerLocStore = PlayerPawn->GetActorLocation();
-	EnemyLocStore = ControlledPawn->GetActorLocation();
-	DistStore = FMath::Sqrt(((PlayerLocStore.X - EnemyLocStore.X) * (PlayerLocStore.X - EnemyLocStore.X)) + ((PlayerLocStore.Y - EnemyLocStore.Y) * (PlayerLocStore.Y - EnemyLocStore.Y)) + ((PlayerLocStore.Z - EnemyLocStore.Z) * (PlayerLocStore.Z - EnemyLocStore.Z)));
-
-	if (DistStore >= 0 && DistStore <= 200)
+	if (CheckDistanceToPlayer() >= 0 && CheckDistanceToPlayer() <= 200 && CheckPlayerDirection() >= 0)
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), true);
 		SetFocus(PlayerPawn);
@@ -66,4 +36,50 @@ void AEnemyBTAISplineController::CheckDistanceToPlayer()
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), false);
 		ClearFocus(EAIFocusPriority::Gameplay);
 	}
+}
+
+void AEnemyBTAISplineController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	ControlledPawn = GetPawn();
+
+	if (ControlledPawn != nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Found Controlled Pawn")));
+		GLog->Log("Controlled Pawn Found");
+		ChildActor = ControlledPawn->FindComponentByClass<UChildActorComponent>();
+
+		if (ChildActor != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Child Pawn Found")));
+			
+			CubeStore = ChildActor->GetChildActor();
+		}
+	}
+}
+
+float AEnemyBTAISplineController::CheckPlayerDirection()
+{
+	FVector PawnForwardVector = ControlledPawn->GetActorForwardVector();
+	FVector PawnCurrentLocation = ControlledPawn->GetActorLocation();
+	FVector PlayerLocation = PlayerPawn->GetActorLocation();
+	
+	float DotProductResult = FVector::DotProduct(PawnForwardVector, (PlayerLocation - PawnCurrentLocation).GetSafeNormal());
+
+	return DotProductResult;
+}
+
+
+
+float AEnemyBTAISplineController::CheckDistanceToPlayer()
+{
+	FVector PlayerLocStore;
+	FVector EnemyLocStore;
+	float DistStore;
+	PlayerLocStore = PlayerPawn->GetActorLocation();
+	EnemyLocStore = ControlledPawn->GetActorLocation();
+	DistStore = FMath::Sqrt(((PlayerLocStore.X - EnemyLocStore.X) * (PlayerLocStore.X - EnemyLocStore.X)) + ((PlayerLocStore.Y - EnemyLocStore.Y) * (PlayerLocStore.Y - EnemyLocStore.Y)) + ((PlayerLocStore.Z - EnemyLocStore.Z) * (PlayerLocStore.Z - EnemyLocStore.Z)));
+
+	return DistStore;
 }

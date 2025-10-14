@@ -15,11 +15,12 @@ class SIEGESMASHER_API AEnemyBTAISplineController : public AAIController
 {
 	GENERATED_BODY()
 public:
-
 protected:
 	
-	void CheckDistanceToPlayer();
-	void CheckPlayerDirection();
+	float CheckDistanceToPlayer();
+	float CheckPlayerDirection();
+
+	virtual void OnPossess(APawn* InPawn) override;
 public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -31,6 +32,7 @@ public:
 	AAIController* AIController;
 	UChildActorComponent* ChildActor;
 	AActor* CubeStore;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
