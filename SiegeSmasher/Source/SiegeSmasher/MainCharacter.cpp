@@ -196,6 +196,23 @@ void AMainCharacter::InitialiseTowers()
 
 }
 
+void AMainCharacter::CallCreateLobby()
+{
+	UWorld* MultiWorld = GetWorld();
+	{
+		MultiWorld->ServerTravel("/Script/Engine.World'/Game/ZoTestMap.ZoTestMap'?listen");
+	}
+}
+
+void AMainCharacter::CallClientTravel(const FString& Address)
+{
+	APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
+	if (PlayerController)
+	{
+		PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+	}
+}
+
 void AMainCharacter::setHealth(float HealthStore)
 {
 	Health = HealthStore;

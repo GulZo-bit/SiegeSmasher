@@ -66,6 +66,13 @@ public:
 	void setHealth(float HealthStore);
 
 	float getHealth();
+
+	//Online Lobby 
+	UFUNCTION(BlueprintCallable)
+	void CallCreateLobby();
+
+	UFUNCTION(BlueprintCallable)
+	void CallClientTravel(const FString& Address);
 private:
 
 	UCameraComponent* camera;
