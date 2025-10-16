@@ -218,8 +218,13 @@ void AWaveManager::EvaluateEnemySpawning()
 		if (PotentialEnemyInstance == nullptr) {
 
 			GLog->Log(TEXT("could not get existing enemy instance attempting to spawn new enemy instance"));
-			PotentialEnemyInstance = CurrentSpawnPoint->SpawnEnemy(CurrentEnemyToSpawn);
-			EnemyPools[CurrentEnemyToSpawn->GetEnemyWaveType()].Add(PotentialEnemyInstance);
+			//For multiplayer. This makes it so that only the server can spawn enemies in. This way we only have the right amount of enemies spawning.
+			if (HasAuthority())
+			{
+				PotentialEnemyInstance = CurrentSpawnPoint->SpawnEnemy(CurrentEnemyToSpawn);
+				EnemyPools[CurrentEnemyToSpawn->GetEnemyWaveType()].Add(PotentialEnemyInstance);
+			}
+			
 		}
 
 		EnemyWaveContribution[CurrentEnemyToSpawn->GetEnemyWaveType()] -= 1;

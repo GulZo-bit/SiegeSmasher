@@ -28,8 +28,6 @@ protected:
 	TArray<AActor*> CheckpointStore;
 	float CheckDistanceToPlayer();
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-	TSubclassOf<class AAIController> AIControllerClass;*/
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -45,10 +43,13 @@ public:
 	UPROPERTY()
 	ASword* Sword;
 
+	UPROPERTY()
 	APawn* PlayerPawn;
 
 	FName Tag = FName(TEXT("SplineMovementActor")); //Tag used to find the correct child actor.
+	UPROPERTY()
 	TArray<ASplineController*> SplineControllerStore; //Stores the multiple splines in the scene
+	UPROPERTY()
 	AActor* CubeStore; //Stores the cube of the enmey.
 	int32 SplineNum; //Number that will be set randomly based on how many splines are in the scene.
 	float StartTime;

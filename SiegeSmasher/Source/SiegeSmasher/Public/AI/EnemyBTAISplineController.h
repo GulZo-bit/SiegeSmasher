@@ -25,12 +25,13 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY()
 	APawn* PlayerPawn;
+	UPROPERTY()
 	APawn* ControlledPawn;
-	ASplineMovementActor* SplineMovementActor;
-	TArray<ASplineMovementActor*> SplineMovementActorStore;
-	AAIController* AIController;
+	UPROPERTY()
 	UChildActorComponent* ChildActor;
+	UPROPERTY()
 	AActor* CubeStore;
 	
 private:

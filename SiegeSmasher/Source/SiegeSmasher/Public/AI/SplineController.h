@@ -30,25 +30,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "SplineController")
 	float TotalPathTimeController;
 
-	float StartTime;
-
-	UPROPERTY(EditDefaultsOnly, Category = "SplineController")
-	TSubclassOf<class AActor> ActorToMoveClass;
-
-	class AActor* ActorToMove;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void setTotalPathTimeController(float TotalPathTimeStore);
 	float getTotalPathTimeController();
-
-	UChildActorComponent* ChildActor;
-	AActor* CubeStore;
-	
-	TArray<AActor*> EnemyActorStore;
-	TArray<UChildActorComponent*> ChildActorArray;
-	TArray<AActor*> CubeStoreArray;
 
 	USplineComponent* getSpline();
 };
