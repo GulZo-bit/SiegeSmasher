@@ -46,6 +46,8 @@ public:
 	UPROPERTY()
 	APawn* PlayerPawn;
 
+	TArray<AActor*> PlayerActorArray;
+
 	FName Tag = FName(TEXT("SplineMovementActor")); //Tag used to find the correct child actor.
 	UPROPERTY()
 	TArray<ASplineController*> SplineControllerStore; //Stores the multiple splines in the scene

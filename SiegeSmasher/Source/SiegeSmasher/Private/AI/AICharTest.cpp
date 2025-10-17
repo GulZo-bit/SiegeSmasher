@@ -32,6 +32,9 @@ void AAICharTest::BeginPlay()
 	//	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Controller null")));
 	//}
 
+	
+	
+
 	//Sword Stuff
 	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);
 

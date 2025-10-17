@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "SplineMovementActor.h"
+#include "../MainCharacter.h"
 #include "EnemyBTAISplineController.generated.h"
 
 /**
@@ -33,8 +34,13 @@ public:
 	UChildActorComponent* ChildActor;
 	UPROPERTY()
 	AActor* CubeStore;
+
+	UPROPERTY()
+	TArray<AActor*> PlayerActorArray;
 	
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
+
+	int32 Loop = 0;
 };

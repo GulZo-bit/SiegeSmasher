@@ -16,6 +16,14 @@ void AEnemyBTAISplineController::BeginPlay()
 		RunBehaviorTree(AIBehavior);
 		PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMainCharacter::StaticClass(), PlayerActorArray);
+		for (int i = 0; i < PlayerActorArray.Num(); i++)
+		{
+			if (PlayerActorArray[i] != nullptr)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Player Found")));
+			}
+		}
 	}
 }
 
@@ -77,9 +85,23 @@ float AEnemyBTAISplineController::CheckDistanceToPlayer()
 	FVector PlayerLocStore;
 	FVector EnemyLocStore;
 	float DistStore;
-	PlayerLocStore = PlayerPawn->GetActorLocation();
 	EnemyLocStore = ControlledPawn->GetActorLocation();
-	DistStore = FMath::Sqrt(((PlayerLocStore.X - EnemyLocStore.X) * (PlayerLocStore.X - EnemyLocStore.X)) + ((PlayerLocStore.Y - EnemyLocStore.Y) * (PlayerLocStore.Y - EnemyLocStore.Y)) + ((PlayerLocStore.Z - EnemyLocStore.Z) * (PlayerLocStore.Z - EnemyLocStore.Z)));
+	
+	//if (Loop < PlayerActorArray.Num())
+	//{
+		for (int i =0; i < PlayerActorArray.Num(); i++)
+		{
+			PlayerLocStore = PlayerActorArray[Loop]->GetActorLocation();
+			DistStore = FMath::Sqrt(((PlayerLocStore.X - EnemyLocStore.X) * (PlayerLocStore.X - EnemyLocStore.X)) + ((PlayerLocStore.Y - EnemyLocStore.Y) * (PlayerLocStore.Y - EnemyLocStore.Y)) + ((PlayerLocStore.Z - EnemyLocStore.Z) * (PlayerLocStore.Z - EnemyLocStore.Z)));
 
-	return DistStore;
+		}
+	//}
+		return DistStore;
+	/*else
+	{
+		Loop = 0;
+		return DistStore;
+	}*/
+	
+	
 }
