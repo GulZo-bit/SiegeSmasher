@@ -18,16 +18,13 @@ class SIEGESMASHER_API AEnemyBTAISplineController : public AAIController
 public:
 protected:
 	
-	float CheckDistanceToPlayer();
-	float CheckPlayerDirection();
+	void CheckDistanceAndDirectionToPlayer(); //Responsible for checking how far the players are from the enemy and if the enemy is facing them.
 
 	virtual void OnPossess(APawn* InPawn) override;
 public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY()
-	APawn* PlayerPawn;
 	UPROPERTY()
 	APawn* ControlledPawn;
 	UPROPERTY()
@@ -37,7 +34,9 @@ public:
 
 	UPROPERTY()
 	TArray<AActor*> PlayerActorArray;
-	
+
+	float DistStoreArray[4];
+	float DotProductArray[4];
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;

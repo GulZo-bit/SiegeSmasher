@@ -26,7 +26,6 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, Category = "Checkpoints")
 	TArray<AActor*> CheckpointStore;
-	float CheckDistanceToPlayer();
 
 public:	
 	// Called every frame
@@ -42,11 +41,6 @@ public:
 
 	UPROPERTY()
 	ASword* Sword;
-
-	UPROPERTY()
-	APawn* PlayerPawn;
-
-	TArray<AActor*> PlayerActorArray;
 
 	FName Tag = FName(TEXT("SplineMovementActor")); //Tag used to find the correct child actor.
 	UPROPERTY()
