@@ -10,8 +10,11 @@ ATowerBase::ATowerBase()
 	PrimaryActorTick.bCanEverTick = true;
 	BoxColliderForObjectPlacement = CreateDefaultSubobject<UBoxComponent>(TEXT("Box collider for placement"));
 	RootComponent = BoxColliderForObjectPlacement;
-	StaticMeshForTower = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("static mesh"));
-	StaticMeshForTower->SetupAttachment(RootComponent);
+	TriggerRangeBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger Box For Range"));
+
+	TriggerRangeBox->SetupAttachment(RootComponent);
+
+    
 
 }
 
@@ -46,11 +49,11 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	//GLog->Log(FString::Printf(TEXT("surface min %f %f %f"), SurfaceMin.X,SurfaceMin.Y, SurfaceMin.Z));
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("surface min %f %f %f"), SurfaceMin.X, SurfaceMin.Y, SurfaceMin.Z));
 	FVector PlacementBox = GetPlacementColliderHalfExtents();
-	FVector LocalPlacementPosition = PlacementPosition - SurfacePos;
+	FVector LocalPlacementPosition = (PlacementPosition - SurfacePos);
 	FQuat WorldRotation = surfaceTransform.GetRotation(); 
 	
 	
-	FQuat WorldRotExcludePitch= FQuat(WorldRotation.X, 0.0f, WorldRotation.Z, WorldRotation.W);
+	FQuat WorldRotExcludePitch= FQuat(WorldRotation.X, WorldRotation.Y, WorldRotation.Z, WorldRotation.W);
 	VectorRegister4 LocalTowerTest4 = (VectorQuaternionInverseRotateVector(MakeVectorRegister(WorldRotExcludePitch.X, WorldRotExcludePitch.Y, WorldRotExcludePitch.Z, WorldRotExcludePitch.W),
 		MakeVectorRegister(LocalPlacementPosition.X, LocalPlacementPosition.Y, LocalPlacementPosition.Z, (double)0.0f)));
 	FVector InvertedCamDir = -CamDir;
@@ -70,25 +73,61 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 
 	*/
 
-
+    
 
 	
 
 
 	FVector TowerMin = LocalTowerTestPos + FVector(-PlacementBox.X, -PlacementBox.Y, -PlacementBox.Z);
 	FVector TowerMax = LocalTowerTestPos + FVector(PlacementBox.X, PlacementBox.Y, PlacementBox.Z);
-	FVector TowerMinWorld = PlacementPosition + FVector(-PlacementBox.X, -PlacementBox.Y, -PlacementBox.Z);
-	FVector TowerMaxWorld = PlacementPosition + FVector(PlacementBox.X, PlacementBox.Y, PlacementBox.Z);
+	FVector TowerMinWorld =  PlacementPosition + surfaceTransform.Rotator().RotateVector(  FVector(-PlacementBox.X, -PlacementBox.Y, -PlacementBox.Z));
+	FVector TowerMaxWorld = PlacementPosition + surfaceTransform.Rotator().RotateVector( FVector(PlacementBox.X, PlacementBox.Y, PlacementBox.Z));
 	FVector LocalBoxMin = -SurfaceBoxExtents;
-	FVector LocalBoxMax = SurfaceBoxExtents;
+	FVector LocalBoxMax = SurfaceBoxExtents; 
+	FVector Range = LocalBoxMax - LocalBoxMin;
 	FVector WorldBoxMax = SurfacePos + surfaceTransform.GetRotation().RotateVector(LocalBoxMax); 
-	FVector WorldBoxMin = SurfacePos + surfaceTransform.GetRotation().RotateVector(LocalBoxMin); 
+	FVector WorldBoxMin = SurfacePos + surfaceTransform.GetRotation().RotateVector(LocalBoxMin);  
+
+
+	FBox LocalBox = FBox::BuildAABB(SurfacePos, SurfaceBoxExtents);
+
+
+	FVector worldRange = WorldBoxMax - WorldBoxMin;
+	
 
 
 
+	//float BoundsMinY =  std::min(WorldBoxMax.Y, WorldBoxMin.Y); 
+	//float BoundsMinX = std::min(WorldBoxMax.X, WorldBoxMin.X);
+	//float BoundsMinZ = std::min(WorldBoxMax.Z, WorldBoxMin.Z);
+
+	//float BoundsMaxY = WorldBoxMax.Y * (WorldBoxMax.Y > BoundsMinY) + WorldBoxMin.Y * (WorldBoxMin.Y > BoundsMinY);
+	//float BoundsMaxX = WorldBoxMax.X * (WorldBoxMax.X > BoundsMinX) + WorldBoxMin.X * (WorldBoxMin.X > BoundsMinX);
+	//float BoundsMaxZ = WorldBoxMax.Z * (WorldBoxMax.Z > BoundsMinZ) + WorldBoxMin.Z * (WorldBoxMin.Z > BoundsMinZ);
 
 
-	//potential solution to make placement position in lcoal space would be to use the percentage of the bounds 
+
+	//float PercentBoundsY = ((PlacementPosition.Y - BoundsMinY) / ( BoundsMaxY - BoundsMinY));
+	//float PercentBoundsX = ((PlacementPosition.X - BoundsMinX) / (BoundsMaxX - BoundsMinX));
+	//float PercentBoundsZ = ((PlacementPosition.Z - BoundsMinZ) / (BoundsMaxZ - BoundsMinZ));
+	
+	/*PercentBoundsY *= ((float(PlacementPosition.Y > SurfacePos.Y )) * 2.0f - 1.0f);
+	PercentBoundsX *= ((float(PlacementPosition.X > SurfacePos.X )) * 2.0f - 1.0f);
+	PercentBoundsZ *= ((float(PlacementPosition.Z > SurfacePos.Z )) * 2.0f - 1.0f);*/
+	
+	
+
+
+	
+
+	/*FVector LocalPlacementPositionPercent = FVector(PercentBoundsX ,PercentBoundsY,PercentBoundsZ) * SurfaceBoxExtents; 
+
+
+    LocalPlacementPosition.X *= (((PlacementPosition.X > SurfacePos.X) * 2.0f) - 1.0f);
+	LocalPlacementPosition.Y *= (((PlacementPosition.Y > SurfacePos.Y) * 2.0f) - 1.0f );
+	LocalPlacementPosition.Z *= (((PlacementPosition.Z > SurfacePos.Z) * 2.0f) - 1.0f );*/
+	
+	//potential solution to make placement position in lcoal space would be to use the percentage of the Bounds 
 	//that we are along in world space and then translate from the origin using those instead of trying to 
 	//a reverse transfomration which ends up being skewed due to us sometimes being further into the surface in world 
 	//than we would ever be in local space
@@ -103,6 +142,8 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	//local min
 	//DrawDebugLine(GetWorld(), FVector::ZeroVector,  LocalTowerTestPos , FColor::Red);
 	DrawDebugSphere(GetWorld(), LocalTowerTestPos, 50.0f, 8, FColor::Magenta);
+	//DrawDebugSphere(GetWorld(), LocalTowerTestPos, 50.0f, 8, FColor::Magenta);
+	/*DrawDebugSphere(GetWorld(), LocalPlacementPositionPercent, 50.0f, 8, FColor::Red);*/
 	DrawDebugBox(GetWorld(), FVector(LocalBoxMin.X,LocalBoxMin.Y,LocalBoxMin.Z  ), FVector(20.0f, 20.0f, 20.0f), FColor::Yellow);
 	DrawDebugBox(GetWorld(), FVector(LocalBoxMax.X, LocalBoxMax.Y, LocalBoxMax.Z ), FVector(20.0f, 20.0f, 20.0f), FColor::Magenta);
 	DrawDebugSphere(GetWorld(), TowerMin, 20.0f, 8, FColor::Emerald);
@@ -111,18 +152,26 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	DrawDebugSphere(GetWorld(), TowerMaxWorld, 20.0f, 8, FColor::Emerald); 
 	DrawDebugSphere(GetWorld(),  WorldBoxMin, 20.0f, 8, FColor::Blue); 
 	DrawDebugSphere(GetWorld(),  WorldBoxMax, 20.0f, 8, FColor::Emerald);
+
 	/*DrawDebugLine(GetWorld(), WorldBoxMin, TowerMinWorld, FColor::Red);
 	DrawDebugLine(GetWorld(), WorldBoxMax, TowerMaxWorld, FColor::Magenta);*/
-
+	//FVector SurfaceTransformRot surfaceTransform.GetRotation().Euler();
 	//width
-	
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("placement position percents  X:%f Y: %f z: %f"), PercentBoundsX, PercentBoundsY, PercentBoundsZ));
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("placement position bounds  X:%f Y: %f z: %f"), LocalPlacementPositionPercent.X, LocalPlacementPositionPercent.Y, LocalPlacementPositionPercent.Z));
+
 
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("min for box X:%f Y:%f Z:%f"), WorldBoxMin.X, WorldBoxMin.Y, WorldBoxMin.Z));
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("max for box X:%f Y:%f Z:%f"), WorldBoxMax.X, WorldBoxMax.Y, WorldBoxMax.Z));*/
 
 
-	//width
-	bool IsContainedWidth = TowerMin.Y >= LocalBoxMin.Y && TowerMax.Y <= LocalBoxMax.Y;
+	//width 
+
+
+
+	bool IsContainedWidth = TowerMin.Y >= LocalBoxMin.Y && TowerMax.Y <= LocalBoxMax.Y;  
 		/*((WorldBoxMin.Y > WorldBoxMax.Y) && (TowerMinWorld.Y >= WorldBoxMax.Y && TowerMaxWorld.Y <= WorldBoxMin.Y));
 		 */
 	//height
@@ -135,9 +184,9 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 		*/
 
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("IsContainedWidth: %d IsContainedHeight: %d IsContainedLength: %d"), IsContainedWidth, IsContainedHeight, IsContainedLength));
 	FVector3d CollisionResNormal = FVector3d(IsContainedWidth && IsContainedHeight, IsContainedHeight && IsContainedLength, IsContainedLength && IsContainedWidth);
 	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("normal x: %f y: %f z: %f"), CollisionResNormal.X, CollisionResNormal.Y, CollisionResNormal.Z));
 
 
 
@@ -150,6 +199,8 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 
 	FVector TransformedNormal = WorldRotation.RotateVector( CollisionResNormal);
 	
+
+
 	float normalDir = 1 + ((TransformedNormal.Dot(CamDir) > 0.0f) * -2.0f);
 	TransformedNormal *= normalDir;
 	FVector TrueNormalSigned = CollisionResNormal * normalDir; 
@@ -172,7 +223,10 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	
 
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("rot angle %f"), angle));*/
-	bool CeilingCheck = roundf(TrueNormalSigned.Dot(FVector::UpVector)) < 0.0f;
+	bool CeilingCheck = roundf(TrueNormalSigned.Dot(FVector::UpVector)) != 0.0f;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Ceiling check %d"), (int)CeilingCheck));
+
+
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("Dot for normal direction signed %f %f %f "), TrueNormalSigned.X,TrueNormalSigned.Y,TrueNormalSigned.Z));
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("angle between  normal and local up %f"), angle));
 	////GLog->Log(FString::Printf(TEXT("Dot for normal direction with up %f "), ColNormalDir));
@@ -183,27 +237,52 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	
 
 
-	FVector currentAxisUp = (FVector::UpVector * (1.0f - CeilingCheck) + FVector::RightVector * CeilingCheck) ;
+	FVector currentAxisUp = FVector::UpVector * (1.0f - CeilingCheck) + FVector::RightVector * CeilingCheck;
 	 
-	FVector axisOfRotation = surfaceTransform.Rotator().RotateVector(CollisionResNormal.Cross(currentAxisUp));;
-	FVector AxisOfRotationSkewed = axisOfRotation;
-	FVector trueAxisOfRotation = CollisionResNormal.Cross(currentAxisUp) ; 
+
+
+	FVector axisOfRotation = CollisionResNormal.Cross(currentAxisUp).GetAbs();
+
+	FVector TransFormedAxisOfRotation = TransformedNormal.Cross(currentAxisUp);
+
+	
+
+	bool CheckOppositeRotation = roundf(TransFormedAxisOfRotation.Dot(axisOfRotation)) == 0.0f;  
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("check opposite rotation: %d "), (int)CheckOppositeRotation));
+	FVector opposite = (axisOfRotation.Cross(currentAxisUp))*   ((float)CheckOppositeRotation);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("check opposite rotation v : %f %f %f "), opposite.X, opposite.Y, opposite.Z ));
+
+
+	if (CheckOppositeRotation){
+		axisOfRotation = (axisOfRotation.Cross(currentAxisUp)) *(1.0f - CeilingCheck) + axisOfRotation * CeilingCheck;
+	    
+	}
+
+	//currentAxisUp = currentAxisUp * (1.0f - (CeilingCheck && CheckOppositeRotation) + opposite.Cross(currentAxisUp) * (CeilingCheck && CheckOppositeRotation));
+
+
+
+	//(1.0f - CeilingCheck)) + (CollisionResNormal.Cross(FVector::ForwardVector) * CeilingCheck); 
+	FQuat rotationForAxis = FQuat(FVector(0.0f, 0.0f, surfaceTransform.Rotator().GetComponentForAxis(EAxis::Z)), surfaceTransform.GetRotation().Euler().Z);
+	FVector AxisOfRotationSkewed = rotationForAxis.RotateVector(axisOfRotation);
+	FVector trueAxisOfRotation = CollisionResNormal.Cross(currentAxisUp); 
 	VectorRegister4 AxisRotationNoSkewStore = VectorRound(MakeVectorRegisterFloat(axisOfRotation.X,axisOfRotation.Y,axisOfRotation.Z,0.0f));
 
-	VectorStoreFloat3(AxisRotationNoSkewStore, &axisOfRotation);
-
+	VectorStoreFloat3(AxisRotationNoSkewStore, &AxisOfRotationSkewed);
 	float anglePicthDot = TransformedNormal.Dot(FVector::UpVector);
 	FVector PitchAxis = currentAxisUp.Cross(FVector::ForwardVector);;
 	FVector test = TransformedNormal.Cross(FVector::UpVector) ;
 	FVector pitchCrossTest = TransformedNormal.Cross(FVector::UpVector);
 
-	FVector pitchCross =  TransformedNormal.Cross(FVector::UpVector) * axisOfRotation ;
+	FVector pitchCross =  TransformedNormal.Cross(FVector::UpVector) * axisOfRotation.GetAbs() ;
 	float anglePitchCross = pitchCross.X + pitchCross.Y + pitchCross.Z;
 	
 
 	double angle = atan2(anglePitchCross, anglePicthDot);
 
-	
+
+
 
      
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("pitchc x %f  pitchc y %f pitchc z %f"), pitchCrossTest.X, pitchCrossTest.Y, pitchCrossTest.Z));
@@ -218,7 +297,7 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 
 
 
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("pitch dot %f  pitch cross %f pitch angle %f"), anglePicthDot, anglePitchCross, FMath::RadiansToDegrees(angle)));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("pitch dot %f  pitch cross %f pitch angle %f"), anglePicthDot, anglePitchCross, FMath::RadiansToDegrees(angle)));
 
 	//angle *= sin(angle); 
 
@@ -232,13 +311,16 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	//DrawDebugLine(GetWorld(), PlacementPosition, PlacementPosition + up * FVector(200.0f, 200.0f, 200.0f), FColor::Magenta);
 
 
-	//DrawDebugLine(GetWorld(), PlacementPosition, PlacementPosition + axisOfRotation * FVector(400.0f, 400.0f, 400.0f), FColor::Yellow);
+	DrawDebugLine(GetWorld(), PlacementPosition, PlacementPosition + axisOfRotation * FVector(400.0f, 400.0f, 400.0f), FColor::Yellow);
+	DrawDebugLine(GetWorld(), PlacementPosition, PlacementPosition + TransFormedAxisOfRotation * FVector(400.0f, 400.0f, 400.0f), FColor::Green);
+
 	//DrawDebugLine(GetWorld(), PlacementPosition, PlacementPosition + AxisOfRotationSkewed * FVector(400.0f, 400.0f, 400.0f), FColor::Red);
 
 
 	//GLog->Log(FString::Printf(TEXT("axis rot X:%f Y:%f Z:%f"), axisOfRotation.X, axisOfRotation.Y, axisOfRotation.Z));
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("true axis rot X:%f Y:%f Z:%f"), trueAxisOfRotation.X, trueAxisOfRotation.Y, trueAxisOfRotation.Z));
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("axis rot X:%f Y:%f Z:%f"), axisOfRotation.X, axisOfRotation.Y, axisOfRotation.Z));
+
 
 	//GLog->Log(FString::Printf(TEXT("axis of rotation skewed X:%f Y:%f Z:%f"), AxisOfRotationSkewed.X, AxisOfRotationSkewed.Y, AxisOfRotationSkewed.Z));
 	//////GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("up rot X:%f Y:%f Z:%f"), up.X, up.Y, up.Z));
@@ -251,7 +333,7 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("pitcDir %f "), pitchDir));
 
 
-	FRotator RotatorPitch= FRotator(angleDeg * trueAxisOfRotation.Y  , angleDeg * trueAxisOfRotation.Z , angleDeg * trueAxisOfRotation.X );
+	FRotator RotatorPitch= FRotator(angleDeg * axisOfRotation.Y  , angleDeg * axisOfRotation.Z , angleDeg * axisOfRotation.X );
 	FTransform transform = FTransform(RotatorPitch, ResolvedPosition, GetActorScale());
 
 	 
@@ -260,7 +342,7 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 */ 
 
 
-	SetActorRotation(RotatorPitch);
+	SetActorRotation(RotatorPitch  );
 
 
 
@@ -316,13 +398,12 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	
 
 	FVector actorUp = GetActorUpVector();
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("actor up X:%f Y:%f Z:%f"), actorUp.X, actorUp.Y, actorUp.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("actor up X:%f Y:%f Z:%f"), actorUp.X, actorUp.Y, actorUp.Z));
 
 	//yaws
 	FVector right = TransformedNormal.Cross(currentAxisUp);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("right  X:%f Y:%f Z:%f"), right.X, right.Y, right.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("right  X:%f Y:%f Z:%f"), right.X, right.Y, right.Z));
 	
-	//FVector TrueUp = right.Cross(TransformedNormal);
 
 	//FVector YawScalerVClose = actorUp.Cross(currentAxisUp) * right.GetAbs();
 	//FVector YawScalerV = right;
@@ -331,51 +412,90 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT(" yaw scalar  x: %f y: %f z: %f"), YawScalerV.X, YawScalerV.Y, YawScalerV.Z));
 	//VectorStoreFloat3(,);
 	
-	//float YawScalarClose = YawScalerVClose.X + YawScalerVClose.Y + YawScalerVClose.Z;
+	//float YawScalarClose = YawScalerVClose.X + YawScalerVClose.Y + YawScalerVClose.Z; 
+	if (CheckOppositeRotation && CeilingCheck) {
+		CollisionResNormal = trueAxisOfRotation; 
+		
+		trueAxisOfRotation = currentAxisUp;
+		currentAxisUp =  FVector::UpVector;
 	
-	FVector AtanSinRatioYaw = actorUp.Cross(TransformedNormal) * currentAxisUp ; 
-	FVector CrossForYRatio = (CollisionResNormal.Cross(currentAxisUp)).GetAbs();
-	FVector AtanYRatioScalar = (CrossForYRatio * TransformedNormal).GetAbs();
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" cross y ratio x: %f y: %f z: %f"), CrossForYRatio.X, CrossForYRatio.Y, CrossForYRatio.Z));
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" cross ratio x: %f y: %f z: %f"), AtanYRatioScalar.X, AtanYRatioScalar.Y, AtanYRatioScalar.Z));
+	}
+
+	
+
+	FVector AtanSinRatioYaw = actorUp.Cross(TransformedNormal); 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" atan ratio x: %f y: %f z: %f"), AtanSinRatioYaw.X, AtanSinRatioYaw.Y, AtanSinRatioYaw.Z));
+
+	FVector CrossForYRatio = (CollisionResNormal.Cross(currentAxisUp)).GetAbs(); 
+	CrossForYRatio = CollisionResNormal.Cross(trueAxisOfRotation).GetAbs();
+	FVector AtanYRatio = AtanSinRatioYaw * CrossForYRatio;  
+	FVector crossForNormal = (CollisionResNormal.Cross(currentAxisUp).GetAbs() * (1.0f- CheckOppositeRotation)) + axisOfRotation * CheckOppositeRotation ;
+	FVector YRatioForNormal = (TransformedNormal) * crossForNormal;
+	//YRatioForNormal = TransformedNormal * axisOfRotation;
+	//YRatioForNormal = TransformedNormal * currentAxisUp;
+	//FVector AtanYRatioScalar = (CrossForYRatio * TransformedNormal).GetAbs(); 
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" cross y ratio x: %f y: %f z: %f"), CrossForYRatio.X, CrossForYRatio.Y, CrossForYRatio.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" cross normal ratio x: %f y: %f z: %f"), crossForNormal.X, crossForNormal.Y, crossForNormal.Z));
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" cross ratio x: %f y: %f z: %f"), AtanSinRatioYaw.X, AtanSinRatioYaw.Y, AtanSinRatioYaw.Z));
 	FVector compare = (GetActorUpVector() * CrossForYRatio) ;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT(" atan ratio x: %f y: %f z: %f"), AtanSinRatioYaw.X, AtanSinRatioYaw.Y, AtanSinRatioYaw.Z));
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT(" compare x: %f y: %f z: %f"), compare.X, compare.Y, compare.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT(" atan ratio x: %f y: %f z: %f"), AtanSinRatioYaw.X, AtanSinRatioYaw.Y, AtanSinRatioYaw.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT(" compare x: %f y: %f z: %f"), compare.X, compare.Y, compare.Z));
 
-	bool IsNotNegative =   (AtanSinRatioYaw.X + AtanSinRatioYaw.Y + AtanSinRatioYaw.Z) > 0.0f;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT(" is smaller %d"), (int)IsNotNegative));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Ratios normal : %f  sin: %f "), (YRatioForNormal.X + YRatioForNormal.Y + YRatioForNormal.Z), (AtanYRatio.X + AtanYRatio.Y + AtanYRatio.Z)));
+
+	bool IsNotNegative =   (AtanYRatio.X + AtanYRatio.Y + AtanYRatio.Z) > 0.0f && (YRatioForNormal.X + YRatioForNormal.Y + YRatioForNormal.Z) > 0.0f ||
+		                   (AtanYRatio.X + AtanYRatio.Y + AtanYRatio.Z) < 0.0f && (YRatioForNormal.X + YRatioForNormal.Y + YRatioForNormal.Z) < 0.0f;
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT(" is not negative %d"), (int)IsNotNegative));
 	
-	float YRatio = (AtanYRatioScalar.X + AtanYRatioScalar.Y + AtanYRatioScalar.Z);
-	float YRatioNegate = IsNotNegative * 2.0f - 1.0f;
+	float YRatio = (YRatioForNormal.X + YRatioForNormal.Y + YRatioForNormal.Z);
+	
+	float YRatioNegate = ((float)IsNotNegative) * 2.0f - 1.0f;
 	float XRatio = actorUp.Dot(TransformedNormal);
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" yaw angle x ratio %f"),   XRatio));
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" yaw angle  y ratio %f"), YRatio));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" yaw angle x ratio %f"),   XRatio));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" yaw angle  y ratio %f"), YRatio * YRatioNegate));
 
 	//float YawScalar = (YawScalerV.X + YawScalerV.Y + YawScalerV.Z);
 	
 	//DrawDebugLine(GetWorld(), PlacementPosition, PlacementPosition + TrueUp * FVector(1000.0f, 1000.0f, 1000.0f), FColor::Green);
-	double YawAtan = atan2(YRatio * YRatioNegate, XRatio) ;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" yaw angle %f"), FMath::RadiansToDegrees( YawAtan)));
+	double YawAtan = atan2(YRatio * YRatioNegate  , XRatio) * (  XRatio != 0.0f );
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" yaw angle %f"), FMath::RadiansToDegrees( YawAtan)));
 
 	float angleYaw = (acosf(actorUp.Dot(TransformedNormal)));
+
+
+
 	FQuat YawRot = FQuat(currentAxisUp, YawAtan);
+
+
+
+
+
 	FVector YawRotatedUp = YawRot.RotateVector(actorUp);
-	FVector rollAxis = CollisionResNormal;
-	FVector rollScalarV = YawRotatedUp.Cross(TransformedNormal) * rollAxis;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("roll vector scalar: %f %f %f "), rollScalarV.X, rollScalarV.Y, rollScalarV.Z));
+	FVector rollAxis =  CollisionResNormal;
+	FVector rollScalarV = actorUp.Cross( YawRotatedUp); 
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("roll vector scalar: %f %f %f "), rollScalarV.X, rollScalarV.Y, rollScalarV.Z));
+	
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("roll up scalar: %f %f %f "), TrueUp.X, TrueUp.Y, TrueUp.Z));
+	//FVector RollYRatioCheck = TransformedNormal * currentAxisUp; 
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("yaw roll ratio check roll %f"),));
+
+
 	float YawScalarRoll = ((rollAxis.X + rollAxis.Y + rollAxis.Z));
 	float RollScalar = rollScalarV.X + rollScalarV.Y + rollScalarV.Z;
 	float ratioRoll = YawRotatedUp.Dot(TransformedNormal);
 	double Roll = atan2(RollScalar, ratioRoll);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("yaw scalar roll %f"), YawScalarRoll));
 
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("roll  %f"), Roll));
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("roll axis X:%f Y:%f Z:%f"), rollAxis.X, rollAxis.Y, rollAxis.Z));
 	////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("roll scalar: %f "), RollScalar))
 
 	//
-	//FQuat RollRot = FQuat(rollAxis, Roll);
+	FQuat RollRot = FQuat(rollAxis, Roll);
 
 	//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + right * FVector(400.0f, 400.0f, 400.0f), FColor::Black);
 
@@ -389,12 +509,12 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
     //DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + finalRot * FVector(700.0f, 700.0f, 700.0f), FColor::Magenta);
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("cos pitch %f"),cos(angle)));
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("sin pitch %f"), FMath::RadiansToDegrees( asinf(angleYaw))));
+	 //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("sin pitch %f"), FMath::RadiansToDegrees( asinf(angleYaw))));
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("final rot  %f %f %f"),finalRot.X,finalRot.Y,finalRot.Z ));
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("roll %f"), roll));
-	FVector finalRot =  YawRot.RotateVector( actorUp); 
+	FVector finalRot = YawRot.RotateVector( actorUp); 
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Final angles pitch %f yaw %f roll %f "), angleDeg, FMath::RadiansToDegrees(YawAtan)));
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("final rot  %f %f %f"), finalRot.X, finalRot.Y, finalRot.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("final rot  %f %f %f"), finalRot.X, finalRot.Y, finalRot.Z));
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + TransformedNormal * FVector(700.0f, 700.0f, 700.0f), FColor::Blue);
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + finalRot * FVector(700.0f, 700.0f, 700.0f), FColor::Magenta);
 	//DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(finalRot.X,0.0f,0.0f) * FVector(700.0f, 700.0f, 700.0f), FColor::Red);
@@ -405,8 +525,10 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0.0f, 0.0f, TransformedNormal.Z) * FVector(700.0f, 700.0f, 700.0f), FColor::Green);
 	*/
 	
-	SetActorRotation(RotatorPitch + YawRot.Rotator( ));
-    
+	//SetActorRotation(RotatorPitch+ YawRot.Rotator());
+ //   
+
+	SetActorRotation(RotatorPitch  + YawRot.Rotator());
 	/*  GLog->Log(FString::Printf(TEXT("axis result rot X:%f Y:%f Z:%f"), res.X, res.Y, res.Z));
 	  GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("axis result rot X:%f Y:%f Z:%f"), res.X, res.Y, res.Z));
 	  */
@@ -418,10 +540,51 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 
 }
 
+void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor* OverlapedActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool SweepBool ,const FHitResult& HitResult) {
+	
+	CurrentyActive = true;
+	if (ShouldGetTargets == true ) {
+		
+		AEnemyBase* EnemyTOHandle = Cast<AEnemyBase>(OverlapedActor);
+		HandleNewEnemy(EnemyTOHandle);
+	}
+
+	
+} 
+
+
+
+
+
+void ATowerBase::CheckForEnemies(){}
+void ATowerBase::HandleNewEnemy(AEnemyBase* EnemyBase){}
+void ATowerBase::TowerActive() {}
+void ATowerBase::DamageEnemy(AEnemyBase* enemy) {}
+
+
+
+
+void ATowerBase::TowerSetUp()
+{ 
+	TriggerRangeBox->OnComponentBeginOverlap.AddDynamic(this,&ATowerBase::OnOverLapBegin);
+
+
+}
+
+
+
 // Called every frame
 void ATowerBase::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime); 
+
+	if (CurrentyActive) {
+		
+		TowerActive();
+        
+	}
+
+
 
 }
 
