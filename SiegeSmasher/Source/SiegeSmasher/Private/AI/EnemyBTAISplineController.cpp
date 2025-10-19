@@ -16,13 +16,13 @@ void AEnemyBTAISplineController::BeginPlay()
 		RunBehaviorTree(AIBehavior);
 
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMainCharacter::StaticClass(), PlayerActorArray);
-		for (int i = 0; i < PlayerActorArray.Num(); i++)
+		/*for (int i = 0; i < PlayerActorArray.Num(); i++)
 		{
 			if (PlayerActorArray[i] != nullptr)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Player Found")));
 			}
-		}
+		}*/
 	}
 }
 

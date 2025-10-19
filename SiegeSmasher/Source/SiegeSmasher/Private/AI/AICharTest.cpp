@@ -11,10 +11,6 @@ AAICharTest::AAICharTest()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	//AIControllerClass = AEnemyBTAISplineController::StaticClass();
-
-	//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 // Called when the game starts or when spawned
@@ -22,18 +18,6 @@ void AAICharTest::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Begin play called")));
-	//PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-
-	////Controller = Cast<AController*> (AEnemyBTAISplineController());
-	////AEnemyBTAISplineController* Temp = Cast<AEnemyBTAISplineController>(GetController());
-	//if (GetController() == nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Controller null")));
-	//}
-
-	
-	
 
 	//Sword Stuff
 	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);
@@ -117,6 +101,40 @@ void AAICharTest::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+void AAICharTest::PlayAttackMontage()
+{
+	//Checks to see if the client is the one asking to play the animation.
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		//If it is then we play the attack animation on the server.
+		Server_PlayAttackMontage();
+	}
+	else
+	{
+		//Otherwise we play it locally and replicate it to the clients.
+		Multicast_PlayAttackMontage();
+	}
+}
+
+void AAICharTest::Server_PlayAttackMontage_Implementation()
+{
+	Multicast_PlayAttackMontage();
+}
+
+//Plays the attack animation.
+void AAICharTest::Multicast_PlayAttackMontage_Implementation()
+{
+	if (AttackMontage != nullptr)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(AttackMontage);
+		}
+	}
+}
+
 
 
 TArray<AActor*> AAICharTest::getCheckpoints()
