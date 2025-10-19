@@ -39,7 +39,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* AttackMontage;
 
+	//==========================================================================================================================
 	//Animation replication.
+	//Requires a remote procedure call (RPC) to tell all the clients to play the animation at the exact same time.
+	//==========================================================================================================================
+
 	//A Function that is only executed on the server. That is what the server specifier is for. 
 	//The server identifier also declares an additional function that has the same name except it has IMPLEMENTATION at the end this is where the code actually goes.
 	//Reliable means that the function is replicated over the network and is guaranteed to arrive regardless of bandwidth or network error.

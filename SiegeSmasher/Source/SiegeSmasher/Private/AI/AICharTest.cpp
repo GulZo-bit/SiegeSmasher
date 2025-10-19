@@ -108,6 +108,7 @@ void AAICharTest::PlayAttackMontage()
 	if (GetLocalRole() < ROLE_Authority)
 	{
 		//If it is then we play the attack animation on the server.
+		//This is also here to validate the request by the client initiating the action then it calls the multicast.
 		Server_PlayAttackMontage();
 	}
 	else
