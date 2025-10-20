@@ -2,7 +2,6 @@
 
 
 #include "AI/AICharTest.h"
-#include "AIController.h"
 #include "AI/Sword.h"
 #include "Kismet/GameplayStatics.h"
 
