@@ -21,6 +21,7 @@ EBTNodeResult::Type UWitchAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& 
 	{
 		AAIWitch* Witch = Cast<AAIWitch>(ControlledPawn);
 		Witch->PlayAttack();
+		return EBTNodeResult::Succeeded;
 	}
 
 	return EBTNodeResult::Succeeded;

@@ -27,7 +27,6 @@ protected:
 	UStaticMeshComponent* Mesh;
 
 	AMainCharacter* Player;
-
 	FVector StartLocation;
 public:	
 	// Called every frame
@@ -35,5 +34,7 @@ public:
 
 	UFUNCTION()
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	float Damage = 10;
 
 };

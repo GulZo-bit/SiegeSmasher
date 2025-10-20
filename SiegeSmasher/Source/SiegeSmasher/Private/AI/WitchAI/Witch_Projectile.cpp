@@ -19,8 +19,6 @@ AWitch_Projectile::AWitch_Projectile()
 	Mesh->AttachToComponent(Root, FAttachmentTransformRules::KeepRelativeTransform);
 
 	Mesh->SetupAttachment(Root);
-
-	Mesh->OnComponentBeginOverlap.AddDynamic(this, &AWitch_Projectile::OnOverLapBegin);
 }
 
 // Called when the game starts or when spawned
@@ -29,7 +27,7 @@ void AWitch_Projectile::BeginPlay()
 	Super::BeginPlay();
 
 	StartLocation = this->GetActorLocation();
-
+	Mesh->OnComponentBeginOverlap.AddDynamic(this, &AWitch_Projectile::OnOverLapBegin);
 	
 }
 
@@ -38,24 +36,23 @@ void AWitch_Projectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-	FVector Target = FMath::VInterpTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 2.0f);
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);										//cm/s
+	FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 5000.0f);
 	SetActorLocation(Target);
 }
 
 void AWitch_Projectile::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Spell overlap with: %s"), *OtherActor->GetName());
-	/*if (OtherActor && (OtherActor != this))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spell overlap with: %s"), *OtherActor->GetName());
-	}
-	this->Destroy();
+
 	if (Cast<AMainCharacter>(OtherActor))
 	{
-		this->Destroy();
-	}*/
-
+		AMainCharacter* MainChar = Cast<AMainCharacter>(OtherActor);
+		MainChar->setHealth(MainChar->getHealth() - Damage);
+		GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
+		//this->Destroy();
+	}
+	this->Destroy();
+	
 }
 
 

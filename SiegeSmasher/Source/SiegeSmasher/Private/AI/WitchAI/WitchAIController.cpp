@@ -16,6 +16,7 @@ void AWitchAIController::BeginPlay()
 
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMainCharacter::StaticClass(), PlayerActorArray);
 		PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+		GetBlackboardComponent()->SetValueAsObject(TEXT("Player"), PlayerPawn);
 		/*for (int i = 0; i < PlayerActorArray.Num(); i++)
 		{
 			if (PlayerActorArray[i] != nullptr)
@@ -60,6 +61,7 @@ void AWitchAIController::Tick(float DeltaTime)
 
 	else
 	{
+		ClearFocus(EAIFocusPriority::Gameplay);
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
 		GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
 	}

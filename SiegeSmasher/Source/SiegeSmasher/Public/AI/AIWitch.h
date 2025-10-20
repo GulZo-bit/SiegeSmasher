@@ -30,6 +30,8 @@ protected:
 	int32 SplineNum; //Number that will be set randomly based on how many splines are in the scene.
 	float StartTime;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	UAnimMontage* AttackSpellMontage;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -37,7 +39,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UAnimInstance* AnimInstance;
+	int32 iCount = 0;
 	void PlayAttack();
+
 	UPROPERTY(EditDefaultsOnly);
 	TSubclassOf<AWitch_Projectile> SpellClass;
 	UPROPERTY()

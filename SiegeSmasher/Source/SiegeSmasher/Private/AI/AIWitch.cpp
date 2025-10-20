@@ -59,6 +59,22 @@ void AAIWitch::BeginPlay()
 	}
 }
 
+void AAIWitch::PlayAttack()
+{
+	if (AttackSpellMontage != nullptr)
+	{
+		AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(AttackSpellMontage);
+			iCount = 0;
+		}
+	}
+	
+}
+
+
 // Called every frame
 void AAIWitch::Tick(float DeltaTime)
 {
@@ -79,6 +95,21 @@ void AAIWitch::Tick(float DeltaTime)
 	FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
 	CubeStore->SetActorRotation(Rotator);
 
+	if (AnimInstance != nullptr)
+	{
+		if (AnimInstance->Montage_IsPlaying(AttackSpellMontage))
+		{
+			float MontageTimeStore = AnimInstance->Montage_GetPosition(AttackSpellMontage);
+			UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
+			if (MontageTimeStore >= 1.23f && iCount < 1)
+			{
+				Spell = GetWorld()->SpawnActor<AWitch_Projectile>(SpellClass, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				iCount++;
+			}
+		}
+	}
+	
+
 }
 
 // Called to bind functionality to input
@@ -88,13 +119,4 @@ void AAIWitch::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AAIWitch::PlayAttack()
-{
-	Spell = GetWorld()->SpawnActor<AWitch_Projectile>(SpellClass, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f,1.0f,1.0f)));
-	/*if (Spell != nullptr)
-	{
-		Spell->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SpellSocket"));
-		Spell->SetOwner(this);
-	}*/
-}
 
