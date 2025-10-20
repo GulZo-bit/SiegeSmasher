@@ -6,9 +6,16 @@
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
 #include "../Enemies/EnemyBase.h" 
+#include "Components/TimelineComponent.h"
 #include "Math/MathFwd.h" 
-#include "Math/Vector.h"
-#include "TowerBase.generated.h"
+#include "Math/Vector.h" 
+
+#include "TowerBase.generated.h" 
+
+
+  #define PlacingSurface ECC_GameTraceChannel1
+
+ // !PlacingSurface
 
 
 // enum bit flags for chekcing if an enemy already has a status effect we can have each enum go up in a power of two as that will give 
@@ -39,41 +46,61 @@ class SIEGESMASHER_API ATowerBase : public AActor
 	GENERATED_BODY()
 public:
 	// Sets default values for this actor's properties
-	ATowerBase();
+	ATowerBase(); 
+	void DisableTick();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
 	FVector GetPlacementColliderHalfExtents();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
 	void ResolvePlacement(FVector SurfaceHalfExtents, FVector SurfacePos, FVector PlacementPosition, FVector CamDir,FVector CamPos, FTransform surfaceTransform);
 protected:
 	// Called when the game starts or when spawned
+
 	virtual void BeginPlay() override;
 	bool CurrentyActive = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MeshForTower");
-	USkeletalMeshComponent * MeshForTower;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementCollider");
 	UBoxComponent* BoxColliderForObjectPlacement;
+	FOnTimelineEvent TowerEndAction; 
+	bool RequiresReset = false; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerWaitTimeToReset");
+	float MaxWaitTimeToReset;
+
+
+	float WaitTimeToReset = 0.0f; 
+    
+	UFUNCTION()
+	virtual void TowerTimeLineEnd();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTriggerBox")
 	UBoxComponent* TriggerRangeBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTriggerBoxDim")
-	FVector TriggerBoxDim; 
+	FVector TriggerBoxDim;  
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerProjectile(Optional)"); 
-	AActor* Projectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlacementSize");
+	float PlacementSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StartingFacingDirection") 
+	FVector InitialFacingDirection = FVector(0.0f, 0.0f, 1.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerSurfaceAlignmentVector"); 
+	FVector AlignmentVector = FVector::ZeroVector; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerSurfaceAlignmentAxis");
+	FVector AlignmentAxis = FVector::ZeroVector;
+
+
 
 protected:
-	AEnemyBase* FirstTarget = nullptr; 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActiveRange");
-	float TargetingRange = 0.0f;
-	bool ShouldGetTargets = true;
+	
+	
+	bool NeedsNewTargets = true;
 	virtual void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	void HandleNewEnemy(AEnemyBase* EnemyBase);
+	virtual void HandleNewEnemy(AEnemyBase* EnemyBase); 
+	virtual void TowerReset();
 	virtual void TowerSetUp();
-	virtual void TowerActive() ;
+	virtual void TowerActive(float& DeltaTime) ;
 	virtual void CheckForEnemies();
-	virtual void DamageEnemy(AEnemyBase* EnemyBase) ; 
-
-
+	
 
 public:
 	// Called every frame

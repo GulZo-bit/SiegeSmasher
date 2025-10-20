@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputMappingContext* DefaultContext; //The defult input mapping context. This will change depending on what context the player is in such as driving.
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	class UInputAction* TowerPlacementAction;
+
 	//Jump Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* JumpAction;
@@ -63,9 +66,12 @@ public:
 
 	void Jumping();
 
+	void PlaceTower();
+
 	void setHealth(float HealthStore);
 
-	float getHealth();
+	float getHealth(); 
+
 
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)
@@ -78,9 +84,11 @@ private:
 	UCameraComponent* camera;
 	TArray<ATowerBase*> TowersToSpawn;
 	ATowerBase* Selected;
-	UWorld* World;
-
-	float Health = 100.0f;
+	UWorld* World; 
+	FActorSpawnParameters TowerSpawnParameters;
+	int SelectedTowerIndex = 0;
+	float Health = 100.0f; 
+	bool IsPlacingTower = false;
 
 private:
 
@@ -91,6 +99,7 @@ private:
 
 	void HandleTowerPlacement();
 	void InitialiseTowers();
+	void AlignTowerBeforePlacement();
 
 
 };

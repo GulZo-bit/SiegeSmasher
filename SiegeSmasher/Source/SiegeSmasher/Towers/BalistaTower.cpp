@@ -8,13 +8,24 @@ ABalistaTower::ABalistaTower()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	BallistaBase = CreateDefaultSubobject<UStaticMeshComponent>("BallistaBase"); 
+	BallistaBase->SetupAttachment(RootComponent); 
+	BallistaTurret = CreateDefaultSubobject<UStaticMeshComponent>("BallistaTurret");
+	BallistaTurret->SetupAttachment(RootComponent);
+	BallistaArrow = CreateDefaultSubobject<UStaticMeshComponent>("BallistaArrow");
+	BallistaArrow->SetupAttachment(BallistaTurret);
+
+
+
+
 
 }
-void ABalistaTower::TowerActive() {
+void ABalistaTower::TowerActive(float& DeltaTime) {
 	 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Balista Tower Active ")));
 
-	FVector ToTarget = FirstTarget->GetActorLocation() - GetActorLocation();
-	if (ToTarget.SquaredLength() < TargetingRange ) {
+	FVector ToTarget = EnemySingleTarget->GetActorLocation() - GetActorLocation();
+	if ( ToTarget.SquaredLength() < TargetingRange ) {
 		FVector TargetDir = ToTarget.GetSafeNormal(); 
 		FVector ActorForward = GetActorForwardVector(); 
 		float CosAngle = ActorForward.Dot(TargetDir);
@@ -31,7 +42,7 @@ void ABalistaTower::TowerActive() {
 		   
           
 
-		}
+	   }
 	
 
 
@@ -45,35 +56,10 @@ void ABalistaTower::TowerActive() {
 } 
 
 
-void ABalistaTower::HandleNewEnemy(AEnemyBase* Enemy) {
-
-	    
-	    ShouldGetTargets = false;
-		FirstTarget = Enemy;
-	    
-	
-
-
-
-
-}  
 
 
 
 
 
 
-// Called when the game starts or when spawned
-void ABalistaTower::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ABalistaTower::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 

@@ -17,8 +17,6 @@ class SIEGESMASHER_API ATowerTestBox : public ATowerBase
 public:	
 	// Sets default values for this actor's properties
 	ATowerTestBox();
-	void TowerActive();
-	void DamageEnemy(AEnemyBase* enemy);
 
 
 protected:

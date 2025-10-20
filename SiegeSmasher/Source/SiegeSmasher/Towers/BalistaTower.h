@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h" 
-#include "TowerBase.h"
+#include "ProjectileTowerBase.h"
 #include "BalistaTower.generated.h"
 
 
 
 UCLASS()
-class SIEGESMASHER_API ABalistaTower : public ATowerBase
+class SIEGESMASHER_API ABalistaTower : public AProjectileTowerBase
 {
 	GENERATED_BODY()
 	
@@ -19,19 +19,22 @@ public:
 	ABalistaTower();
 
 
-	void HandleNewEnemy(AEnemyBase * Enemy);
-	void TowerActive();  
+	void TowerActive(float& DeltaTime);  
 
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	UPROPERTY(editAnyWhere, BluePrintReadWrite, Category = "FOV Snapping");
-	float FovSnappingThreshold = 0.5f; 
-	UPROPERTY(editAnyWhere, BluePrintReadWrite, Category = "Rotation Speed");
-	float RotationLerpSpeed = 0.3f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaMesh");
+	UStaticMeshComponent* BallistaBase;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaMesh");
+	UStaticMeshComponent* BallistaTurret;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaMesh");
+	UStaticMeshComponent* BallistaArrow;
+
+
+	
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
 
 };

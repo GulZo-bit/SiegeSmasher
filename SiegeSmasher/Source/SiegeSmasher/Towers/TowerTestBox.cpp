@@ -18,13 +18,8 @@ void ATowerTestBox::BeginPlay()
 	
 }
 
-void ATowerTestBox::TowerActive() {
 
-}
 
-void ATowerTestBox::DamageEnemy(AEnemyBase* enemy) {
-
-}
 // Called every frame
 void ATowerTestBox::Tick(float DeltaTime)
 {

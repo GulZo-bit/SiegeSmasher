@@ -68,7 +68,7 @@ bool AWaveManager::CheckWaveEnd() {
 		WaveNumber++;
 		BeginWave();
 		WaveGlobalWaitTimer = WaveGlobalWaitTimerMax;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("wave global wait timer reset to %f"), WaveGlobalWaitTimer));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("wave global wait timer reset to %f"), WaveGlobalWaitTimer));
 
 		GLog->Log(FString::Printf(TEXT("wave global wait timer reset to %f"), WaveGlobalWaitTimer));
 		return true;
@@ -81,11 +81,11 @@ bool AWaveManager::CheckWaveEnd() {
 void AWaveManager::BeginWave()
 {
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" beggining wave, wave number is %d"), WaveNumber));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" beggining wave, wave number is %d"), WaveNumber));
 
 	EnemySetUp();
 	CurrentSpawnPointCap = ceil((float)WaveEnemyCount / (float)SpawnPoints.Num());
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" spawn point cap for wave %d"), CurrentSpawnPointCap));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" spawn point cap for wave %d"), CurrentSpawnPointCap));
 	GLog->Log(FString::Printf(TEXT(" spawn point cap for wave %d"), CurrentSpawnPointCap));
 	GetNewSpawnPoint();
 }
@@ -106,7 +106,7 @@ void AWaveManager::GetNewSpawnPoint()
 		CurrentSpawnPoint->ResetCoolDownTimer();
 
 		CurrentTimeForSpawnPoint = CurrentSpawnPoint->GetNewSpawnTime();
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" new allocated spawn time %f"), CurrentTimeForSpawnPoint));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" new allocated spawn time %f"), CurrentTimeForSpawnPoint));
 		GLog->Log(FString::Printf(TEXT(" new allocated spawn time %f"), CurrentTimeForSpawnPoint));
 	}
 }
@@ -121,8 +121,8 @@ void AWaveManager::CheckSpawnPoints(float DeltaTime)
 {
 
 	if (CurrentTimeForSpawnPoint <= 0.0f || EnemiesSpawnedOnPoint == CurrentSpawnPointCap) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-			FString::Printf(TEXT("need new spawn point, time for spawn point reached  %f Enemies spawned on point %d"), CurrentTimeForSpawnPoint, EnemiesSpawnedOnPoint));
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+			FString::Printf(TEXT("need new spawn point, time for spawn point reached  %f Enemies spawned on point %d"), CurrentTimeForSpawnPoint, EnemiesSpawnedOnPoint));*/
 
 		GLog->Log(FString::Printf(TEXT("need new spawn point, time for spawn point reached  %f Enemies spawned on point %d"), CurrentTimeForSpawnPoint, EnemiesSpawnedOnPoint));
 		GetNewSpawnPoint();
@@ -149,8 +149,8 @@ void AWaveManager::EnemySetUp()
 		EnemyTypes EnemyType = EnemiesToSpawn[i]->GetEnemyWaveType();
 		if (EnemiesToSpawn[i]->GetStartingWave() <= WaveNumber) {
 
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-				FString::Printf(TEXT(" new enemy added to available enemies %d wave number was %d"), (int)EnemyType, WaveNumber));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+			//	FString::Printf(TEXT(" new enemy added to available enemies %d wave number was %d"), (int)EnemyType, WaveNumber));
 			GLog->Log(FString::Printf(TEXT(" new enemy added to available enemies %d wave number was %d"), (int)EnemyType, WaveNumber));
 
 			AvailableEnemies.Add(EnemiesToSpawn[i]);
@@ -160,8 +160,8 @@ void AWaveManager::EnemySetUp()
 			continue;
 		}
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-			FString::Printf(TEXT(" enemy excluded from this wave, wave number was %d enemy types was %d enemy starting wave"), WaveNumber, (int)EnemyType, EnemiesToSpawn[i]->GetStartingWave()));
+	/*	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+			FString::Printf(TEXT(" enemy excluded from this wave, wave number was %d enemy types was %d enemy starting wave"), WaveNumber, (int)EnemyType, EnemiesToSpawn[i]->GetStartingWave()));*/
 		GLog->Log(FString::Printf(TEXT(" enemy excluded from this wave, wave number was %d enemy types was %d enemy starting wave"), WaveNumber, (int)EnemyType, EnemiesToSpawn[i]->GetStartingWave()));
 
 
@@ -175,16 +175,16 @@ void AWaveManager::EnemySetUp()
 		WaveEnemyCount += NewEnemyWaveContrib;
 		EnemyAvailablePoolIndicies[EnemyType] = 0;
 		EnemyWaveContribution[EnemyType] = NewEnemyWaveContrib;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-			FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+			FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));*/
 		GLog->Log(FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));
 	}
 
 	AliveEnemyCount = WaveEnemyCount;
 
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-		FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));*/
 	GLog->Log(FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));
 
 
@@ -228,7 +228,7 @@ void AWaveManager::EvaluateEnemySpawning()
 		}
 
 		EnemyWaveContribution[CurrentEnemyToSpawn->GetEnemyWaveType()] -= 1;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Enemy wave contirbtuion  for enemy type %d  is now %d"), (int)CurrentEnemyToSpawn->GetEnemyWaveType(), EnemyWaveContribution[CurrentEnemyToSpawn->GetEnemyWaveType()]));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Enemy wave contirbtuion  for enemy type %d  is now %d"), (int)CurrentEnemyToSpawn->GetEnemyWaveType(), EnemyWaveContribution[CurrentEnemyToSpawn->GetEnemyWaveType()]));
 		GLog->Log(FString::Printf(TEXT("Enemy wave contirbtuion  for enemy type %d  is now %d"), (int)CurrentEnemyToSpawn->GetEnemyWaveType(), EnemyWaveContribution[CurrentEnemyToSpawn->GetEnemyWaveType()]));
 		if (!(EnemyWaveContribution[CurrentEnemyToSpawn->GetEnemyWaveType()]))
 		{
@@ -236,7 +236,7 @@ void AWaveManager::EvaluateEnemySpawning()
 			AvailableEnemies[CurrentAvailableEnemyIndex] = AvailableEnemies[randomAvailableEnemyIndex];
 			AvailableEnemies[randomAvailableEnemyIndex] = temp;
 			CurrentAvailableEnemyIndex++;
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Enemy wave contirbtuion reached 0 for enemy type %d new available index is %d"), (int)CurrentEnemyToSpawn->GetEnemyWaveType(), CurrentAvailableEnemyIndex));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Enemy wave contirbtuion reached 0 for enemy type %d new available index is %d"), (int)CurrentEnemyToSpawn->GetEnemyWaveType(), CurrentAvailableEnemyIndex));
 			GLog->Log(FString::Printf(TEXT("Enemy wave contirbtuion reached 0 for enemy type %d new available index is %d"), (int)CurrentEnemyToSpawn->GetEnemyWaveType(), CurrentAvailableEnemyIndex));
 
 		}
@@ -256,8 +256,8 @@ AEnemyBase* AWaveManager::GetExistingInstance(EnemyTypes EnemyType)
 	if (availableIndex != EnemyPools[EnemyType].Num() && !EnemyPools[EnemyType][availableIndex]->IsActorTickEnabled()) {
 
 		availableIndex++;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-			FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+			FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));*/
 		GLog->Log(FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));
 
 		return CurrentSpawnPoint->SpawnAndResetExistingEnemyInstance(EnemyPools[EnemyType][availableIndex - 1]);

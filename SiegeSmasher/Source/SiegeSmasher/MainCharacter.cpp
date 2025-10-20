@@ -7,15 +7,16 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h" 
 
-#define PlacingSurface ECC_GameTraceChannel1
+
 
 // Sets default values
 AMainCharacter::AMainCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
+	
+	TowerSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
+	
 
 
 }
@@ -74,7 +75,11 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move);
 
 		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacter::Look);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacter::Look); 
+
+		EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacter::PlaceTower);
+
+
 
 	}
 }
@@ -120,10 +125,22 @@ void AMainCharacter::Jumping()
 	Jump();
 }
 
+void AMainCharacter::PlaceTower()
+{
+	if (IsPlacingTower) {
+		
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Placing tower")));
+		ATowerBase * TowerRef =  World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
+		
+
+	}
+
+}
+
 void AMainCharacter::DisplaySelected()
 {
 	Selected->SetActorHiddenInGame(false);
-
+	
 
 }
 
@@ -132,37 +149,53 @@ void AMainCharacter::HideSelected()
 {
 	Selected->SetActorHiddenInGame(true);
 	Selected->SetActorEnableCollision(false);
-	
+	Selected->SetActorTickEnabled(false);
 
 }
 
 void AMainCharacter::HandleTowerPlacement()
 {
 
-	FVector PlayerCameForward = camera->GetForwardVector();
+	if (Selected != nullptr) {
+		FVector PlayerCameForward = camera->GetForwardVector();
 
-	FHitResult PlacementSurfaceResult = FHitResult();
+		FHitResult PlacementSurfaceResult = FHitResult();
 
-	FVector start = camera->GetComponentLocation() + PlayerCameForward;
+		FVector start = camera->GetComponentLocation() + PlayerCameForward;
 
-	FVector end = start + PlayerCameForward * PlayerPlacementDistances;
-	
-
-	if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
-	{
-		UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
+		FVector end = start + PlayerCameForward * PlayerPlacementDistances; 
+		IsPlacingTower = false;
 		
-		FVector SurfaceOrigin = HitComponent->GetComponentLocation(); 
-		FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
-		FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
-    
-		DrawDebugLine(World, start, end, FColor::Blue);
-		DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
-		Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint,PlayerCameForward, camera->GetComponentLocation(), SurfaceTransform);
-	};
+
+		if ( Selected != nullptr && World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
+		{
+			UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
+
+			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
+			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
+			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
+
+			DrawDebugLine(World, start, end, FColor::Blue);
+			DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
+			Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward, camera->GetComponentLocation(), SurfaceTransform); 
+			IsPlacingTower = true;
+			
+
+			return;
+		} 
+
+		
+
+
+
+		
+
+	}
+	
 
 
 }
+
 
 void AMainCharacter::InitialiseTowers()
 {
@@ -171,7 +204,8 @@ void AMainCharacter::InitialiseTowers()
 	UWorld* world = GetWorld();
 	FTransform SpawnTransForm = FTransform();
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
+
 	GLog->Log(FString::Printf(TEXT("towers types to spawn count:%d"), TowerTypesToSpawn.Num()));
 	for (TSubclassOf<ATowerBase>& towerType : TowerTypesToSpawn) {
 
@@ -179,17 +213,48 @@ void AMainCharacter::InitialiseTowers()
 		TowersToSpawn.Add(currentInstance);
 		currentInstance->SetActorHiddenInGame(true);
 		currentInstance->SetActorEnableCollision(false);
-		currentInstance->SetActorTickEnabled(false);
-
+		currentInstance->DisableTick();
+		
+	
 	}
 
 
 	if (TowersToSpawn.Num() > 0) {
 
 		Selected = TowersToSpawn[0];
-		DisplaySelected();
+	 	DisplaySelected();
 
 	}
+
+
+
+
+}
+
+void AMainCharacter::AlignTowerBeforePlacement()
+{
+	 
+	/*FVector ToSelected = (GetActorLocation() - Selected->GetActorLocation()).GetSafeNormal();
+	
+
+	 VectorRegister4 RoundedDiff =  VectorRound(MakeVectorRegisterFloat(ToSelected.X, ToSelected.Y, ToSelected.Z, 0.0f)); 
+
+	 VectorStoreFloat3(RoundedDiff, &ToSelected);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Difference between player %f %f %f"), ToSelected.X, ToSelected.Y, ToSelected.Z));
+
+	FVector Right = ToSelected.Cross(FVector::UpVector); 
+
+
+	double Angle = atan2(ToSelected.Y,ToSelected.X);
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("angle for snapping %f"), FMath::RadiansToDegrees( Angle)));
+	*/
+	//Selected->SetActorRotation(FQuat(FVector::UpVector, Angle));
+
+	
+
+
 
 
 

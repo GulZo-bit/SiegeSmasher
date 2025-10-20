@@ -15,12 +15,12 @@ class SIEGESMASHER_API ATowerTest : public ATowerBase
 public:	
 	// Sets default values for this actor's properties
 	ATowerTest();
-	void  TowerActive();
-	void DamageEnemy(AEnemyBase* EnemyBase);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	 
 
+ 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
