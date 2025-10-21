@@ -2,7 +2,6 @@
 
 
 #include "AI/AICharTest.h"
-#include "AIController.h"
 #include "AI/Sword.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -11,10 +10,6 @@ AAICharTest::AAICharTest()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	//AIControllerClass = AEnemyBTAISplineController::StaticClass();
-
-	//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 // Called when the game starts or when spawned
@@ -22,15 +17,6 @@ void AAICharTest::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Begin play called")));
-	//PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-
-	////Controller = Cast<AController*> (AEnemyBTAISplineController());
-	////AEnemyBTAISplineController* Temp = Cast<AEnemyBTAISplineController>(GetController());
-	//if (GetController() == nullptr)
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Controller null")));
-	//}
 
 	//Sword Stuff
 	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);
@@ -115,29 +101,41 @@ void AAICharTest::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
-float AAICharTest::CheckDistanceToPlayer()
+void AAICharTest::PlayAttackMontage()
 {
-	FVector PlayerLocStore;
-	FVector EnemyLocStore;
-	float DistStore;
-	PlayerLocStore = PlayerPawn->GetActorLocation();
-	EnemyLocStore = this->GetActorLocation();
-	DistStore = FMath::Sqrt(((PlayerLocStore.X - EnemyLocStore.X) * (PlayerLocStore.X - EnemyLocStore.X)) + ((PlayerLocStore.Y - EnemyLocStore.Y) * (PlayerLocStore.Y - EnemyLocStore.Y)) + ((PlayerLocStore.Z - EnemyLocStore.Z) * (PlayerLocStore.Z - EnemyLocStore.Z)));
-
-	/*if (DistStore >= 0 && DistStore <= 200)
+	//Checks to see if the client is the one asking to play the animation.
+	if (GetLocalRole() < ROLE_Authority)
 	{
-		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), true);
-		SetFocus(PlayerPawn);
+		//If it is then we play the attack animation on the server.
+		//This is also here to validate the request by the client initiating the action then it calls the multicast.
+		Server_PlayAttackMontage();
 	}
-
 	else
 	{
-		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), false);
-		ClearFocus(EAIFocusPriority::Gameplay);
-	}*/
-
-	return DistStore;
+		//Otherwise we play it locally and replicate it to the clients.
+		Multicast_PlayAttackMontage();
+	}
 }
+
+void AAICharTest::Server_PlayAttackMontage_Implementation()
+{
+	Multicast_PlayAttackMontage();
+}
+
+//Plays the attack animation.
+void AAICharTest::Multicast_PlayAttackMontage_Implementation()
+{
+	if (AttackMontage != nullptr)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(AttackMontage);
+		}
+	}
+}
+
+
 
 TArray<AActor*> AAICharTest::getCheckpoints()
 {

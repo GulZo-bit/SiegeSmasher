@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "SplineMovementActor.h"
+#include "../MainCharacter.h"
+#include "AICharTest.h"
 #include "EnemyBTAISplineController.generated.h"
 
 /**
@@ -17,8 +19,7 @@ class SIEGESMASHER_API AEnemyBTAISplineController : public AAIController
 public:
 protected:
 	
-	float CheckDistanceToPlayer();
-	float CheckPlayerDirection();
+	void CheckDistanceAndDirectionToPlayer(); //Responsible for checking how far the players are from the enemy and if the enemy is facing them.
 
 	virtual void OnPossess(APawn* InPawn) override;
 public:
@@ -26,15 +27,20 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY()
-	APawn* PlayerPawn;
-	UPROPERTY()
 	APawn* ControlledPawn;
 	UPROPERTY()
 	UChildActorComponent* ChildActor;
 	UPROPERTY()
 	AActor* CubeStore;
-	
+
+	UPROPERTY()
+	TArray<AActor*> PlayerActorArray;
+
+	float DistStoreArray[4];
+	float DotProductArray[4];
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
+
+	int32 Loop = 0;
 };
