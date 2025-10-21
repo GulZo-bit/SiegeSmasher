@@ -38,9 +38,8 @@ protected:
 	UWorld* World = nullptr;
 	void HandleNewEnemy(AEnemyBase* Enemy);
 	FActorSpawnParameters ProjectileSpawnParameters;
-	void ShootProjectile(FRotator rotation);
+	void ShootProjectile(FRotator Rotation);
 	// Called every frame
 	virtual void Tick(float DeltaTime) override; 
-
 
 };

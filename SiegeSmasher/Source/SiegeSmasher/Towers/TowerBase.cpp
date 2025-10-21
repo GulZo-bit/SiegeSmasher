@@ -315,8 +315,6 @@ void ATowerBase::Tick(float DeltaTime)
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("waitimeToReset is %f requires reset is %d"), WaitTimeToReset,(int)RequiresReset));
 			if (RequiresReset && (WaitTimeToReset -= DeltaTime)<=0.0f) {
 
-				
-
 				RequiresReset = false;
 				WaitTimeToReset = MaxWaitTimeToReset;
 				TowerReset();

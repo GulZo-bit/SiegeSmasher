@@ -35,6 +35,8 @@ protected:
 	virtual void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	AEnemyBase* Target = nullptr; 
+	float InitalPitch = 0.0f;
+
 
 	
 
@@ -44,7 +46,8 @@ public:
 
 	void SetEnemyTarget(AEnemyBase * Enemy); 
 
-	virtual void MoveToTarget(float DeltaTime);
+	virtual void MoveToTarget(float DeltaTime); 
+	void SetInitialPitch(float Pitch);
 private:
 	FVector TargetPosition = FVector::ZeroVector;
 	UWorld* World = nullptr;

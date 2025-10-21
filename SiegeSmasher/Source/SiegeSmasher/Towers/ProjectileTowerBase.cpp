@@ -50,13 +50,16 @@ void AProjectileTowerBase::HandleNewEnemy(AEnemyBase* Enemy) {
 
 }
 
-void AProjectileTowerBase::ShootProjectile(FRotator rotation)
+void AProjectileTowerBase::ShootProjectile(FRotator Rotation)
 {
 	
-	ATowerProjectileBase * ProjectilRef =  World->SpawnActor<ATowerProjectileBase>(Projectile, FTransform(rotation, TowerFiringPoint->GetComponentLocation(), FVector::OneVector), ProjectileSpawnParameters);
+	ATowerProjectileBase * ProjectilRef =  World->SpawnActor<ATowerProjectileBase>(Projectile, FTransform(Rotation, TowerFiringPoint->GetComponentLocation(), FVector::OneVector), ProjectileSpawnParameters);
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Ballista shooting projectile")));
+	ProjectilRef->SetInitialPitch(Rotation.Pitch);
 	ProjectilRef->SetEnemyTarget(EnemySingleTarget);
-	RequiresReset = true;
+	
+	RequiresReset = true; 
+	
 
 }
 

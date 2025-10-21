@@ -28,6 +28,21 @@ void AEnemyBase::DamageEnemy(float Damage)
 	CurrentHealth -= Damage;
 }
 
+void AEnemyBase::SetHealth(float Health)
+{
+	CurrentHealth = Health;
+}
+
+float AEnemyBase::GetHealth()
+{
+	return CurrentHealth;
+}
+
+void AEnemyBase::AddToHealth(float Increase)
+{
+	 CurrentHealth  = std::min((CurrentHealth + Increase),MaxHealth);
+}
+
 // Called every frame
 void AEnemyBase::Tick(float DeltaTime)
 {

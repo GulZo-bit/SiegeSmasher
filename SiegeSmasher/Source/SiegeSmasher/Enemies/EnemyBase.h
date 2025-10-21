@@ -63,7 +63,9 @@ public:
 	void SetCurrentWaveContribution(int WaveContrib);
 	int GetStartingWave();
 	virtual void DamageEnemy(float Damage);
-
+	void SetHealth(float Health); 
+	float GetHealth(); 
+	void AddToHealth(float Increase);
 
 	EnemyTypes GetEnemyWaveType();
 };

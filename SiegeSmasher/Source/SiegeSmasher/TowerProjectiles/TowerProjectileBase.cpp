@@ -78,14 +78,23 @@ void ATowerProjectileBase::MoveToTarget(float DeltaTime)
 	
 	FVector CurrentDifference = TargetPosition - GetActorLocation(); 
 
-	double currentRotationAngleYaw = atan2(TargetPosition.Y, TargetPosition.X);  
+	double currentRotationAngleYaw = atan2(CurrentDifference.Y,CurrentDifference.X);  
 
+
+	FQuat TravelRot = FRotator(InitalPitch, FMath::RadiansToDegrees(currentRotationAngleYaw),0.0f).Quaternion();
 
 	
 
 	SetActorLocation(FMath::VInterpConstantTo(GetActorLocation(), TargetPosition, DeltaTime, ProjectileSpeed));
 
 
+	SetActorRotation(TravelRot);
 
+
+}
+
+void ATowerProjectileBase::SetInitialPitch(float Pitch)
+{
+	InitalPitch = Pitch;
 }
 
