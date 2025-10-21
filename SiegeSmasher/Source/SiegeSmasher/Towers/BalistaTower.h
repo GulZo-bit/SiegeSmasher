@@ -28,13 +28,15 @@ protected:
 	UStaticMeshComponent* BallistaBase;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaMesh");
 	UStaticMeshComponent* BallistaTurret;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaMesh");
-	UStaticMeshComponent* BallistaArrow;
 
+	
 
 	
 
 public:	
+
+private: 
+
 
 
 };

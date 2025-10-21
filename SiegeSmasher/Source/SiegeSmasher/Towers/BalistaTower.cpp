@@ -12,9 +12,7 @@ ABalistaTower::ABalistaTower()
 	BallistaBase->SetupAttachment(RootComponent); 
 	BallistaTurret = CreateDefaultSubobject<UStaticMeshComponent>("BallistaTurret");
 	BallistaTurret->SetupAttachment(RootComponent);
-	BallistaArrow = CreateDefaultSubobject<UStaticMeshComponent>("BallistaArrow");
-	BallistaArrow->SetupAttachment(BallistaTurret);
-
+	TowerFiringPoint->SetupAttachment(BallistaTurret);
 
 
 
@@ -22,39 +20,57 @@ ABalistaTower::ABalistaTower()
 }
 void ABalistaTower::TowerActive(float& DeltaTime) {
 	 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Balista Tower Active ")));
-
-	FVector ToTarget = EnemySingleTarget->GetActorLocation() - GetActorLocation();
-	if ( ToTarget.SquaredLength() < TargetingRange ) {
-		FVector TargetDir = ToTarget.GetSafeNormal(); 
-		FVector ActorForward = GetActorForwardVector(); 
-		float CosAngle = ActorForward.Dot(TargetDir);
-		FVector SinAngle = ActorForward.Cross(TargetDir) * FVector::UpVector; 
-		
-
-		float PitchAngle = atan2f(ToTarget.Z, ToTarget.X); 
-		float YawAngle = atan2(ToTarget.X, ToTarget.Y);
-		FQuat RequiredRotation = FRotator(FMath::RadiansToDegrees(PitchAngle), FMath::RadiansToDegrees(YawAngle), 0.0f).Quaternion();
-		
-		FQuat ActorRotation = FQuat::Slerp(GetActorRotation().Quaternion(), RequiredRotation, RotationLerpSpeed);
-	   if (CosAngle > FovSnappingThreshold) {
-
-		   
-          
-
-	   }
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Ballista Tower Active ")));
 	
+	FVector ToTarget = EnemySingleTarget->GetActorLocation() - BallistaTurret->GetComponentLocation();
+	float toTargetLength = ToTarget.Length();
+	DrawDebugLine(GetWorld(), BallistaTurret->GetComponentLocation(), BallistaTurret->GetComponentLocation() + ToTarget.GetSafeNormal() * FVector(toTargetLength, toTargetLength, toTargetLength), FColor::Cyan);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Target distance %f"), ToTarget.SquaredLength()));
+	if ( ToTarget.SquaredLength() < (TargetingRange * TargetingRange) ) {
+		
+		
+		FVector TargetDir = ToTarget.GetSafeNormal();
 
+		float Alignment = TargetDir.Dot(BallistaTurret->GetForwardVector()); 
+		FVector FromTarget = BallistaTurret->GetComponentLocation() - EnemySingleTarget->GetActorLocation();
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("alignment  for turret %f "), Alignment));
+		FVector PitchVector = FVector(0.0f, 0.0f, TargetDir.Z); 
+		float DistanceForPitch = sqrt(ToTarget.X * ToTarget.X + ToTarget.Y * ToTarget.Y);
+		float PitchAngle = atan2f(ToTarget.Z,DistanceForPitch);
+		float YawAngle = atan2f(ToTarget.Y, ToTarget.X);
+
+		FQuat RequiredRotation= FRotator(FMath::RadiansToDegrees(PitchAngle), FMath::RadiansToDegrees(YawAngle), 0.0f).Quaternion();
+
+		
+		FVector YawAlignedActorForward = GetActorForwardVector();
+		FQuat TurretRotation = FQuat::Slerp(BallistaTurret->GetComponentRotation().Quaternion(),(RequiredRotation ), 0.5f);
+		BallistaTurret->SetWorldRotation(TurretRotation);
+
+		if (Alignment > FovSnappingThreshold && !RequiresReset) {
+
+
+			ShootProjectile(RequiredRotation.Rotator());
+
+
+
+
+		}
+
+	  
+
+		
 
 
 	} 
 
+	
 
 
 
 
+
+	
 } 
-
 
 
 

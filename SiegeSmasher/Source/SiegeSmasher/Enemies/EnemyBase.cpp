@@ -23,6 +23,11 @@ int AEnemyBase::EnemyTest()
 	return 0;
 }
 
+void AEnemyBase::DamageEnemy(float Damage)
+{
+	CurrentHealth -= Damage;
+}
+
 // Called every frame
 void AEnemyBase::Tick(float DeltaTime)
 {

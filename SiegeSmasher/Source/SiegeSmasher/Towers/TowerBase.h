@@ -93,7 +93,8 @@ protected:
 protected:
 	
 	
-	bool NeedsNewTargets = true;
+	bool NeedsNewTargets = true; 
+	UFUNCTION()
 	virtual void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void HandleNewEnemy(AEnemyBase* EnemyBase); 
 	virtual void TowerReset();
