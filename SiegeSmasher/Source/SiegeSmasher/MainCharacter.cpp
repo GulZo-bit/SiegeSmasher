@@ -77,7 +77,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacter::Look); 
 
-		EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacter::PlaceTower);
+		EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Started, this, &AMainCharacter::PlaceTower);
 
 
 
