@@ -48,7 +48,7 @@ void AWitch_Projectile::Tick(float DeltaTime)
 	else
 	{
 		float CurrentTime = (GetWorld()->GetTimeSeconds() - StartTime) / DeltaTime;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Current Time: %f"), CurrentTime));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Current Time: %f"), CurrentTime));
 
 		if (CurrentTime >= 50.0f)
 		{

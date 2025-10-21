@@ -104,6 +104,8 @@ void AAIWitch::HealEnemy()
 				if (Cast<AAICharTest>(ActorVampStore[i]))
 				{
 					GLog->Log("Healing Enemies");
+					AAICharTest* Temp = Cast<AAICharTest>(ActorVampStore[i]);
+					Temp->AddToHealth(20);
 				}
 			}
 		}

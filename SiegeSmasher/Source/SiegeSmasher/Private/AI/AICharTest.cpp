@@ -16,8 +16,7 @@ AAICharTest::AAICharTest()
 void AAICharTest::BeginPlay()
 {
 	Super::BeginPlay();
-
-
+	
 	//Sword Stuff
 	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);
 
@@ -90,7 +89,6 @@ void AAICharTest::Tick(float DeltaTime)
 	FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
 	FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
 	CubeStore->SetActorRotation(Rotator);
-	
 	
 }
 
