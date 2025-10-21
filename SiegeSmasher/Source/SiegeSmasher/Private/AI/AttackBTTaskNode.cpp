@@ -5,6 +5,7 @@
 #include "AIController.h"
 #include "SiegeSmasher/MainCharacter.h"
 #include "AI/Sword.h"
+#include "AI/AICharTest.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -17,32 +18,18 @@ EBTNodeResult::Type UAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Failed;
 	}
 
-	/*ASword* Sword = Cast<ASword>(OwnerComp.GetClass());
-	if (Sword == nullptr)
+	AAIController* Controller = OwnerComp.GetAIOwner();
+	APawn* ControlledPawn = Controller->GetPawn();
+
+	if (ControlledPawn != nullptr)
 	{
-		GLog->Log(FString::Printf(TEXT("Failed PlayerChar")));
-		return EBTNodeResult::Failed;
+		AAICharTest* Enemy = Cast<AAICharTest>(ControlledPawn);
+		if (Enemy != nullptr)
+		{
+			Enemy->PlayAttackMontage();
+			return EBTNodeResult::Succeeded;
+		}
 	}
 
-	else
-	{
-		Sword->setCollisionEnemy();
-		GLog->Log("Collision set to enemy");
-	}*/
-	
-	AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-	AMainCharacter* PlayerCharacter = Cast<AMainCharacter>(Player);
-
-	/*if (PlayerCharacter == nullptr)
-	{
-		GLog->Log(FString::Printf(TEXT("Failed PlayerChar")));
-		return EBTNodeResult::Failed;
-	}
-
-	/*else
-	{
-		PlayerCharacter->setHealth(PlayerCharacter->getHealth() - Damage);
-		GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), PlayerCharacter->getHealth()));
-	}*/
-	return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }

@@ -1,0 +1,58 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "AI/WitchAI/Witch_Projectile.h"
+#include "Kismet/GameplayStatics.h"
+
+// Sets default values
+AWitch_Projectile::AWitch_Projectile()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
+
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+
+	Mesh->BodyInstance.SetInstanceNotifyRBCollision(true);
+	Mesh->AttachToComponent(Root, FAttachmentTransformRules::KeepRelativeTransform);
+
+	Mesh->SetupAttachment(Root);
+}
+
+// Called when the game starts or when spawned
+void AWitch_Projectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	StartLocation = this->GetActorLocation();
+	Mesh->OnComponentBeginOverlap.AddDynamic(this, &AWitch_Projectile::OnOverLapBegin);
+	
+}
+
+// Called every frame
+void AWitch_Projectile::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);										//cm/s
+	FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 5000.0f);
+	SetActorLocation(Target);
+}
+
+void AWitch_Projectile::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+	if (Cast<AMainCharacter>(OtherActor))
+	{
+		AMainCharacter* MainChar = Cast<AMainCharacter>(OtherActor);
+		MainChar->setHealth(MainChar->getHealth() - Damage);
+		GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
+		//this->Destroy();
+	}
+	this->Destroy();
+	
+}
+
+
