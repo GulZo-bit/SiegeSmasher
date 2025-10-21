@@ -9,6 +9,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "PlayerHud/ChargeWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "MyMainCharacterTest.generated.h"
 
 UCLASS()
@@ -36,12 +40,26 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	USpringArmComponent* SpringArmComponent;
 
-
+	//Bools that handle animations 
 	UPROPERTY(VisibleAnywhere, Category = "Input");
 	bool ArrowDrawn;
 
 	UPROPERTY(VisibleAnywhere, Category = "Input");
 	bool ArrowFired;
+	
+	//flaot and bool for the Charging mechanic 
+	UPROPERTY();
+	float MaxCharge;
+
+	UPROPERTY();
+	float ChargeRate;
+
+	UPROPERTY();
+	float CurrentCharge;
+
+	UPROPERTY();
+	bool isCharging;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputMappingContext* DefaultContext; //The defult input mapping context. This will change depending on what context the player is in such as driving.
@@ -64,32 +82,43 @@ public:
 	//Calling for look input
 	void Look(const FInputActionValue& Value);
 
+	//calling for Jump input
 	void Jumping();
 
 	//input for triggering the shooting action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* ShootAction;
-
+	//input for triggering the draw action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* DrawAction;
-
+	//input that triggers stop aiming, which makes the player go back to their default animations
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* StopAimAction;
-	//Offset of the bow from the camera
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
-	FVector BowOffset;
 
 	//Projectile class to spawn.
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class APlayerArrow> ArrowClass;
+	//Static mesh that serves as a spawning point for the arrows
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay");
+	UStaticMeshComponent* BowPosition;
+	//Reference to the widget that will be created, it has to be a subclass of the UserWidget
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Charge")
+	TSubclassOf<class UUserWidget> PlayerHUD;
+	//Holds the created widget
+	UPROPERTY()
+	class UChargeWidget* ChargeWidget;
+
 
 	//function that handles shooting
 	void Shoot();
-
+	//sets bools for animations and starts the charging of the arrow
 	void DrawBow();
-
+	//same as draw bow but in reverse
 	void StopAim();
+	//increments the Current Charge variable
+	void ChargeShot(float DeltaTime);
 
+	//getters and seeters for the bools for the animation blueprint
 	UFUNCTION(BlueprintCallable)
 	bool GetArrowDrawn();
 

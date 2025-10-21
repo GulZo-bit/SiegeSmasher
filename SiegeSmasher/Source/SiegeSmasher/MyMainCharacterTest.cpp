@@ -12,6 +12,7 @@
 // Sets default values
 AMainCharacterTest::AMainCharacterTest()
 {
+
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -24,8 +25,17 @@ AMainCharacterTest::AMainCharacterTest()
 	TPSCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
 	//Attach CameraComponent as a child of Spring Arm
 	TPSCameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
+	//Allows the tick function to play
+	PrimaryActorTick.bCanEverTick = true;
 
-	
+	//Creates the static mesh and assigns it to the socket 
+	BowPosition = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BowPosition"));
+	BowPosition->SetupAttachment(AMainCharacterTest::GetMesh(), TEXT("BowPosition"));
+	//Default values for the charge mechanic
+	isCharging = false;
+	MaxCharge = 100.0f;
+	CurrentCharge = 0.0f;
+	ChargeRate = 10.0f;
 }
 
 // Called when the game starts or when spawned
@@ -62,13 +72,29 @@ void AMainCharacterTest::BeginPlay()
 			Subsystem->AddMappingContext(DefaultContext, 0);
 		}
 	}
+	//checks if the reference to the player hud is not empty
+	if (PlayerHUD != nullptr) 
+	{
+		//creates the widget of the ChargeWidget class in the current world
+	ChargeWidget = CreateWidget<UChargeWidget>(GetWorld(), PlayerHUD);
+		//if the widget was created successfully, add it to viewport
+		if (ChargeWidget != nullptr) 
+		{
+			ChargeWidget->AddToViewport();
+		}
+	}
 }
 
 // Called every frame
 void AMainCharacterTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	ChargeShot(DeltaTime);
+	//if Charge widget is not empty, update the charge amount in the widget
+	if (ChargeWidget != nullptr) 
+	{
+		ChargeWidget->SetChargeAmount(CurrentCharge);
+	}
 }
 
 // Called to bind functionality to input
@@ -150,27 +176,31 @@ void AMainCharacterTest::Shoot()
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
-		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		BowOffset.Set(0.0f, 10.0f, 0.0f);
-		// Transform MuzzleOffset from camera space to world space.
-		FVector BowLocation = CameraLocation + FTransform(CameraRotation).TransformVector(BowOffset);
+		// Transform BowOffset from camera space to world space.
+		//FVector BowLocation = CameraLocation + FTransform(CameraRotation).TransformVector(BowOffset);
 		FRotator BowRotation = CameraRotation;
-
+		//gets the world the player is in
 		UWorld* World = GetWorld();
 		if (World)
-		{
+		{//spawn parameters of the arrow
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = GetInstigator();
-
-			APlayerArrow* Arrow = World->SpawnActor<APlayerArrow>(ArrowClass, BowLocation, CameraRotation, SpawnParams);
-
+			//creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
+			APlayerArrow* Arrow = World->SpawnActor<APlayerArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
+			//if arrow has been succesfully created
 			if (Arrow)
 			{
+				//changes the Bow rotation to be changed into a vector so that it shows a direction
 				FVector LaunchDirection = BowRotation.Vector();
-				Arrow->FireInDirection(LaunchDirection);
+				//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
+				Arrow->FireInDirection(LaunchDirection, CurrentCharge);
+				//sets the bools for animations and turns off charging and resets the charge
 				SetArrowDrawn(false);
 				SetArrowFired(true);
+				isCharging = false;
+				UE_LOG(LogTemp, Warning, TEXT("Charge: %f Percent"), CurrentCharge);
+				CurrentCharge = 0;
 			}
 		}
 	}
@@ -180,7 +210,7 @@ void AMainCharacterTest::DrawBow()
 {
 	SetArrowFired(false);
 	SetArrowDrawn(true);
-	//UE_LOG(LogTemp, Warning, TEXT("bIsActive: %s"), ArrowDrawn ? TEXT("true") : TEXT("false"));
+	isCharging = true;
 }
 
 bool AMainCharacterTest::GetArrowDrawn()
@@ -207,5 +237,15 @@ void AMainCharacterTest::StopAim()
 {
 	SetArrowDrawn(false);
 	SetArrowFired(true);
+	isCharging = false;
+}
+
+void AMainCharacterTest::ChargeShot(float DeltaTime)
+{
+	if (isCharging == true) 
+	{
+		CurrentCharge += ChargeRate * DeltaTime;
+		CurrentCharge = FMath::Clamp(CurrentCharge, 0.0f, MaxCharge);
+	}
 }
 

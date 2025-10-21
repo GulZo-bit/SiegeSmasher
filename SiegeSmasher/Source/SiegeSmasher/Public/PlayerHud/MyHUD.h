@@ -4,14 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Engine/Canvas.h"
+#include "Components/ProgressBar.h"
 #include "MyHUD.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SIEGESMASHER_API AMyHUD : public AHUD
 {
 	GENERATED_BODY()
+
+public:
+	AMyHUD();
+protected:
+	//texture that will be drawn on the screen
+	UPROPERTY(EditDefaultsOnly)
+	UTexture2D* CrosshairTexture;
+
+public:
+	//Primary draw call for the Hud
+	virtual void DrawHUD() override;
 	
 };
