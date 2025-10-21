@@ -39,6 +39,8 @@ void ATowerBase::BeginPlay()
 
 	WaitTimeToReset = MaxWaitTimeToReset;
 	TriggerRangeBox->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnOverLapBegin);
+	TriggerBoxDim = TriggerRangeBox->GetCollisionShape().GetExtent();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower trigger extents called %f %f %f"),TriggerBoxDim.X,TriggerBoxDim.Y,TriggerBoxDim.Z));
 
 	TowerSetUp();
 
@@ -271,6 +273,8 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 
 void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor* OverlapedActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool SweepBool ,const FHitResult& HitResult) {
 	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
+
 	CurrentyActive = true;
 	if (AEnemyBase* EnemyTOHandle = Cast<AEnemyBase>(OverlapedActor)) {
 		
@@ -305,12 +309,10 @@ void ATowerBase::Tick(float DeltaTime)
 
 
 	Super::Tick(DeltaTime); 
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower updating")));
-
 	if (CurrentyActive) {
-	
+	 
 			TowerActive(DeltaTime); 
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("waitimeToReset is %f requires reset is %d"), WaitTimeToReset,(int)RequiresReset));
 			if (RequiresReset && (WaitTimeToReset -= DeltaTime)<=0.0f) {
 
 				RequiresReset = false;

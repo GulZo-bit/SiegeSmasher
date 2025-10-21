@@ -7,7 +7,12 @@
 AProjectileTowerBase::AProjectileTowerBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true; 
+	World = GetWorld(); 
+	ProjectileSpawnParameters = FActorSpawnParameters(); 
+	ProjectileSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	TowerFiringPoint = CreateDefaultSubobject<USceneComponent>("TowerFiringPoint");
+	/*TowerFiringPoint->SetupAttachment(RootComponent);*/
 
 }
 
@@ -21,10 +26,13 @@ void AProjectileTowerBase::BeginPlay()
 
 void AProjectileTowerBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 
-	CurrentyActive = true; 
-	AEnemyBase* NewEnemy = Cast<AEnemyBase>(OtherActor);
-	if (NoTargetsInRange && NewEnemy){
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("projectile tower called")));
+
+	AEnemyBase* NewEnemy = Cast<AEnemyBase>(OtherActor);
+	if (NoTargetsInRange && NewEnemy != nullptr){
+		CurrentyActive = true;
+		
 		HandleNewEnemy(NewEnemy);
 
 	}
@@ -35,12 +43,26 @@ void AProjectileTowerBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 void AProjectileTowerBase::HandleNewEnemy(AEnemyBase* Enemy) {
 
 
+	
 	NoTargetsInRange = false;
 	EnemySingleTarget = Enemy;
 
 
+}
+
+void AProjectileTowerBase::ShootProjectile(FRotator Rotation)
+{
+	
+	ATowerProjectileBase * ProjectilRef =  World->SpawnActor<ATowerProjectileBase>(Projectile, FTransform(Rotation, TowerFiringPoint->GetComponentLocation(), FVector::OneVector), ProjectileSpawnParameters);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Ballista shooting projectile")));
+	ProjectilRef->SetInitialPitch(Rotation.Pitch);
+	ProjectilRef->SetEnemyTarget(EnemySingleTarget);
+	
+	RequiresReset = true; 
+	
 
 }
+
 
 // Called every frame
 void AProjectileTowerBase::Tick(float DeltaTime)

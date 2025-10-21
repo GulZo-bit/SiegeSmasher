@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h" 
-#include "TowerBase.h"
+#include "TowerBase.h" 
+#include "../TowerProjectiles/TowerProjectileBase.h"
 #include "ProjectileTowerBase.generated.h"
 
 UCLASS()
@@ -26,18 +27,19 @@ protected:
 	float FovSnappingThreshold = 0.5f;
 	UPROPERTY(editAnyWhere, BluePrintReadWrite, Category = "Rotation Speed");
 	float RotationLerpSpeed = 0.3f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerProjectile(Optional)");
-	AActor* Projectile;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerProjectile");
+	TSubclassOf<ATowerProjectileBase> Projectile;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerFiringPoint");
+	USceneComponent* TowerFiringPoint;
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	AEnemyBase* EnemySingleTarget = nullptr;
-	bool NoTargetsInRange = true;
+	bool NoTargetsInRange = true; 
+	UWorld* World = nullptr;
 	void HandleNewEnemy(AEnemyBase* Enemy);
-
-
-public:	
+	FActorSpawnParameters ProjectileSpawnParameters;
+	void ShootProjectile(FRotator Rotation);
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override; 
 
 };

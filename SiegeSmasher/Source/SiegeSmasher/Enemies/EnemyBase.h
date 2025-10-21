@@ -44,7 +44,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyVariables")
 	float MaxHealth = 100.0f;
 
-	int StartingWave = 0; // wave 0 = 1(starts counting from 0)
+	int StartingWave = 0; // wave 0 = 1(starts counting from 0) 
+
+
+	
+
 public:
 
 	virtual void Tick(float DeltaTime) override;
@@ -58,7 +62,10 @@ public:
 	int GetCurrentWaveContribution();
 	void SetCurrentWaveContribution(int WaveContrib);
 	int GetStartingWave();
-
+	virtual void DamageEnemy(float Damage);
+	void SetHealth(float Health); 
+	float GetHealth(); 
+	void AddToHealth(float Increase);
 
 	EnemyTypes GetEnemyWaveType();
 };
