@@ -15,14 +15,11 @@ COREUOBJECT_API UScriptStruct* Z_Construct_UScriptStruct_FVector();
 ENGINE_API UClass* Z_Construct_UClass_ACharacter();
 ENGINE_API UClass* Z_Construct_UClass_UCameraComponent_NoRegister();
 ENGINE_API UClass* Z_Construct_UClass_USpringArmComponent_NoRegister();
-ENGINE_API UClass* Z_Construct_UClass_UStaticMeshComponent_NoRegister();
 ENHANCEDINPUT_API UClass* Z_Construct_UClass_UInputAction_NoRegister();
 ENHANCEDINPUT_API UClass* Z_Construct_UClass_UInputMappingContext_NoRegister();
 SIEGESMASHER_API UClass* Z_Construct_UClass_AMainCharacterTest();
 SIEGESMASHER_API UClass* Z_Construct_UClass_AMainCharacterTest_NoRegister();
 SIEGESMASHER_API UClass* Z_Construct_UClass_APlayerArrow_NoRegister();
-SIEGESMASHER_API UClass* Z_Construct_UClass_UChargeWidget_NoRegister();
-UMG_API UClass* Z_Construct_UClass_UUserWidget_NoRegister();
 UPackage* Z_Construct_UPackage__Script_SiegeSmasher();
 // End Cross Module References
 
@@ -261,18 +258,6 @@ struct Z_Construct_UClass_AMainCharacterTest_Statics
 		{ "Category", "Input" },
 		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
 	};
-	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_MaxCharge_MetaData[] = {
-		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
-	};
-	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ChargeRate_MetaData[] = {
-		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
-	};
-	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_CurrentCharge_MetaData[] = {
-		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
-	};
-	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_isCharging_MetaData[] = {
-		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
-	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_DefaultContext_MetaData[] = {
 		{ "Category", "Input" },
 		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
@@ -345,19 +330,6 @@ struct Z_Construct_UClass_AMainCharacterTest_Statics
 		{ "ToolTip", "Projectile class to spawn." },
 #endif
 	};
-	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_BowPosition_MetaData[] = {
-		{ "Category", "Gameplay" },
-		{ "EditInline", "true" },
-		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
-	};
-	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_PlayerHUD_MetaData[] = {
-		{ "Category", "Charge" },
-		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
-	};
-	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ChargeWidget_MetaData[] = {
-		{ "EditInline", "true" },
-		{ "ModuleRelativePath", "MyMainCharacterTest.h" },
-	};
 #endif // WITH_METADATA
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_TPSCameraComponent;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_SpringArmComponent;
@@ -365,11 +337,6 @@ struct Z_Construct_UClass_AMainCharacterTest_Statics
 	static const UECodeGen_Private::FBoolPropertyParams NewProp_ArrowDrawn;
 	static void NewProp_ArrowFired_SetBit(void* Obj);
 	static const UECodeGen_Private::FBoolPropertyParams NewProp_ArrowFired;
-	static const UECodeGen_Private::FFloatPropertyParams NewProp_MaxCharge;
-	static const UECodeGen_Private::FFloatPropertyParams NewProp_ChargeRate;
-	static const UECodeGen_Private::FFloatPropertyParams NewProp_CurrentCharge;
-	static void NewProp_isCharging_SetBit(void* Obj);
-	static const UECodeGen_Private::FBoolPropertyParams NewProp_isCharging;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_DefaultContext;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_JumpAction;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_MoveAction;
@@ -379,9 +346,6 @@ struct Z_Construct_UClass_AMainCharacterTest_Statics
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_StopAimAction;
 	static const UECodeGen_Private::FStructPropertyParams NewProp_BowOffset;
 	static const UECodeGen_Private::FClassPropertyParams NewProp_ArrowClass;
-	static const UECodeGen_Private::FObjectPropertyParams NewProp_BowPosition;
-	static const UECodeGen_Private::FClassPropertyParams NewProp_PlayerHUD;
-	static const UECodeGen_Private::FObjectPropertyParams NewProp_ChargeWidget;
 	static const UECodeGen_Private::FPropertyParamsBase* const PropPointers[];
 	static UObject* (*const DependentSingletons[])();
 	static constexpr FClassFunctionLinkInfo FuncInfo[] = {
@@ -408,14 +372,6 @@ void Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ArrowFired_SetBit(vo
 	((AMainCharacterTest*)Obj)->ArrowFired = 1;
 }
 const UECodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ArrowFired = { "ArrowFired", nullptr, (EPropertyFlags)0x0010000000020001, UECodeGen_Private::EPropertyGenFlags::Bool | UECodeGen_Private::EPropertyGenFlags::NativeBool, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, sizeof(bool), sizeof(AMainCharacterTest), &Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ArrowFired_SetBit, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ArrowFired_MetaData), NewProp_ArrowFired_MetaData) };
-const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_MaxCharge = { "MaxCharge", nullptr, (EPropertyFlags)0x0010000000000000, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, MaxCharge), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_MaxCharge_MetaData), NewProp_MaxCharge_MetaData) };
-const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ChargeRate = { "ChargeRate", nullptr, (EPropertyFlags)0x0010000000000000, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, ChargeRate), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ChargeRate_MetaData), NewProp_ChargeRate_MetaData) };
-const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_CurrentCharge = { "CurrentCharge", nullptr, (EPropertyFlags)0x0010000000000000, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, CurrentCharge), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_CurrentCharge_MetaData), NewProp_CurrentCharge_MetaData) };
-void Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_isCharging_SetBit(void* Obj)
-{
-	((AMainCharacterTest*)Obj)->isCharging = 1;
-}
-const UECodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_isCharging = { "isCharging", nullptr, (EPropertyFlags)0x0010000000000000, UECodeGen_Private::EPropertyGenFlags::Bool | UECodeGen_Private::EPropertyGenFlags::NativeBool, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, sizeof(bool), sizeof(AMainCharacterTest), &Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_isCharging_SetBit, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_isCharging_MetaData), NewProp_isCharging_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_DefaultContext = { "DefaultContext", nullptr, (EPropertyFlags)0x0010000000000015, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, DefaultContext), Z_Construct_UClass_UInputMappingContext_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_DefaultContext_MetaData), NewProp_DefaultContext_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_JumpAction = { "JumpAction", nullptr, (EPropertyFlags)0x0010000000000015, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, JumpAction), Z_Construct_UClass_UInputAction_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_JumpAction_MetaData), NewProp_JumpAction_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_MoveAction = { "MoveAction", nullptr, (EPropertyFlags)0x0010000000000015, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, MoveAction), Z_Construct_UClass_UInputAction_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_MoveAction_MetaData), NewProp_MoveAction_MetaData) };
@@ -425,18 +381,11 @@ const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AMainCharacter
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_StopAimAction = { "StopAimAction", nullptr, (EPropertyFlags)0x0010000000000015, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, StopAimAction), Z_Construct_UClass_UInputAction_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_StopAimAction_MetaData), NewProp_StopAimAction_MetaData) };
 const UECodeGen_Private::FStructPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_BowOffset = { "BowOffset", nullptr, (EPropertyFlags)0x0010000000000005, UECodeGen_Private::EPropertyGenFlags::Struct, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, BowOffset), Z_Construct_UScriptStruct_FVector, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_BowOffset_MetaData), NewProp_BowOffset_MetaData) };
 const UECodeGen_Private::FClassPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ArrowClass = { "ArrowClass", nullptr, (EPropertyFlags)0x0014000000010001, UECodeGen_Private::EPropertyGenFlags::Class, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, ArrowClass), Z_Construct_UClass_UClass, Z_Construct_UClass_APlayerArrow_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ArrowClass_MetaData), NewProp_ArrowClass_MetaData) };
-const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_BowPosition = { "BowPosition", nullptr, (EPropertyFlags)0x001000000008000d, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, BowPosition), Z_Construct_UClass_UStaticMeshComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_BowPosition_MetaData), NewProp_BowPosition_MetaData) };
-const UECodeGen_Private::FClassPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_PlayerHUD = { "PlayerHUD", nullptr, (EPropertyFlags)0x0014000000010005, UECodeGen_Private::EPropertyGenFlags::Class, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, PlayerHUD), Z_Construct_UClass_UClass, Z_Construct_UClass_UUserWidget_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_PlayerHUD_MetaData), NewProp_PlayerHUD_MetaData) };
-const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ChargeWidget = { "ChargeWidget", nullptr, (EPropertyFlags)0x0010000000080008, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AMainCharacterTest, ChargeWidget), Z_Construct_UClass_UChargeWidget_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ChargeWidget_MetaData), NewProp_ChargeWidget_MetaData) };
 const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AMainCharacterTest_Statics::PropPointers[] = {
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_TPSCameraComponent,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_SpringArmComponent,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ArrowDrawn,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ArrowFired,
-	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_MaxCharge,
-	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ChargeRate,
-	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_CurrentCharge,
-	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_isCharging,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_DefaultContext,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_JumpAction,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_MoveAction,
@@ -446,9 +395,6 @@ const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AMainChar
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_StopAimAction,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_BowOffset,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ArrowClass,
-	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_BowPosition,
-	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_PlayerHUD,
-	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AMainCharacterTest_Statics::NewProp_ChargeWidget,
 };
 static_assert(UE_ARRAY_COUNT(Z_Construct_UClass_AMainCharacterTest_Statics::PropPointers) < 2048);
 UObject* (*const Z_Construct_UClass_AMainCharacterTest_Statics::DependentSingletons[])() = {
@@ -488,14 +434,14 @@ AMainCharacterTest::~AMainCharacterTest() {}
 // End Class AMainCharacterTest
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_Users_kewin_Desktop_C__Unreal_Engine_Assigment_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_Statics
+struct Z_CompiledInDeferFile_FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_AMainCharacterTest, AMainCharacterTest::StaticClass, TEXT("AMainCharacterTest"), &Z_Registration_Info_UClass_AMainCharacterTest, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AMainCharacterTest), 557571865U) },
+		{ Z_Construct_UClass_AMainCharacterTest, AMainCharacterTest::StaticClass, TEXT("AMainCharacterTest"), &Z_Registration_Info_UClass_AMainCharacterTest, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AMainCharacterTest), 1798233511U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_kewin_Desktop_C__Unreal_Engine_Assigment_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_615193467(TEXT("/Script/SiegeSmasher"),
-	Z_CompiledInDeferFile_FID_Users_kewin_Desktop_C__Unreal_Engine_Assigment_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_kewin_Desktop_C__Unreal_Engine_Assigment_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_4272629934(TEXT("/Script/SiegeSmasher"),
+	Z_CompiledInDeferFile_FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

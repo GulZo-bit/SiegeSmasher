@@ -70,7 +70,7 @@ void ASword::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle);
 		GetWorldTimerManager().SetTimer(TimerHandle, this, &ASword::ResetHit, 1.0f, false, 1.5f);
-		if (bHitDetected == false)
+		if (bHit == false)
 		{
 			AMainCharacter* MainChar = Cast<AMainCharacter>(OtherActor);
 			MainChar->setHealth(MainChar->getHealth() - Damage);

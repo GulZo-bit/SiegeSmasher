@@ -6,11 +6,12 @@
 #include "GameFramework/Character.h"
 #include "EnemyBase.generated.h"
 
-UENUM(Blueprintable)
-enum EnemyTypes
+UENUM(BlueprintType)
+enum class EnemyTypes : uint8
 {
-	BASE,
-	BASE1,
+	BASE UMETA(DisplayName = "BASE"),
+	BASE1 UMETA(DisplayName = "BASE1"),
+	VAMPIRE UMETA(DisplayName = "VAMPIRE"),
 
 
 };
@@ -35,9 +36,12 @@ protected:
 	float WavePolynomialConstantTwo = 0.2f;
 	int CurrentWaveContribution = 0;
 	
-	EnemyTypes EnemyType = BASE;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyVariables")
+	EnemyTypes EnemyType = EnemyTypes::BASE;
+
 	float CurrentHealth = 100.0f; 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyVariables")
 	float MaxHealth = 100.0f;
 
 	int StartingWave = 0; // wave 0 = 1(starts counting from 0)

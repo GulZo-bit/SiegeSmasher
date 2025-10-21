@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "TowerBase.h"
+#include "GameFramework/Actor.h" 
+#include "TowerBase.h" 
+
+#include "Components/BoxComponent.h"
 #include "TowerTestBox.generated.h"
 
 UCLASS()
@@ -16,9 +18,13 @@ public:
 	// Sets default values for this actor's properties
 	ATowerTestBox();
 
+
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override; 
+
+
+    
 
 public:	
 	// Called every frame

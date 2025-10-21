@@ -15,18 +15,25 @@ class SIEGESMASHER_API AEnemyBTAISplineController : public AAIController
 {
 	GENERATED_BODY()
 public:
-
 protected:
-	virtual void BeginPlay() override;
+	
+	float CheckDistanceToPlayer();
+	float CheckPlayerDirection();
 
+	virtual void OnPossess(APawn* InPawn) override;
 public:
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	ASplineMovementActor* SplineMovementActor;
-	TArray<ASplineMovementActor*> SplineMovementActorStore;
-	AAIController* AIController;
+	UPROPERTY()
+	APawn* PlayerPawn;
+	UPROPERTY()
+	APawn* ControlledPawn;
+	UPROPERTY()
 	UChildActorComponent* ChildActor;
+	UPROPERTY()
 	AActor* CubeStore;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;

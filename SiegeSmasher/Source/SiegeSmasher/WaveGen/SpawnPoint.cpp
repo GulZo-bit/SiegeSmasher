@@ -49,7 +49,7 @@ void ASpawnPoint::ResetCoolDownTimer()
 {
 
 	CoolDownTimer = random.FRandRange(CoolDownTimerMin, CoolDownTimerMax);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("reseting cool donw timer inside of spawn point new value is %f"), CoolDownTimer));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("reseting cool donw timer inside of spawn point new value is %f"), CoolDownTimer));
 	GLog->Log(FString::Printf(TEXT("reseting cool donw timer inside of spawn point new value is %f"), CoolDownTimer));
 
 

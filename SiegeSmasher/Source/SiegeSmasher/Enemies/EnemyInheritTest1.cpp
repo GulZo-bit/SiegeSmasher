@@ -8,7 +8,7 @@ AEnemyInheritTest1::AEnemyInheritTest1()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	EnemyType = BASE1;
+	EnemyType = EnemyTypes::BASE1;
 }
 
 // Called when the game starts or when spawned

@@ -18,6 +18,8 @@ void ATowerTestBox::BeginPlay()
 	
 }
 
+
+
 // Called every frame
 void ATowerTestBox::Tick(float DeltaTime)
 {
