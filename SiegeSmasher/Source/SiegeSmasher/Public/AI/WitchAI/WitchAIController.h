@@ -34,10 +34,12 @@ protected:
 
 	APawn* PlayerPawn;
 
+	FTimerHandle Timer;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void PlayAttack();
+	void setHealBool();
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;

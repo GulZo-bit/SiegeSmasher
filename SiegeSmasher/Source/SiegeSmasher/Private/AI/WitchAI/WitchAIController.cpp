@@ -4,6 +4,7 @@
 #include "AI/WitchAI/WitchAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
 
 void AWitchAIController::BeginPlay()
 {
@@ -24,6 +25,7 @@ void AWitchAIController::BeginPlay()
 				GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Player Found")));
 			}
 		}*/
+
 	}
 }
 
@@ -46,6 +48,8 @@ void AWitchAIController::OnPossess(APawn* InPawn)
 			CubeStore = ChildActor->GetChildActor();
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(Timer, this, &AWitchAIController::setHealBool, 5.0f, true, 1.0f);
 	
 }
 
@@ -53,10 +57,12 @@ void AWitchAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 	if (LineOfSightTo(PlayerPawn))
 	{
 		SetFocus(PlayerPawn);
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), false);
 	}
 
 	else
@@ -66,4 +72,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
 	}
 	
+}
+
+void AWitchAIController::setHealBool()
+{
+	GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), true);
 }

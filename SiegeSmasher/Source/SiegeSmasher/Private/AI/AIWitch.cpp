@@ -3,6 +3,8 @@
 
 #include "AI/AIWitch.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/BoxComponent.h"
+#include "AI/AICharTest.h"
 
 // Sets default values
 AAIWitch::AAIWitch()
@@ -37,7 +39,7 @@ void AAIWitch::BeginPlay()
 	TArray<UChildActorComponent*> ChildActors;
 	this->GetComponents(ChildActors, true);
 	SplineNum = FMath::RandRange(0, SplineControllerStore.Num() - 1);
-
+	
 	//Loop through the array.
 	for (int i = 0; i < ChildActors.Num(); i++)
 	{
@@ -55,8 +57,19 @@ void AAIWitch::BeginPlay()
 
 				StartTime = GetWorld()->GetTimeSeconds();
 			}
+
+			
 		}
 	}
+	HealZone = this->FindComponentByClass<UBoxComponent>();
+	//HealStore = GetComponentsByTag(UBoxComponent::StaticClass(), TEXT("HealZone"));
+	/*for (int i = 0; i < Temp.Num(); i++)
+	{
+		if (Temp[i] != nullptr)
+		{
+			
+		}
+	}*/
 }
 
 void AAIWitch::PlayAttack()
@@ -72,6 +85,29 @@ void AAIWitch::PlayAttack()
 		}
 	}
 	
+}
+
+void AAIWitch::HealEnemy()
+{
+	if (HealZone != nullptr)
+	{
+		GLog->Log("Found HealZone");
+
+		TArray<AActor*> ActorVampStore;
+		//TArray<AAICharTest*> VampStore;
+		HealZone->GetOverlappingActors(ActorVampStore);
+
+		for (int i = 0; i < ActorVampStore.Num(); i++)
+		{
+			if (ActorVampStore[i] != nullptr)
+			{
+				if (Cast<AAICharTest>(ActorVampStore[i]))
+				{
+					GLog->Log("Healing Enemies");
+				}
+			}
+		}
+	}
 }
 
 
@@ -109,7 +145,6 @@ void AAIWitch::Tick(float DeltaTime)
 		}
 	}
 	
-
 }
 
 // Called to bind functionality to input

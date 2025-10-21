@@ -43,6 +43,10 @@ public:
 	int32 iCount = 0;
 	void PlayAttack();
 
+	TArray<UActorComponent*> HealStore;
+	UBoxComponent* HealZone;
+	void HealEnemy();
+
 	UPROPERTY(EditDefaultsOnly);
 	TSubclassOf<AWitch_Projectile> SpellClass;
 	UPROPERTY()
