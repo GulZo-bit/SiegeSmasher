@@ -9,6 +9,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "PlayerHud/ChargeWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "MyMainCharacterTest.generated.h"
 
 UCLASS()
@@ -36,12 +40,23 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	USpringArmComponent* SpringArmComponent;
 
-
 	UPROPERTY(VisibleAnywhere, Category = "Input");
 	bool ArrowDrawn;
 
 	UPROPERTY(VisibleAnywhere, Category = "Input");
 	bool ArrowFired;
+	
+	UPROPERTY();
+	float MaxCharge;
+
+	UPROPERTY();
+	float ChargeRate;
+
+	UPROPERTY();
+	float CurrentCharge;
+
+	UPROPERTY();
+	bool isCharging;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputMappingContext* DefaultContext; //The defult input mapping context. This will change depending on what context the player is in such as driving.
@@ -83,12 +98,24 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class APlayerArrow> ArrowClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay");
+	UStaticMeshComponent* BowPosition;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Charge")
+	TSubclassOf<class UUserWidget> PlayerHUD;
+
+	UPROPERTY()
+	class UChargeWidget* ChargeWidget;
+
+
 	//function that handles shooting
 	void Shoot();
 
 	void DrawBow();
 
 	void StopAim();
+
+	void ChargeShot(float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
 	bool GetArrowDrawn();

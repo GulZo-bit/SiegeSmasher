@@ -37,7 +37,7 @@ APlayerArrow::APlayerArrow()
 		ArrowMovement =
 			CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 		ArrowMovement->SetUpdatedComponent(ArrowCollision);
-		ArrowMovement->InitialSpeed = 3000.0f;
+		ArrowMovement->InitialSpeed = 5000.0f;
 		ArrowMovement->MaxSpeed = 3000.0f;
 		ArrowMovement->bRotationFollowsVelocity = true;
 		ArrowMovement->bShouldBounce = false;
@@ -66,8 +66,8 @@ APlayerArrow::APlayerArrow()
 
 		ArrowMesh->SetMaterial(0, ArrowMaterialInstance);
 		ArrowMesh->SetupAttachment(RootComponent);
-		ArrowMesh->SetRelativeLocation(FVector(-110.0f, 0.0f, 0.0f));
-		ArrowMesh->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
+		ArrowMesh->SetRelativeLocation(FVector(-70.0f, 0.0f, 0.0f));
+		ArrowMesh->SetRelativeScale3D(FVector(3.0f, 2.0f, 2.0f));
 		ArrowMesh->SetRelativeRotation(FQuat(FVector(0.0f, 0.0f, 1.0f), FMath::DegreesToRadians(90.0f)));
 
 	}
@@ -87,14 +87,17 @@ void APlayerArrow::Tick(float DeltaTime)
 
 }
 
-void APlayerArrow::FireInDirection(const FVector& ShootDirection)
-{
-	ArrowMovement->Velocity =
-		ShootDirection * ArrowMovement->InitialSpeed;
-}
+
 //called when the projectile hits something
 void APlayerArrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Destroy();
+}
+
+void APlayerArrow::FireInDirection(const FVector& ShootDirection, float Charge)
+{
+	float ArrowSpeed = ArrowMovement->InitialSpeed * (Charge/100);
+	UE_LOG(LogTemp, Warning, TEXT("ArrowSpeed: %f"), ArrowSpeed);
+	ArrowMovement->Velocity = ShootDirection * ArrowSpeed;
 }
 

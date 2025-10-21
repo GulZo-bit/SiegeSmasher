@@ -12,6 +12,7 @@
 // Sets default values
 AMainCharacterTest::AMainCharacterTest()
 {
+
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -25,7 +26,16 @@ AMainCharacterTest::AMainCharacterTest()
 	//Attach CameraComponent as a child of Spring Arm
 	TPSCameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 
-	
+	PrimaryActorTick.bCanEverTick = true;
+
+	BowPosition = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BowPosition"));
+
+	BowPosition->SetupAttachment(AMainCharacterTest::GetMesh(), TEXT("BowPosition"));
+
+	isCharging = false;
+	MaxCharge = 100.0f;
+	CurrentCharge = 0.0f;
+	ChargeRate = 10.0f;
 }
 
 // Called when the game starts or when spawned
@@ -62,13 +72,28 @@ void AMainCharacterTest::BeginPlay()
 			Subsystem->AddMappingContext(DefaultContext, 0);
 		}
 	}
+
+	if (PlayerHUD != nullptr) 
+	{
+	ChargeWidget = CreateWidget<UChargeWidget>(GetWorld(), PlayerHUD);
+
+		if (ChargeWidget != nullptr) 
+		{
+			ChargeWidget->AddToViewport();
+		}
+	}
 }
 
 // Called every frame
 void AMainCharacterTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	ChargeShot(DeltaTime);
 
+	if (ChargeWidget != nullptr) 
+	{
+		ChargeWidget->SetChargeAmount(CurrentCharge);
+	}
 }
 
 // Called to bind functionality to input
@@ -151,7 +176,7 @@ void AMainCharacterTest::Shoot()
 		FRotator CameraRotation;
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
 		// Set MuzzleOffset to spawn projectiles slightly in front of the camera.
-		BowOffset.Set(0.0f, 10.0f, 0.0f);
+		BowOffset.Set(150.0f, 10.0f, 0.0f);
 		// Transform MuzzleOffset from camera space to world space.
 		FVector BowLocation = CameraLocation + FTransform(CameraRotation).TransformVector(BowOffset);
 		FRotator BowRotation = CameraRotation;
@@ -163,14 +188,17 @@ void AMainCharacterTest::Shoot()
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = GetInstigator();
 
-			APlayerArrow* Arrow = World->SpawnActor<APlayerArrow>(ArrowClass, BowLocation, CameraRotation, SpawnParams);
+			APlayerArrow* Arrow = World->SpawnActor<APlayerArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
 
 			if (Arrow)
 			{
 				FVector LaunchDirection = BowRotation.Vector();
-				Arrow->FireInDirection(LaunchDirection);
+				Arrow->FireInDirection(LaunchDirection, CurrentCharge);
 				SetArrowDrawn(false);
 				SetArrowFired(true);
+				isCharging = false;
+				UE_LOG(LogTemp, Warning, TEXT("Charge: %f Percent"), CurrentCharge);
+				CurrentCharge = 0;
 			}
 		}
 	}
@@ -180,7 +208,7 @@ void AMainCharacterTest::DrawBow()
 {
 	SetArrowFired(false);
 	SetArrowDrawn(true);
-	//UE_LOG(LogTemp, Warning, TEXT("bIsActive: %s"), ArrowDrawn ? TEXT("true") : TEXT("false"));
+	isCharging = true;
 }
 
 bool AMainCharacterTest::GetArrowDrawn()
@@ -207,5 +235,15 @@ void AMainCharacterTest::StopAim()
 {
 	SetArrowDrawn(false);
 	SetArrowFired(true);
+	isCharging = false;
+}
+
+void AMainCharacterTest::ChargeShot(float DeltaTime)
+{
+	if (isCharging == true) 
+	{
+		CurrentCharge += ChargeRate * DeltaTime;
+		CurrentCharge = FMath::Clamp(CurrentCharge, 0.0f, MaxCharge);
+	}
 }
 
