@@ -26,6 +26,7 @@ void AWitch_Projectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	StartTime = GetWorld()->GetTimeSeconds();
 	StartLocation = this->GetActorLocation();
 	Mesh->OnComponentBeginOverlap.AddDynamic(this, &AWitch_Projectile::OnOverLapBegin);
 	
@@ -37,8 +38,23 @@ void AWitch_Projectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);										//cm/s
-	FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 5000.0f);
-	SetActorLocation(Target);
+	
+	if (bMove == true)
+	{
+		FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 5000.0f);
+		SetActorLocation(Target);
+	}
+	
+	else
+	{
+		float CurrentTime = (GetWorld()->GetTimeSeconds() - StartTime) / DeltaTime;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Current Time: %f"), CurrentTime));
+
+		if (CurrentTime >= 50.0f)
+		{
+			this->Destroy();
+		}
+	}
 }
 
 void AWitch_Projectile::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

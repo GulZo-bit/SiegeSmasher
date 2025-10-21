@@ -32,6 +32,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* AttackSpellMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	UAnimMontage* HealSpellMontage;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -45,11 +48,15 @@ public:
 
 	TArray<UActorComponent*> HealStore;
 	UBoxComponent* HealZone;
+	int32 iHealCount = 0;
 	void HealEnemy();
 
-	UPROPERTY(EditDefaultsOnly);
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AWitch_Projectile> SpellClass;
 	UPROPERTY()
 	AWitch_Projectile* Spell;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AWitch_Projectile> HealSpell;
 
 };

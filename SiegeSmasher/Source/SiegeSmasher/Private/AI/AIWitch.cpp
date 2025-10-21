@@ -18,7 +18,7 @@ AAIWitch::AAIWitch()
 void AAIWitch::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	AnimInstance = GetMesh()->GetAnimInstance();
 	//Spline controller stuff.
 	//Get all the spline controllers in the scene.
 	TArray<AActor*> SplineControllerAsActor;
@@ -76,7 +76,7 @@ void AAIWitch::PlayAttack()
 {
 	if (AttackSpellMontage != nullptr)
 	{
-		AnimInstance = GetMesh()->GetAnimInstance();
+		
 
 		if (AnimInstance != nullptr)
 		{
@@ -106,6 +106,17 @@ void AAIWitch::HealEnemy()
 					GLog->Log("Healing Enemies");
 				}
 			}
+		}
+	}
+
+	if (HealSpellMontage != nullptr)
+	{
+		//AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(HealSpellMontage);
+			iHealCount = 0;
 		}
 	}
 }
@@ -141,6 +152,17 @@ void AAIWitch::Tick(float DeltaTime)
 			{
 				Spell = GetWorld()->SpawnActor<AWitch_Projectile>(SpellClass, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
 				iCount++;
+			}
+		}
+
+		else if (AnimInstance->Montage_IsPlaying(HealSpellMontage))
+		{
+			float MontageTimeStore = AnimInstance->Montage_GetPosition(HealSpellMontage);
+			UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
+			if (MontageTimeStore >= 0.97f && iHealCount < 1)
+			{
+				Spell = GetWorld()->SpawnActor<AWitch_Projectile>(HealSpell, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				iHealCount++;
 			}
 		}
 	}

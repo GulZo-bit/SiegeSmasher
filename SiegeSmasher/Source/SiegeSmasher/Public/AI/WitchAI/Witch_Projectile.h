@@ -36,5 +36,8 @@ public:
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	float Damage = 10;
+	float StartTime;
 
+	UPROPERTY(EditAnywhere, Category = "Spell Move")
+	bool bMove = false;
 };

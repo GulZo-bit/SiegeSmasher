@@ -62,7 +62,7 @@ void AWitchAIController::Tick(float DeltaTime)
 	{
 		SetFocus(PlayerPawn);
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
-		GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), false);
+		//GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), false);
 	}
 
 	else
