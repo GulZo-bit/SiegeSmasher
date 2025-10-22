@@ -16,8 +16,7 @@ void AWitchAIController::BeginPlay()
 		RunBehaviorTree(AIBehavior);
 
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMainCharacter::StaticClass(), PlayerActorArray);
-		PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-		GetBlackboardComponent()->SetValueAsObject(TEXT("Player"), PlayerPawn);
+		//GetBlackboardComponent()->SetValueAsObject(TEXT("Player"), PlayerPawn);
 		/*for (int i = 0; i < PlayerActorArray.Num(); i++)
 		{
 			if (PlayerActorArray[i] != nullptr)
@@ -34,6 +33,7 @@ void AWitchAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	ControlledPawn = GetPawn();
+	Witch = Cast<AAIWitch>(ControlledPawn);
 
 	if (ControlledPawn != nullptr)
 	{
@@ -57,24 +57,196 @@ void AWitchAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
-	if (LineOfSightTo(PlayerPawn))
+	//Switch for checking line of sight to each player.
+	switch (PlayerActorArray.Num())
 	{
-		SetFocus(PlayerPawn);
-		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
-		//GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), false);
+	case(1):
+		if (LineOfSightTo(PlayerActorArray[0]))
+		{
+			SetFocus(PlayerActorArray[0]);
+
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					//Sets the index for the fireball to attack the player that is being focused on.
+					Witch->getSpell()->setPlayerIndex(0);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else
+		{
+			ClearFocus(EAIFocusPriority::Gameplay);
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
+			GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+		}
+		break;
+
+	case(2):
+		if (LineOfSightTo(PlayerActorArray[0]))
+		{
+			SetFocus(PlayerActorArray[0]);
+
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(0);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else if (LineOfSightTo(PlayerActorArray[1]))
+		{
+			SetFocus(PlayerActorArray[1]);
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(1);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else
+		{
+			ClearFocus(EAIFocusPriority::Gameplay);
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
+			GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+		}
+		break;
+
+	case(3):
+		if (LineOfSightTo(PlayerActorArray[0]))
+		{
+			SetFocus(PlayerActorArray[0]);
+
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(0);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else if (LineOfSightTo(PlayerActorArray[1]))
+		{
+			SetFocus(PlayerActorArray[1]);
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(1);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else if (LineOfSightTo(PlayerActorArray[2]))
+		{
+			SetFocus(PlayerActorArray[2]);
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(2);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else
+		{
+			ClearFocus(EAIFocusPriority::Gameplay);
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
+			GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+		}
+		break;
+		
+	case(4):
+		if (LineOfSightTo(PlayerActorArray[0]))
+		{
+			SetFocus(PlayerActorArray[0]);
+
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(0);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else if (LineOfSightTo(PlayerActorArray[1]))
+		{
+			SetFocus(PlayerActorArray[1]);
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(1);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else if (LineOfSightTo(PlayerActorArray[2]))
+		{
+			SetFocus(PlayerActorArray[2]);
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(2);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else if (LineOfSightTo(PlayerActorArray[3]))
+		{
+			SetFocus(PlayerActorArray[3]);
+			if (Witch != nullptr)
+			{
+				if (Witch->getSpell() != nullptr)
+				{
+					Witch->getSpell()->setPlayerIndex(3);
+				}
+			}
+
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+		}
+
+		else
+		{
+			ClearFocus(EAIFocusPriority::Gameplay);
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
+			GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+		}
+		break;
+
 	}
 
-	else
-	{
-		ClearFocus(EAIFocusPriority::Gameplay);
-		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
-		GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
-	}
-	
 }
 
 void AWitchAIController::setHealBool()
 {
 	GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), true);
 }
+

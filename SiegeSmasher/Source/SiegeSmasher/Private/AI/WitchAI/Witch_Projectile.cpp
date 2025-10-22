@@ -37,11 +37,11 @@ void AWitch_Projectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);										//cm/s
+	PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(),PlayerIndex);										//cm/s
 	
 	if (bMove == true)
 	{
-		FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 5000.0f);
+		FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 2500.0f);
 		SetActorLocation(Target);
 	}
 	
@@ -70,5 +70,11 @@ void AWitch_Projectile::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, clas
 	this->Destroy();
 	
 }
+
+void AWitch_Projectile::setPlayerIndex(int32 Store)
+{
+	PlayerIndex = Store;
+}
+
 
 

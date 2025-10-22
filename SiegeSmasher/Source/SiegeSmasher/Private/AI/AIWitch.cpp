@@ -118,6 +118,19 @@ void AAIWitch::HealEnemy()
 	}
 }
 
+AWitch_Projectile* AAIWitch::getSpell()
+{
+	if (Spell != nullptr)
+	{
+		return Spell;
+	}
+	
+	else
+	{
+		return nullptr;
+	}
+}
+
 void AAIWitch::Server_PlayHealSpellMontage_Implementation()
 {
 	Multicast_PlayHealSpellMontage();

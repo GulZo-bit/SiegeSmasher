@@ -72,4 +72,5 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AWitch_Projectile> HealSpell;
 
+	AWitch_Projectile* getSpell();
 };

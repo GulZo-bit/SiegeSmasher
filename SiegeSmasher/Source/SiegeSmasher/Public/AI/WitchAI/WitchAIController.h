@@ -29,11 +29,10 @@ protected:
 	UPROPERTY()
 	AActor* CubeStore;
 
+	AAIWitch* Witch;
+
 	UPROPERTY()
 	TArray<AActor*> PlayerActorArray;
-
-	APawn* PlayerPawn;
-
 	FTimerHandle Timer;
 
 public:

@@ -28,6 +28,9 @@ protected:
 
 	AMainCharacter* Player;
 	FVector StartLocation;
+
+	int32 PlayerIndex = 0;
+	APawn* PlayerPawn;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -40,4 +43,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Spell Move")
 	bool bMove = false;
+
+	void setPlayerIndex(int32 Store);
 };
