@@ -74,9 +74,28 @@ void AAIWitch::BeginPlay()
 
 void AAIWitch::PlayAttack()
 {
+	
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayAttackMontage();
+	}
+	
+	else
+	{
+		Multicast_PlayAttackMontage();
+	}
+}
+
+void AAIWitch::Server_PlayAttackMontage_Implementation()
+{
+	Multicast_PlayAttackMontage();
+}
+
+void AAIWitch::Multicast_PlayAttackMontage_Implementation()
+{
 	if (AttackSpellMontage != nullptr)
 	{
-		
+
 
 		if (AnimInstance != nullptr)
 		{
@@ -84,10 +103,27 @@ void AAIWitch::PlayAttack()
 			iCount = 0;
 		}
 	}
-	
 }
 
 void AAIWitch::HealEnemy()
+{
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayHealSpellMontage();
+	}
+
+	else
+	{
+		Multicast_PlayHealSpellMontage();
+	}
+}
+
+void AAIWitch::Server_PlayHealSpellMontage_Implementation()
+{
+	Multicast_PlayHealSpellMontage();
+}
+
+void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 {
 	if (HealZone != nullptr)
 	{
@@ -152,7 +188,10 @@ void AAIWitch::Tick(float DeltaTime)
 			UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
 			if (MontageTimeStore >= 1.23f && iCount < 1)
 			{
-				Spell = GetWorld()->SpawnActor<AWitch_Projectile>(SpellClass, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				if (HasAuthority())
+				{
+					Spell = GetWorld()->SpawnActor<AWitch_Projectile>(SpellClass, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				}
 				iCount++;
 			}
 		}
@@ -163,7 +202,11 @@ void AAIWitch::Tick(float DeltaTime)
 			UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
 			if (MontageTimeStore >= 0.97f && iHealCount < 1)
 			{
-				Spell = GetWorld()->SpawnActor<AWitch_Projectile>(HealSpell, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				if (HasAuthority())
+				{
+					Spell = GetWorld()->SpawnActor<AWitch_Projectile>(HealSpell, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				}
+				
 				iHealCount++;
 			}
 		}

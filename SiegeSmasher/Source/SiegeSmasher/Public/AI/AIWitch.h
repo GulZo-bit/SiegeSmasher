@@ -30,11 +30,24 @@ protected:
 	int32 SplineNum; //Number that will be set randomly based on how many splines are in the scene.
 	float StartTime;
 
+	//Animation for attack spell
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* AttackSpellMontage;
 
+	UFUNCTION(Server, Reliable)
+	void Server_PlayAttackMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayAttackMontage();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* HealSpellMontage;
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayHealSpellMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayHealSpellMontage();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
