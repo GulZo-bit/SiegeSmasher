@@ -9,13 +9,19 @@ ATowerBase::ATowerBase()
 	
 	PrimaryActorTick.bCanEverTick = true;
 	BoxColliderForObjectPlacement = CreateDefaultSubobject<UBoxComponent>(TEXT("Box collider for placement"));
-
+	TowerTimeLine = CreateDefaultSubobject<UTimelineComponent>("TowerTimeLine");
 	RootComponent = BoxColliderForObjectPlacement;
 	TriggerRangeBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger Box For Range"));
-	TriggerRangeBox->SetupAttachment(RootComponent);   
+	TriggerRangeBox->SetupAttachment(RootComponent);
 	TriggerRangeBox->SetCollisionResponseToChannel(PlacingSurface, ECollisionResponse::ECR_Ignore);
+	TowerTimeLineCurve = CreateDefaultSubobject<UCurveFloat>("Tower Time Line Curve");
+	TowerHitBox = CreateDefaultSubobject<UBoxComponent>("Tower Hit Box"); 
+	TriggerRangeBox->SetCollisionProfileName(FName("TowerPreset"));
+	TowerHitBox->SetCollisionProfileName(FName("TowerPreset"));
+	BoxColliderForObjectPlacement->SetCollisionProfileName(FName("TowerPreset"));
+	TowerHitBox->SetBoxExtent(FVector::ZeroVector); 
 	
-	
+   
 
 	
 }
@@ -34,28 +40,24 @@ void ATowerBase::BeginPlay()
 {
 
 	Super::BeginPlay();
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower begin play called")));
-
-	WaitTimeToReset = MaxWaitTimeToReset;
+	WaitTimeToReset = MaxWaitTimeToReset; 
+	CoolDownAfterReset = MaxCoolDownAfterReset;
 	TriggerRangeBox->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnOverLapBegin);
-	TriggerBoxDim = TriggerRangeBox->GetCollisionShape().GetExtent();
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower trigger extents called %f %f %f"),TriggerBoxDim.X,TriggerBoxDim.Y,TriggerBoxDim.Z));
+	TowerHitBox->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnOverlapHitBox); 
+	TriggerBoxDim = TriggerRangeBox->GetCollisionShape().GetExtent(); 
+	/*TriggerRangeBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	TowerHitBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);*/
+	
+	for (int i = 0; i < AllowedDirections.Num(); i++) {
+
+		FacingDirSum += AllowedDirections[i];
+
+	}
+
 
 	TowerSetUp();
 
 }
-
-
-
-void ATowerBase::TowerTimeLineEnd()
-{
-	RequiresReset = true;
-}
-
-
-
-
 
 
 FVector ATowerBase::GetPlacementColliderHalfExtents()
@@ -64,7 +66,7 @@ FVector ATowerBase::GetPlacementColliderHalfExtents()
 
 }
 
-void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos, FVector PlacementPosition, FVector CamDir,FVector CamPos,FTransform surfaceTransform)
+bool ATowerBase::ResolvePlacement(FVector& SurfaceBoxExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos,FTransform& surfaceTransform)
 {
 
 
@@ -122,20 +124,34 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 
 	FVector3d CollisionResNormal = FVector3d(IsContainedWidth && IsContainedHeight, IsContainedHeight && IsContainedLength, IsContainedLength && IsContainedWidth);
 	
+	bool Contained = (CollisionResNormal.X + CollisionResNormal.Y + CollisionResNormal.Z)  >0;
+  
+	FVector AllowedDirection = CollisionResNormal + FacingDirSum - FVector::OneVector;
+
 
 	FVector TransformedNormal = WorldRotation.RotateVector( CollisionResNormal);
+	
+	FVector TransformedTowerNormal = WorldRotation.RotateVector(AllowedDirection); 
+
 	
 
 	float normalDir = 1 + ((TransformedNormal.Dot(CamDir) > 0.0f) * -2.0f);
 	TransformedNormal *= normalDir;
 
-
-	FVector FacingDirSigned =  InitialFacingDirection * normalDir;
-	FVector TrueNormalSigned = CollisionResNormal * normalDir; 
-
-	FVector ResolvedPosition = PlacementPosition + TransformedNormal * (PlacementSize ) ;
-	
+	FVector ResolvedPosition = PlacementPosition + TransformedNormal * (PlacementSize);
+	SetActorLocation(ResolvedPosition); 
+	FVector TrueNormalSigned = CollisionResNormal * normalDir;
 	bool CeilingCheck = roundf(TrueNormalSigned.Dot(FVector::UpVector)) != 0.0f;
+	bool IncorrectSurfaceDir = TransformedTowerNormal.Dot(AllowedDirection * normalDir) == 0.0f;
+	if (!Contained ) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
+		
+	/*	SetActorRotation(GetActorRotation() * !(Contained && IncorrectSurfaceDir));*/
+
+		return false;
+	}
+
+	
 	FVector currentAxisUp = FVector::UpVector * (1.0f - CeilingCheck) + FVector::RightVector * CeilingCheck;
 	 
 	FVector axisOfRotation = (CollisionResNormal.Cross(currentAxisUp)).GetAbs();
@@ -177,25 +193,25 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	float anglePicthDot = TransformedNormal.Dot(FVector::UpVector);
 	FVector pitchCross = TransformedNormal.Cross(FVector::UpVector) * axisOfRotation.GetAbs();
 	float anglePitchCross = pitchCross.X + pitchCross.Y + pitchCross.Z;
-	SetActorLocation(ResolvedPosition);
+
 
 	if (AlignmentVector != FVector::ZeroVector && AlignmentAngle != 0.0f) {
 
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Alignment angle not equal to zero "), AlignmentAngle)); 
 		FVector AlignmentAxisCros = AlignmentAxis.Cross(AlignmentVector);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("alignment axis cross after alignment check X:%f Y:%f Z:%f  "), AlignmentAxisCros.X, AlignmentAxisCros.Y, AlignmentAxisCros.Z));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("alignment axis cross after alignment check X:%f Y:%f Z:%f  "), AlignmentAxisCros.X, AlignmentAxisCros.Y, AlignmentAxisCros.Z));
 		FQuat AligmentRotation = FQuat(AlignmentAxis, AlignmentAngle);
 
 		FVector rotatedAlignementVector = AligmentRotation.RotateVector(AlignmentVector);
 		double PitchAngleForAlingment = atan2(anglePitchCross, anglePicthDot); 
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("pitch angle for alignmen :%f"), PitchAngleForAlingment));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("pitch angle for alignmen :%f"), PitchAngleForAlingment));
 
 		FQuat PicthRotationForAlignment = FQuat(AlignmentAxisCros, abs(PitchAngleForAlingment));
 		SetActorRotation(AligmentRotation.Rotator() + PicthRotationForAlignment.Rotator());
 	    
 
-		return;
+		return true;
 
 	}
 
@@ -268,37 +284,71 @@ void ATowerBase::ResolvePlacement(FVector SurfaceBoxExtents, FVector SurfacePos,
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("final rot  %f %f %f"), finalRot.X, finalRot.Y, finalRot.Z));
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + TransformedNormal * FVector(700.0f, 700.0f, 700.0f), FColor::Blue);
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + AlignedAlignmentVector * FVector(700.0f, 700.0f, 700.0f), FColor::Green);	
-	SetActorRotation( RotatorPitch + YawRot.Rotator());
+	SetActorRotation( RotatorPitch + YawRot.Rotator()); 
+
+	return true;
+}
+
+void ATowerBase::TowerTimeLineInterp(float value){}
+
+void ATowerBase::SetHitBoxActive(bool HitBoxActive)
+{
+
+	TowerHitBox->SetActive(HitBoxActive);
+
 }
 
 void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor* OverlapedActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool SweepBool ,const FHitResult& HitResult) {
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
 
-	CurrentyActive = true;
 	if (AEnemyBase* EnemyTOHandle = Cast<AEnemyBase>(OverlapedActor)) {
-		
-		
-		HandleNewEnemy(EnemyTOHandle); 
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin hit ")));
 
+			CurrentyActive = true;
+	}
+		
+		
+
+
+	
+
+	
+}
+
+void ATowerBase::OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit enemy")));
+
+		ApplyDamage(Enemy);
 
 	}
 
-	
-} 
 
 
+}
 
-
-
-void ATowerBase::CheckForEnemies(){}
-
+// methods to be inherited and overriden by  child classes unreal does have a macro for defining 
+// null implemented(abstract methods) inside UObjects but all it does is create the methods for you 
+// and implement them as stubs anyway as unreal needs to create an instance for UObjects to see them
 void ATowerBase::HandleNewEnemy(AEnemyBase* EnemyBase){}
 void ATowerBase::TowerReset() {}
-void ATowerBase::TowerActive(float &DeltaTime) {}
-
-
+void ATowerBase::TowerActive(float& DeltaTime) {}
+void ATowerBase::ApplyDamage(AEnemyBase* Enemy){}
+void ATowerBase::TowerDormant(float& DeltaTime) {}
 void ATowerBase::TowerSetUp(){}
+
+// generic method for resseting towers once they have finished there timeline based animation
+//this is bound to the TowerTimeLine component via method pointer in this base class(can be overriden if needed)
+void ATowerBase::TowerTimeLineEnd() 
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("tower time line end ")));
+
+	RequiresReset = true;
+}
+
 
 
 
@@ -311,19 +361,20 @@ void ATowerBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime); 
 	if (CurrentyActive) {
 	 
-			TowerActive(DeltaTime); 
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("waitimeToReset is %f requires reset is %d"), WaitTimeToReset,(int)RequiresReset));
-			if (RequiresReset && (WaitTimeToReset -= DeltaTime)<=0.0f) {
 
-				RequiresReset = false;
-				WaitTimeToReset = MaxWaitTimeToReset;
-				TowerReset();
+		TowerActive(DeltaTime); 
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("waitimeToReset is %f requires reset is %d"), WaitTimeToReset,(int)RequiresReset));
+		if (RequiresReset && (WaitTimeToReset -= DeltaTime)<=0.0f) {
+
+			RequiresReset = false;
+			WaitTimeToReset = MaxWaitTimeToReset;
+			TowerReset();
 				
-			}
-			
+		}
+		return;
 	}
 	
-
+	TowerDormant(DeltaTime);
 	
 	
 

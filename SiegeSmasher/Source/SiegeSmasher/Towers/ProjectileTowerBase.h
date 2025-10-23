@@ -31,14 +31,22 @@ protected:
 	TSubclassOf<ATowerProjectileBase> Projectile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerFiringPoint");
 	USceneComponent* TowerFiringPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProjectileAppearDuringReloadPercent", meta = (ClampMin = "0.1", ClampMax = "1.0"));
+	float ProjectileReappearPercent = 1.0f;
+
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	AEnemyBase* EnemySingleTarget = nullptr;
-	bool NoTargetsInRange = true; 
+
 	UWorld* World = nullptr;
 	void HandleNewEnemy(AEnemyBase* Enemy);
 	FActorSpawnParameters ProjectileSpawnParameters;
-	void ShootProjectile(FRotator Rotation);
+	void ShootProjectile(FVector Position, FRotator Rotation); 
+	
+	bool NoTargetsInRange = true;
+
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override; 
 

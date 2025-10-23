@@ -167,20 +167,20 @@ void AMainCharacter::HandleTowerPlacement()
 		IsPlacingTower = false;
 		
 
-		if ( Selected != nullptr && World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
+		if ( World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
 		{
 			UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
 
 			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
 			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
 			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
-
+			FVector CamPos = camera->GetComponentLocation();
 			DrawDebugLine(World, start, end, FColor::Blue);
 			DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
-			Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward, camera->GetComponentLocation(), SurfaceTransform); 
-			IsPlacingTower = true;
+			IsPlacingTower =  Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward, CamPos, SurfaceTransform); 
 			
-
+			//Selected->SetActorHiddenInGame(IsPlacingTower);
+		
 			return;
 		} 
 

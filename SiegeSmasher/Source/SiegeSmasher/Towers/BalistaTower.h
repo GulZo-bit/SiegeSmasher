@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h" 
-#include "ProjectileTowerBase.h"
+#include "ProjectileTowerBase.h" 
+
 #include "BalistaTower.generated.h"
+
+
 
 
 
@@ -28,8 +31,10 @@ protected:
 	UStaticMeshComponent* BallistaBase;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaMesh");
 	UStaticMeshComponent* BallistaTurret;
-
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaArrow");
+	UStaticMeshComponent* BallistaArrow;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaRecoliTimeLine");
+	UTimelineComponent * BallistaRecoliTimeline;
 
 	
 
