@@ -266,7 +266,7 @@ void AMainCharacter::CallCreateLobby()
 	UWorld* MultiWorld = GetWorld();
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Lobby Created")));
-		MultiWorld->ServerTravel("/Script/Engine.World/Game/ZoTestMap.ZoTestMap?listen");
+		MultiWorld->ServerTravel("/Game/ZoTestMap?listen");
 	}
 }
 

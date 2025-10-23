@@ -198,7 +198,7 @@ void AAIWitch::Tick(float DeltaTime)
 		if (AnimInstance->Montage_IsPlaying(AttackSpellMontage))
 		{
 			float MontageTimeStore = AnimInstance->Montage_GetPosition(AttackSpellMontage);
-			UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
+			//UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
 			if (MontageTimeStore >= 1.23f && iCount < 1)
 			{
 				if (HasAuthority())
@@ -212,7 +212,7 @@ void AAIWitch::Tick(float DeltaTime)
 		else if (AnimInstance->Montage_IsPlaying(HealSpellMontage))
 		{
 			float MontageTimeStore = AnimInstance->Montage_GetPosition(HealSpellMontage);
-			UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
+			//UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
 			if (MontageTimeStore >= 0.97f && iHealCount < 1)
 			{
 				if (HasAuthority())
