@@ -12,7 +12,7 @@ enum class EnemyTypes : uint8
 	BASE UMETA(DisplayName = "BASE"),
 	BASE1 UMETA(DisplayName = "BASE1"),
 	VAMPIRE UMETA(DisplayName = "VAMPIRE"),
-
+	WITCH UMETA(DisplayName = "WITCH"),
 
 };
 

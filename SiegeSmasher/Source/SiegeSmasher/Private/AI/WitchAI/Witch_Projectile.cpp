@@ -41,7 +41,7 @@ void AWitch_Projectile::Tick(float DeltaTime)
 	
 	if (bMove == true)
 	{
-		FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 2500.0f);
+		FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 1500.0f);
 		SetActorLocation(Target);
 	}
 	
@@ -67,6 +67,7 @@ void AWitch_Projectile::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, clas
 		GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
 		//this->Destroy();
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Actor Name: %s"), *OtherActor->GetName()));
 	this->Destroy();
 	
 }
