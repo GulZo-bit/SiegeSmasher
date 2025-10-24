@@ -155,6 +155,16 @@ void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 					GLog->Log("Healing Enemies");
 					AAICharTest* Temp = Cast<AAICharTest>(ActorVampStore[i]);
 					Temp->AddToHealth(20);
+					UChildActorComponent* Store = Cast<UChildActorComponent>(Temp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
+
+					if (Store != nullptr)
+					{
+						GLog->Log("Found Heal Aura");
+						Store->SetVisibility(true, true);
+						//Store->BeginPlay();
+						
+
+					}
 				}
 			}
 		}
