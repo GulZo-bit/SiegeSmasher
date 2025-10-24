@@ -12,6 +12,7 @@ AProjectileTowerBase::AProjectileTowerBase()
 	ProjectileSpawnParameters = FActorSpawnParameters(); 
 	ProjectileSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	TowerFiringPoint = CreateDefaultSubobject<USceneComponent>("TowerFiringPoint");
+
 	/*TowerFiringPoint->SetupAttachment(RootComponent);*/
 
 }
@@ -20,9 +21,8 @@ AProjectileTowerBase::AProjectileTowerBase()
 void AProjectileTowerBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-}
 
+}
 
 void AProjectileTowerBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 
@@ -50,14 +50,18 @@ void AProjectileTowerBase::HandleNewEnemy(AEnemyBase* Enemy) {
 
 }
 
-void AProjectileTowerBase::ShootProjectile(FRotator Rotation)
+void AProjectileTowerBase::ShootProjectile(FVector Position,FRotator Rotation)
 {
 	
 	ATowerProjectileBase * ProjectilRef =  World->SpawnActor<ATowerProjectileBase>(Projectile, FTransform(Rotation, TowerFiringPoint->GetComponentLocation(), FVector::OneVector), ProjectileSpawnParameters);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Ballista shooting projectile")));
-	ProjectilRef->SetInitialPitch(Rotation.Pitch);
-	ProjectilRef->SetEnemyTarget(EnemySingleTarget);
 	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Ballista shooting projectile")));
+	if (ProjectilRef != nullptr) {
+		ProjectilRef->SetInitialPitch(Rotation.Pitch);
+		ProjectilRef->SetEnemyTarget(EnemySingleTarget);
+
+	}
+
 	RequiresReset = true; 
 	
 

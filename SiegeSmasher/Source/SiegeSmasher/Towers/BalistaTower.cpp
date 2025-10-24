@@ -13,9 +13,9 @@ ABalistaTower::ABalistaTower()
 	BallistaTurret = CreateDefaultSubobject<UStaticMeshComponent>("BallistaTurret");
 	BallistaTurret->SetupAttachment(RootComponent);
 	TowerFiringPoint->SetupAttachment(BallistaTurret);
-
-
-
+	BallistaArrow = CreateDefaultSubobject<UStaticMeshComponent>("BallistaArrow");
+	BallistaArrow->SetupAttachment(BallistaTurret);
+	
 
 }
 void ABalistaTower::TowerActive(float& DeltaTime) {
@@ -26,7 +26,9 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 	float toTargetLength = ToTarget.Length();
 	DrawDebugLine(GetWorld(), BallistaTurret->GetComponentLocation(), BallistaTurret->GetComponentLocation() + ToTarget.GetSafeNormal() * FVector(toTargetLength, toTargetLength, toTargetLength), FColor::Cyan);
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Target distance %f"), ToTarget.SquaredLength()));
-	if ( ToTarget.SquaredLength() < (TargetingRange * TargetingRange) ) {
+	float FullTargetingRange = TargetingRange * TargetingRange; 
+
+	if ( ToTarget.SquaredLength() < (FullTargetingRange) ) {
 		
 		
 		FVector TargetDir = ToTarget.GetSafeNormal();
@@ -40,33 +42,59 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 		float YawAngle = atan2f(ToTarget.Y, ToTarget.X);
 
 		FQuat RequiredRotation= FRotator(FMath::RadiansToDegrees(PitchAngle), FMath::RadiansToDegrees(YawAngle), 0.0f).Quaternion();
-
-		
 		FVector YawAlignedActorForward = GetActorForwardVector();
 		FQuat TurretRotation = FQuat::Slerp(BallistaTurret->GetComponentRotation().Quaternion(),(RequiredRotation ), 0.5f);
+
 		BallistaTurret->SetWorldRotation(TurretRotation);
 
 		if (Alignment > FovSnappingThreshold && !RequiresReset) {
 
 
-			ShootProjectile(RequiredRotation.Rotator());
+			BallistaArrow->SetHiddenInGame(true);
+
+			ShootProjectile( BallistaArrow->GetComponentLocation(), RequiredRotation.Rotator());
 
 
 
+			
+		}
+		
+		if (WaitTimeToReset <= MaxWaitTimeToReset * ProjectileReappearPercent) {
+
+			BallistaArrow->SetHiddenInGame(false);
 
 		}
 
-	  
-
-		
-
-
+		return;
 	} 
 
+	TArray<AActor*> EnemiesInRange = TArray<AActor*>{};
 	
+	TriggerRangeBox->GetOverlappingActors(EnemiesInRange, AEnemyBase::StaticClass());
 
+	if (EnemiesInRange.Num() > 0) {
 
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Ballista getting enemy in range number of enemmies %d"),EnemiesInRange.Num()));
+		
 
+		EnemiesInRange.Sort([this](const AActor & target, const AActor &  Other)
+		{
+				float ToCurrentTarget = (target.GetActorLocation() - GetActorLocation()).SquaredLength();
+				float ToOtherTarget = (Other.GetActorLocation() - GetActorLocation()).SquaredLength();
+
+				return ToCurrentTarget < ToOtherTarget;
+
+		});
+		EnemySingleTarget = Cast<AEnemyBase>(EnemiesInRange[0]); 
+		
+
+		return;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Ballista could not find targets waiting for next overlap")));
+
+	CurrentyActive = false;   
+	NoTargetsInRange = true;
 
 
 	
