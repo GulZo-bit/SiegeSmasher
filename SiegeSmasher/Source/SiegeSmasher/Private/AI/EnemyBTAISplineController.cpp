@@ -41,6 +41,7 @@ void AEnemyBTAISplineController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	ControlledPawn = GetPawn();
+	Vampire = Cast<AAICharTest>(ControlledPawn);
 
 	if (ControlledPawn != nullptr)
 	{
@@ -81,22 +82,26 @@ void AEnemyBTAISplineController::CheckDistanceAndDirectionToPlayer()
 		if (DistStoreArray[0] >= 0 && DistStoreArray[0] <= 200 && DotProductArray[0] >= 0)
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), true);
+			Vampire->setbCanActorMove(false);
 		}
 
 		else
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), false);
+			Vampire->setbCanActorMove(true);
 		}
 		break;
 	case(2):
 		if (DistStoreArray[0] >= 0 && DistStoreArray[0] <= 200 && DotProductArray[0] >= 0 || DistStoreArray[1] >= 0 && DistStoreArray[1] <= 200 && DotProductArray[1] >= 0)
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), true);
+			Vampire->setbCanActorMove(false);
 		}
 
 		else
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), false);
+			Vampire->setbCanActorMove(true);
 		}
 		break;
 	case(3):
@@ -104,11 +109,13 @@ void AEnemyBTAISplineController::CheckDistanceAndDirectionToPlayer()
 			|| DistStoreArray[2] >= 0 && DistStoreArray[2] <= 200 && DotProductArray[2] >= 0)
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), true);
+			Vampire->setbCanActorMove(false);
 		}
 
 		else
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), false);
+			Vampire->setbCanActorMove(true);
 		}
 		break;
 	case(4):
@@ -116,11 +123,13 @@ void AEnemyBTAISplineController::CheckDistanceAndDirectionToPlayer()
 			|| DistStoreArray[2] >= 0 && DistStoreArray[2] <= 200 && DotProductArray[2] >= 0 || DistStoreArray[3] >= 0 && DistStoreArray[3] <= 200 && DotProductArray[3] >= 0)
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), true);
+			Vampire->setbCanActorMove(false);
 		}
 
 		else
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerNear"), false);
+			Vampire->setbCanActorMove(true);
 		}
 		break;
 	}

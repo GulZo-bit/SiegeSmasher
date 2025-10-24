@@ -38,6 +38,9 @@ public:
 
 	float DistStoreArray[4];
 	float DotProductArray[4];
+
+	UPROPERTY()
+	AAICharTest* Vampire;
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;

@@ -49,7 +49,7 @@ void AWitchAIController::OnPossess(APawn* InPawn)
 		}
 	}
 
-	GetWorldTimerManager().SetTimer(Timer, this, &AWitchAIController::setHealBool, 5.0f, true, 1.0f);
+	GetWorldTimerManager().SetTimer(Timer, this, &AWitchAIController::setHealBool, 15.0f, true, 3.0f);
 	
 }
 
@@ -75,6 +75,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else
@@ -82,6 +83,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			ClearFocus(EAIFocusPriority::Gameplay);
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
 			GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+			Witch->setbCanActorMove(true);
 		}
 		break;
 
@@ -99,6 +101,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else if (LineOfSightTo(PlayerActorArray[1]))
@@ -113,6 +116,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else
@@ -120,6 +124,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			ClearFocus(EAIFocusPriority::Gameplay);
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
 			GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+			Witch->setbCanActorMove(true);
 		}
 		break;
 
@@ -137,6 +142,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else if (LineOfSightTo(PlayerActorArray[1]))
@@ -151,6 +157,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else if (LineOfSightTo(PlayerActorArray[2]))
@@ -165,6 +172,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else
@@ -172,6 +180,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			ClearFocus(EAIFocusPriority::Gameplay);
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
 			GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+			Witch->setbCanActorMove(true);
 		}
 		break;
 		
@@ -189,6 +198,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else if (LineOfSightTo(PlayerActorArray[1]))
@@ -203,6 +213,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else if (LineOfSightTo(PlayerActorArray[2]))
@@ -217,6 +228,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else if (LineOfSightTo(PlayerActorArray[3]))
@@ -231,6 +243,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
+			Witch->setbCanActorMove(false);
 		}
 
 		else
@@ -238,6 +251,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			ClearFocus(EAIFocusPriority::Gameplay);
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), false);
 			GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+			Witch->setbCanActorMove(true);
 		}
 		break;
 

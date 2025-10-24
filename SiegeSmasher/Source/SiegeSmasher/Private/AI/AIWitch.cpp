@@ -56,6 +56,7 @@ void AAIWitch::BeginPlay()
 				CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
 
 				StartTime = GetWorld()->GetTimeSeconds();
+				Count = GetWorld()->GetTimeSeconds();
 			}
 
 			
@@ -118,19 +119,6 @@ void AAIWitch::HealEnemy()
 	}
 }
 
-AWitch_Projectile* AAIWitch::getSpell()
-{
-	if (Spell != nullptr)
-	{
-		return Spell;
-	}
-	
-	else
-	{
-		return nullptr;
-	}
-}
-
 void AAIWitch::Server_PlayHealSpellMontage_Implementation()
 {
 	Multicast_PlayHealSpellMontage();
@@ -188,20 +176,25 @@ void AAIWitch::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//How long the current spline has been going for.
-	float CurrentSplineTime = (GetWorld()->GetTimeSeconds() - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
+	if (bCanActorMove == true)
+	{
+		//How long the current spline has been going for.
+		float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
+		//Find the distance we are along the spline.
+		float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
 
-	//Find the distance we are along the spline.
-	float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
+		//Translate that distance into world space. Then move the cube to it,
+		FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+		CubeStore->SetActorLocation(Position);
 
-	//Translate that distance into world space. Then move the cube to it,
-	FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-	CubeStore->SetActorLocation(Position);
-
-	//Rotate the cube in world space.
-	FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-	FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
-	CubeStore->SetActorRotation(Rotator);
+		//Rotate the cube in world space.
+		FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+		FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
+		CubeStore->SetActorRotation(Rotator);
+		
+		Count += 1.0f * DeltaTime;
+	}
+	
 
 	if (AnimInstance != nullptr)
 	{
@@ -244,4 +237,27 @@ void AAIWitch::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AAIWitch::setbCanActorMove(bool bStore)
+{
+	bCanActorMove = bStore;
+}
+
+
+bool AAIWitch::getbCanActorMove()
+{
+	return bCanActorMove;
+}
+
+AWitch_Projectile* AAIWitch::getSpell()
+{
+	if (Spell != nullptr)
+	{
+		return Spell;
+	}
+
+	else
+	{
+		return nullptr;
+	}
+}
 

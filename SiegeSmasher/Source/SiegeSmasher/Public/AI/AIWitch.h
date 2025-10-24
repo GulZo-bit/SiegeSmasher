@@ -55,6 +55,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	bool bCanActorMove = true;
+
 	UAnimInstance* AnimInstance;
 	int32 iCount = 0;
 	void PlayAttack();
@@ -72,5 +74,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AWitch_Projectile> HealSpell;
 
+	void setbCanActorMove(bool bStore);
+
 	AWitch_Projectile* getSpell();
+	bool getbCanActorMove();
+	float Count = 0.0f;
 };
