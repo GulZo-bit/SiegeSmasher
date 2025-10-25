@@ -9,7 +9,7 @@
 #include "ProjectileTowerBase.generated.h"
 
 #ifndef TowerNoLOSChannel
- #define TowerNoLOSChannel ECC_GameTraceChannel6
+ #define TowerNoLOSChannel ECC_GameTraceChannel8
 #endif // !TowerNoLOSChannel
 
 
