@@ -37,7 +37,7 @@ protected:
 	AEnemyBase* Target = nullptr; 
 	float InitalPitch = 0.0f;
 
-
+	
 	
 
 public:	
@@ -47,7 +47,8 @@ public:
 	void SetEnemyTarget(AEnemyBase * Enemy); 
 
 	virtual void MoveToTarget(float DeltaTime); 
-	void SetInitialPitch(float Pitch);
+	void SetInitialPitch(float Pitch); 
+	
 private:
 	FVector TargetPosition = FVector::ZeroVector;
 	UWorld* World = nullptr;

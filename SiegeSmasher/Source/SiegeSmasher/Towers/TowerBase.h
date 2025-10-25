@@ -107,7 +107,6 @@ protected:
 	virtual void TowerTimeLineInterp(float value); 
 
 	void SetHitBoxActive(bool HitBoxActive);
-	
 protected:
 
 	
