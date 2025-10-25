@@ -7,6 +7,7 @@
 #include "AI/SplineController.h"
 #include "../Enemies/EnemyBase.h"
 #include "WitchAI/Witch_Projectile.h"
+#include "AI/HealAuraLight.h"
 #include "AIWitch.generated.h"
 
 UCLASS()
@@ -48,6 +49,12 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayHealSpellMontage();
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayLightTimeLine(AHealAuraLight* LightStore);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayLightTimeLine(AHealAuraLight* LightStore);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

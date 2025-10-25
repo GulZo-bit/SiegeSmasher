@@ -4,7 +4,6 @@
 #include "AI/AIWitch.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
-#include "AI/HealAuraLight.h"
 #include "AI/AICharTest.h"
 
 // Sets default values
@@ -94,6 +93,7 @@ void AAIWitch::Server_PlayAttackMontage_Implementation()
 	Multicast_PlayAttackMontage();
 }
 
+
 void AAIWitch::Multicast_PlayAttackMontage_Implementation()
 {
 	if (AttackSpellMontage != nullptr)
@@ -106,6 +106,16 @@ void AAIWitch::Multicast_PlayAttackMontage_Implementation()
 			iCount = 0;
 		}
 	}
+}
+
+void AAIWitch::Server_PlayLightTimeLine_Implementation(AHealAuraLight* LightStore)
+{
+	Multicast_PlayLightTimeLine(LightStore);
+}
+
+void AAIWitch::Multicast_PlayLightTimeLine_Implementation(AHealAuraLight* LightStore)
+{
+	LightStore->getLightTimeLineComp()->PlayFromStart();
 }
 
 void AAIWitch::HealEnemy()
@@ -135,7 +145,7 @@ void AAIWitch::HealEnemy()
 						if (HealAuraLightStore != nullptr)
 						{
 							GLog->Log("Found Heal Aura");
-							HealAuraLightStore->getLightTimeLineComp()->PlayFromStart();
+							Server_PlayLightTimeLine(HealAuraLightStore);
 						}
 
 					}
