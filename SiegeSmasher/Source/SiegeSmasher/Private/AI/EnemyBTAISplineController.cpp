@@ -47,7 +47,8 @@ void AEnemyBTAISplineController::OnPossess(APawn* InPawn)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Found Controlled Pawn")));
 		//GLog->Log("Controlled Pawn Found");
-		ChildActor = ControlledPawn->FindComponentByClass<UChildActorComponent>();
+		//ChildActor = ControlledPawn->FindComponentByClass<UChildActorComponent>();
+		ChildActor = ControlledPawn->FindComponentByTag<UChildActorComponent>(FName("SplineMovementActor"));
 
 		if (ChildActor != nullptr)
 		{
