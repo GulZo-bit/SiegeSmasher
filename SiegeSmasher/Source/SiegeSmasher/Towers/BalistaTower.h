@@ -22,7 +22,7 @@ public:
 	ABalistaTower();
 
 
-	void TowerActive(float& DeltaTime);  
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,8 +35,9 @@ protected:
 	UStaticMeshComponent* BallistaArrow;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaRecoliTimeLine");
 	UTimelineComponent * BallistaRecoliTimeline;
-
-	
+	bool HasLineOfSite(FVector To);
+	void TowerActive(float& DeltaTime);
+	void TowerDormant(float& DeltaTime);
 
 public:	
 

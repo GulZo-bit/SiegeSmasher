@@ -43,6 +43,15 @@ void AEnemyBase::AddToHealth(float Increase)
 	 CurrentHealth  = std::min((CurrentHealth + Increase),MaxHealth);
 }
 
+void AEnemyBase::ResetEnemyOnDeath()
+{
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+
+
+}
+
 // Called every frame
 void AEnemyBase::Tick(float DeltaTime)
 {
@@ -63,6 +72,9 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+
+
 
 void AEnemyBase::ResetOnSpawn()
 {

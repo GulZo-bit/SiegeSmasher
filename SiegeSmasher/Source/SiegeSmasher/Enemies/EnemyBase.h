@@ -66,6 +66,6 @@ public:
 	void SetHealth(float Health); 
 	float GetHealth(); 
 	void AddToHealth(float Increase);
-
+	void ResetEnemyOnDeath();
 	EnemyTypes GetEnemyWaveType();
 };
