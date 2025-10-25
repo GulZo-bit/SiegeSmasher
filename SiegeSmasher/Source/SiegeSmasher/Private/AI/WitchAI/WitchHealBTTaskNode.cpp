@@ -22,7 +22,7 @@ EBTNodeResult::Type UWitchHealBTTaskNode::ExecuteTask(UBehaviorTreeComponent& Ow
 	{
 		Controller->GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), false);
 		AAIWitch* Witch = Cast<AAIWitch>(ControlledPawn);
-		Witch->HealEnemy();
+		Witch->PlayHealSpellMontage();
 		return EBTNodeResult::Succeeded;
 	}
 

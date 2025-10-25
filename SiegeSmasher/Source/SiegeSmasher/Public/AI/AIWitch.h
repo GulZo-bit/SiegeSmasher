@@ -65,6 +65,7 @@ public:
 	UBoxComponent* HealZone;
 	int32 iHealCount = 0;
 	void HealEnemy();
+	void PlayHealSpellMontage();
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AWitch_Projectile> SpellClass;
@@ -79,4 +80,6 @@ public:
 	AWitch_Projectile* getSpell();
 	bool getbCanActorMove();
 	float Count = 0.0f;
+
+	UWorld* World;
 };

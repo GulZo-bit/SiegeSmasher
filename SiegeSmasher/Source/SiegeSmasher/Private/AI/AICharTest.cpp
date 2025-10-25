@@ -47,6 +47,7 @@ void AAICharTest::BeginPlay()
 	this->GetComponents(ChildActors, true);
 	SplineNum = FMath::RandRange(0, SplineControllerStore.Num() - 1);
 
+	
 	//Loop through the array.
 	for (int i = 0; i < ChildActors.Num(); i++)
 	{

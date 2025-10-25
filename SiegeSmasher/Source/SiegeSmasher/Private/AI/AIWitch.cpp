@@ -4,6 +4,7 @@
 #include "AI/AIWitch.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
+#include "AI/HealAuraLight.h"
 #include "AI/AICharTest.h"
 
 // Sets default values
@@ -57,6 +58,7 @@ void AAIWitch::BeginPlay()
 
 				StartTime = GetWorld()->GetTimeSeconds();
 				Count = GetWorld()->GetTimeSeconds();
+
 			}
 
 			
@@ -108,6 +110,43 @@ void AAIWitch::Multicast_PlayAttackMontage_Implementation()
 
 void AAIWitch::HealEnemy()
 {
+	if (HealZone != nullptr)
+	{
+		GLog->Log("Found HealZone");
+
+		TArray<AActor*> ActorVampStore;
+		//TArray<AAICharTest*> VampStore;
+		HealZone->GetOverlappingActors(ActorVampStore);
+
+		for (int i = 0; i < ActorVampStore.Num(); i++)
+		{
+			if (ActorVampStore[i] != nullptr)
+			{
+				if (Cast<AAICharTest>(ActorVampStore[i]))
+				{
+					GLog->Log("Healing Enemies");
+					AAICharTest* AICharTemp = Cast<AAICharTest>(ActorVampStore[i]);
+					AICharTemp->AddToHealth(20);
+
+					UChildActorComponent* ChildActorStore = Cast<UChildActorComponent>(AICharTemp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
+					if (ChildActorStore != nullptr)
+					{
+						AHealAuraLight* HealAuraLightStore = Cast<AHealAuraLight>(ChildActorStore->GetChildActor());
+						if (HealAuraLightStore != nullptr)
+						{
+							GLog->Log("Found Heal Aura");
+							HealAuraLightStore->getLightTimeLineComp()->PlayFromStart();
+						}
+
+					}
+				}
+			}
+		}
+	}
+}
+
+void AAIWitch::PlayHealSpellMontage()
+{
 	if (GetLocalRole() < ROLE_Authority)
 	{
 		Server_PlayHealSpellMontage();
@@ -126,37 +165,6 @@ void AAIWitch::Server_PlayHealSpellMontage_Implementation()
 
 void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 {
-	if (HealZone != nullptr)
-	{
-		GLog->Log("Found HealZone");
-
-		TArray<AActor*> ActorVampStore;
-		//TArray<AAICharTest*> VampStore;
-		HealZone->GetOverlappingActors(ActorVampStore);
-
-		for (int i = 0; i < ActorVampStore.Num(); i++)
-		{
-			if (ActorVampStore[i] != nullptr)
-			{
-				if (Cast<AAICharTest>(ActorVampStore[i]))
-				{
-					GLog->Log("Healing Enemies");
-					AAICharTest* Temp = Cast<AAICharTest>(ActorVampStore[i]);
-					Temp->AddToHealth(20);
-					UChildActorComponent* Store = Cast<UChildActorComponent>(Temp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
-
-					if (Store != nullptr)
-					{
-						GLog->Log("Found Heal Aura");
-						Store->SetVisibility(true, true);
-						//Store->BeginPlay();
-						
-
-					}
-				}
-			}
-		}
-	}
 
 	if (HealSpellMontage != nullptr)
 	{
@@ -168,6 +176,7 @@ void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 			iHealCount = 0;
 		}
 	}
+
 }
 
 
@@ -221,6 +230,7 @@ void AAIWitch::Tick(float DeltaTime)
 				if (HasAuthority())
 				{
 					Spell = GetWorld()->SpawnActor<AWitch_Projectile>(HealSpell, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+					HealEnemy();
 				}
 				
 				iHealCount++;
