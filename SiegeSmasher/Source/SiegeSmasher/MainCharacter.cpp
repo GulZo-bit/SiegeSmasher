@@ -27,7 +27,8 @@ void AMainCharacter::BeginPlay()
 	Super::BeginPlay();
 	camera = GetComponentByClass<UCameraComponent>();
 	World = GetWorld();
-	InitialiseTowers();
+	InitialiseTowers(); 
+    
 	TraceParams = FCollisionQueryParams();
 	TraceParams.AddIgnoredActor(this);
 	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(camera == nullptr)));

@@ -38,7 +38,7 @@ void ATowerBase::DisableTick()
 // Called when the game starts or when spawned
 void ATowerBase::BeginPlay()
 {
-
+  
 	Super::BeginPlay();
 	WaitTimeToReset = MaxWaitTimeToReset; 
 	CoolDownAfterReset = MaxCoolDownAfterReset;
