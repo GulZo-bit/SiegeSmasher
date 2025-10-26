@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h" 
-#include "ProjectileTowerBase.h"
+#include "ProjectileTowerBase.h" 
+
 #include "BalistaTower.generated.h"
+
+
 
 
 
@@ -19,7 +22,7 @@ public:
 	ABalistaTower();
 
 
-	void TowerActive(float& DeltaTime);  
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,10 +31,13 @@ protected:
 	UStaticMeshComponent* BallistaBase;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaMesh");
 	UStaticMeshComponent* BallistaTurret;
-
-	
-
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaArrow");
+	UStaticMeshComponent* BallistaArrow;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaRecoliTimeLine");
+	UTimelineComponent * BallistaRecoliTimeline;
+	bool HasLineOfSite(FVector To);
+	void TowerActive(float& DeltaTime);
+	void TowerDormant(float& DeltaTime);
 
 public:	
 

@@ -30,8 +30,24 @@ protected:
 	int32 SplineNum; //Number that will be set randomly based on how many splines are in the scene.
 	float StartTime;
 
+	//Animation for attack spell
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* AttackSpellMontage;
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayAttackMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayAttackMontage();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	UAnimMontage* HealSpellMontage;
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayHealSpellMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayHealSpellMontage();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -39,17 +55,28 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	bool bCanActorMove = true;
+
 	UAnimInstance* AnimInstance;
 	int32 iCount = 0;
 	void PlayAttack();
 
 	TArray<UActorComponent*> HealStore;
 	UBoxComponent* HealZone;
+	int32 iHealCount = 0;
 	void HealEnemy();
 
-	UPROPERTY(EditDefaultsOnly);
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AWitch_Projectile> SpellClass;
 	UPROPERTY()
 	AWitch_Projectile* Spell;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AWitch_Projectile> HealSpell;
+
+	void setbCanActorMove(bool bStore);
+
+	AWitch_Projectile* getSpell();
+	bool getbCanActorMove();
+	float Count = 0.0f;
 };

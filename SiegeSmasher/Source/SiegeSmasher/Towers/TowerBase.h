@@ -13,9 +13,8 @@
 #include "TowerBase.generated.h" 
 
 
-  #define PlacingSurface ECC_GameTraceChannel1
 
- // !PlacingSurface
+#define PlacingSurface ECC_GameTraceChannel1
 
 
 // enum bit flags for chekcing if an enemy already has a status effect we can have each enum go up in a power of two as that will give 
@@ -51,36 +50,46 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
 	FVector GetPlacementColliderHalfExtents();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
-	void ResolvePlacement(FVector SurfaceHalfExtents, FVector SurfacePos, FVector PlacementPosition, FVector CamDir,FVector CamPos, FTransform surfaceTransform);
+  	bool ResolvePlacement(FVector& SurfaceHalfExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos, FTransform& surfaceTransform);
+	
 protected:
 	// Called when the game starts or when spawned
 
 	virtual void BeginPlay() override;
 	bool CurrentyActive = false;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementCollider");
 	UBoxComponent* BoxColliderForObjectPlacement;
-	FOnTimelineEvent TowerEndAction; 
+	FOnTimelineEvent TowerEndAction;  
+	FOnTimelineFloat TowerTimeLineInterpEvent;
 	bool RequiresReset = false; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerWaitTimeToReset");
 	float MaxWaitTimeToReset;
 
+	float WaitTimeToReset = 0.0f;
 
-	float WaitTimeToReset = 0.0f; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerHitBox");  
+	UBoxComponent* TowerHitBox;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CoolDownAfterReset");
+	float MaxCoolDownAfterReset = 0.0f;
+	float CoolDownAfterReset = 0.0f;
+	
     
 	UFUNCTION()
 	virtual void TowerTimeLineEnd();
-
+	virtual void TowerDormant(float& DeltaTime);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTriggerBox")
 	UBoxComponent* TriggerRangeBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTriggerBoxDim")
 	FVector TriggerBoxDim;  
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTimeLine(CanBeUsedToAnimateTowers)");
+	UTimelineComponent* TowerTimeLine;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlacementSize");
 	float PlacementSize;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StartingFacingDirection") 
-	FVector InitialFacingDirection = FVector(0.0f, 0.0f, 1.0f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StartingFacingDirection");
+	TArray<FVector> AllowedDirections;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerSurfaceAlignmentVector"); 
 	FVector AlignmentVector = FVector::ZeroVector; 
@@ -88,23 +97,42 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerSurfaceAlignmentAxis");
 	FVector AlignmentAxis = FVector::ZeroVector;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTimeLineCurve"); 
+	UCurveFloat* TowerTimeLineCurve;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerDamage");
+	float TowerDamage = 0.0f;
 
+	UFUNCTION() 
+	virtual void TowerTimeLineInterp(float value); 
+
+	void SetHitBoxActive(bool HitBoxActive);
 protected:
+
 	
-	
-	bool NeedsNewTargets = true; 
+	//bool NeedsNewTargets = true; 
 	UFUNCTION()
 	virtual void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION() 
+	virtual void OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+
 	virtual void HandleNewEnemy(AEnemyBase* EnemyBase); 
 	virtual void TowerReset();
 	virtual void TowerSetUp();
 	virtual void TowerActive(float& DeltaTime) ;
-	virtual void CheckForEnemies();
-	
+	virtual void ApplyDamage(AEnemyBase* Enemy);
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+
+private: 
+
+	FVector FacingDirSum;
+
+
 
 };

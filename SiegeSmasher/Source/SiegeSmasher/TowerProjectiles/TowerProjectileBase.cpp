@@ -10,24 +10,27 @@ ATowerProjectileBase::ATowerProjectileBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Mesh"); 
+	ProjectileMesh->SetCollisionProfileName(FName("TowerProjectile"));
 
-	World = GetWorld(); 
 
 
-	ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	//ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 
 }
 
 // Called when the game starts or when spawned
 void ATowerProjectileBase::BeginPlay()
 {
-	Super::BeginPlay(); 
+	Super::BeginPlay();
+	ProjectileMesh->OnComponentBeginOverlap.AddDynamic(this, &ATowerProjectileBase::OnOverLapBegin);
+	World = GetWorld();
 
-	
 }
+
 void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 
-	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
+	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor) ) {
+
 
 		Enemy->DamageEnemy(Damage);
 		
@@ -37,8 +40,8 @@ void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 
 	}
 
-
-	//World->DestroyActor(this);
+	
+	World->DestroyActor(this);
 
 
 
@@ -46,6 +49,8 @@ void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 
 
 } 
+
+
 
 
 
@@ -97,4 +102,6 @@ void ATowerProjectileBase::SetInitialPitch(float Pitch)
 {
 	InitalPitch = Pitch;
 }
+
+
 

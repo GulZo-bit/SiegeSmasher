@@ -18,7 +18,7 @@ AAIWitch::AAIWitch()
 void AAIWitch::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	AnimInstance = GetMesh()->GetAnimInstance();
 	//Spline controller stuff.
 	//Get all the spline controllers in the scene.
 	TArray<AActor*> SplineControllerAsActor;
@@ -56,6 +56,7 @@ void AAIWitch::BeginPlay()
 				CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
 
 				StartTime = GetWorld()->GetTimeSeconds();
+				Count = GetWorld()->GetTimeSeconds();
 			}
 
 			
@@ -74,9 +75,28 @@ void AAIWitch::BeginPlay()
 
 void AAIWitch::PlayAttack()
 {
+	
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayAttackMontage();
+	}
+	
+	else
+	{
+		Multicast_PlayAttackMontage();
+	}
+}
+
+void AAIWitch::Server_PlayAttackMontage_Implementation()
+{
+	Multicast_PlayAttackMontage();
+}
+
+void AAIWitch::Multicast_PlayAttackMontage_Implementation()
+{
 	if (AttackSpellMontage != nullptr)
 	{
-		AnimInstance = GetMesh()->GetAnimInstance();
+
 
 		if (AnimInstance != nullptr)
 		{
@@ -84,10 +104,27 @@ void AAIWitch::PlayAttack()
 			iCount = 0;
 		}
 	}
-	
 }
 
 void AAIWitch::HealEnemy()
+{
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayHealSpellMontage();
+	}
+
+	else
+	{
+		Multicast_PlayHealSpellMontage();
+	}
+}
+
+void AAIWitch::Server_PlayHealSpellMontage_Implementation()
+{
+	Multicast_PlayHealSpellMontage();
+}
+
+void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 {
 	if (HealZone != nullptr)
 	{
@@ -104,8 +141,31 @@ void AAIWitch::HealEnemy()
 				if (Cast<AAICharTest>(ActorVampStore[i]))
 				{
 					GLog->Log("Healing Enemies");
+					AAICharTest* Temp = Cast<AAICharTest>(ActorVampStore[i]);
+					Temp->AddToHealth(20);
+					UChildActorComponent* Store = Cast<UChildActorComponent>(Temp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
+
+					if (Store != nullptr)
+					{
+						GLog->Log("Found Heal Aura");
+						Store->SetVisibility(true, true);
+						//Store->BeginPlay();
+						
+
+					}
 				}
 			}
+		}
+	}
+
+	if (HealSpellMontage != nullptr)
+	{
+		//AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(HealSpellMontage);
+			iHealCount = 0;
 		}
 	}
 }
@@ -116,31 +176,54 @@ void AAIWitch::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//How long the current spline has been going for.
-	float CurrentSplineTime = (GetWorld()->GetTimeSeconds() - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
+	if (bCanActorMove == true)
+	{
+		//How long the current spline has been going for.
+		float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
+		//Find the distance we are along the spline.
+		float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
 
-	//Find the distance we are along the spline.
-	float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
+		//Translate that distance into world space. Then move the cube to it,
+		FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+		CubeStore->SetActorLocation(Position);
 
-	//Translate that distance into world space. Then move the cube to it,
-	FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-	CubeStore->SetActorLocation(Position);
-
-	//Rotate the cube in world space.
-	FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-	FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
-	CubeStore->SetActorRotation(Rotator);
+		//Rotate the cube in world space.
+		FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+		FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
+		CubeStore->SetActorRotation(Rotator);
+		
+		Count += 1.0f * DeltaTime;
+	}
+	
 
 	if (AnimInstance != nullptr)
 	{
 		if (AnimInstance->Montage_IsPlaying(AttackSpellMontage))
 		{
 			float MontageTimeStore = AnimInstance->Montage_GetPosition(AttackSpellMontage);
-			UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
+			//UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
 			if (MontageTimeStore >= 1.23f && iCount < 1)
 			{
-				Spell = GetWorld()->SpawnActor<AWitch_Projectile>(SpellClass, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				if (HasAuthority())
+				{
+					Spell = GetWorld()->SpawnActor<AWitch_Projectile>(SpellClass, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				}
 				iCount++;
+			}
+		}
+
+		else if (AnimInstance->Montage_IsPlaying(HealSpellMontage))
+		{
+			float MontageTimeStore = AnimInstance->Montage_GetPosition(HealSpellMontage);
+			//UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
+			if (MontageTimeStore >= 0.97f && iHealCount < 1)
+			{
+				if (HasAuthority())
+				{
+					Spell = GetWorld()->SpawnActor<AWitch_Projectile>(HealSpell, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
+				}
+				
+				iHealCount++;
 			}
 		}
 	}
@@ -154,4 +237,27 @@ void AAIWitch::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AAIWitch::setbCanActorMove(bool bStore)
+{
+	bCanActorMove = bStore;
+}
+
+
+bool AAIWitch::getbCanActorMove()
+{
+	return bCanActorMove;
+}
+
+AWitch_Projectile* AAIWitch::getSpell()
+{
+	if (Spell != nullptr)
+	{
+		return Spell;
+	}
+
+	else
+	{
+		return nullptr;
+	}
+}
 

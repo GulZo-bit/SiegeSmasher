@@ -16,19 +16,30 @@ public:
 	// Sets default values for this actor's properties
 	AWallSpikeTrapTower();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "");
-	UTimelineComponent* TowerTimeLine;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WallTrapMesh") 
 	UStaticMeshComponent* WallTrapHinge;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WallTrapMesh")
-	UStaticMeshComponent* WallTrapSpikes;
-protected:
-
-	void TowerTimeLineEnd();
+	UStaticMeshComponent* WallTrapSpikes; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SwingAngle")
+	float SwingRotationAngle = 90.0f;
 
 
 	
+	
+	
+protected:
+	void TowerSetUp();
+	void TowerActive(float& DeltaTime);
+	void TowerTimeLineEnd(); 
+	void TowerReset(); 
+	void TowerDormant(float& DeltaTime);
+	void HandleNewEnemy(AEnemyBase * Enemy); 
+	void TowerTimeLineInterp(float value); 
+	void ApplyDamage(AEnemyBase* Enemy);
+
+protected:
+	FVector EulerAnglesOfSpikesOnPlace;
 
 public:	
 
@@ -36,7 +47,11 @@ public:
 
 private: 
 
+	
+	bool IsSwinging = false; 
+	bool StartedReset = false;
 
-	bool IsSwinging = false;
+	void RotateOnTimeLine(float value);
+
 
 };

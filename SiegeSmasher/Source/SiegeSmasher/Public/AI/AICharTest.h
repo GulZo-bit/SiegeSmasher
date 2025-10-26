@@ -65,6 +65,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	bool bCanActorMove = true;
+	void setbCanActorMove(bool bStore);
+	float Count = 0.0f;
+
 	TArray<AActor*> getCheckpoints();
 
 	UPROPERTY(EditDefaultsOnly)

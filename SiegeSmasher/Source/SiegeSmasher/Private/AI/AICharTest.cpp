@@ -16,8 +16,7 @@ AAICharTest::AAICharTest()
 void AAICharTest::BeginPlay()
 {
 	Super::BeginPlay();
-
-
+	
 	//Sword Stuff
 	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);
 
@@ -64,6 +63,7 @@ void AAICharTest::BeginPlay()
 				CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
 
 				StartTime = GetWorld()->GetTimeSeconds();
+				Count = GetWorld()->GetTimeSeconds();
 			}
 		}
 	}
@@ -76,20 +76,26 @@ void AAICharTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//How long the current spline has been going for.
-	float CurrentSplineTime = (GetWorld()->GetTimeSeconds() - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
+	if (bCanActorMove == true)
+	{
+		//How long the current spline has been going for.
+		float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
 
-	//Find the distance we are along the spline.
-	float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
+		//Find the distance we are along the spline.
+		float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
 
-	//Translate that distance into world space. Then move the cube to it,
-	FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-	CubeStore->SetActorLocation(Position);
+		//Translate that distance into world space. Then move the cube to it,
+		FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+		CubeStore->SetActorLocation(Position);
 
-	//Rotate the cube in world space.
-	FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-	FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
-	CubeStore->SetActorRotation(Rotator);
+		//Rotate the cube in world space.
+		FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+		FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
+		CubeStore->SetActorRotation(Rotator);
+
+		Count += 1.0f * DeltaTime;
+	}
+
 	
 	
 }
@@ -136,6 +142,11 @@ void AAICharTest::Multicast_PlayAttackMontage_Implementation()
 }
 
 
+
+void AAICharTest::setbCanActorMove(bool bStore)
+{
+	bCanActorMove = bStore;
+}
 
 TArray<AActor*> AAICharTest::getCheckpoints()
 {

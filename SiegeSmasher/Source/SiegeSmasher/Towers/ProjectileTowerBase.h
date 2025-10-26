@@ -8,6 +8,13 @@
 #include "../TowerProjectiles/TowerProjectileBase.h"
 #include "ProjectileTowerBase.generated.h"
 
+#ifndef TowerNoLOSChannel
+ #define TowerNoLOSChannel ECC_GameTraceChannel8
+#endif // !TowerNoLOSChannel
+
+
+
+
 UCLASS()
 class SIEGESMASHER_API AProjectileTowerBase : public ATowerBase
 {
@@ -16,7 +23,7 @@ class SIEGESMASHER_API AProjectileTowerBase : public ATowerBase
 public:	
 	// Sets default values for this actor's properties
 	AProjectileTowerBase();
-
+	float GetTargetingRangeSqr();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override; 
@@ -29,16 +36,34 @@ protected:
 	float RotationLerpSpeed = 0.3f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerProjectile");
 	TSubclassOf<ATowerProjectileBase> Projectile;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerFiringPoint");
-	USceneComponent* TowerFiringPoint;
+	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProjectileAppearDuringReloadPercent", meta = (ClampMin = "0.1", ClampMax = "1.0"));
+	float ProjectileReappearPercent = 1.0f;
+
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
+	
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	TMap<AActor*, FVector> DirectionsToRegainLos;
+	TArray<AEnemyBase*> EnemiesToTrackForLOS;
 	AEnemyBase* EnemySingleTarget = nullptr;
-	bool NoTargetsInRange = true; 
+	TMap<AEnemyBase*, int> IndicesForEnemiesInRange;
+	//AEnemyBase* EnemyToTrackForLOS = nullptr;
 	UWorld* World = nullptr;
+	FHitResult LOSResult;
 	void HandleNewEnemy(AEnemyBase* Enemy);
 	FActorSpawnParameters ProjectileSpawnParameters;
-	void ShootProjectile(FRotator Rotation);
+	void ShootProjectile(FVector Position, FRotator Rotation); 
+	virtual bool HasLineOfSite(FVector To);  
+	void TrackEnemyForLos();
+	bool NoTargetsInRange = true; 
+	TArray<AEnemyBase*> CurrentEnemiesInRange;
+	bool CanLoseLOS = false;
+
+	virtual void SortedClosestEnemiesInRange();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override; 
 
