@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "PlayerHud/ChargeWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "Net/UnrealNetwork.h"
 #include "MyMainCharacterTest.generated.h"
 
 UCLASS()
@@ -41,23 +42,23 @@ public:
 	USpringArmComponent* SpringArmComponent;
 
 	//Bools that handle animations 
-	UPROPERTY(VisibleAnywhere, Category = "Input");
+	UPROPERTY(VisibleAnywhere, Category = "Input", Replicated);
 	bool ArrowDrawn;
 
-	UPROPERTY(VisibleAnywhere, Category = "Input");
+	UPROPERTY(VisibleAnywhere, Category = "Input", Replicated);
 	bool ArrowFired;
 	
 	//flaot and bool for the Charging mechanic 
-	UPROPERTY();
+	UPROPERTY(Replicated);
 	float MaxCharge;
 
-	UPROPERTY();
+	UPROPERTY(Replicated);
 	float ChargeRate;
 
-	UPROPERTY();
+	UPROPERTY(Replicated);
 	float CurrentCharge;
 
-	UPROPERTY();
+	UPROPERTY(Replicated);
 	bool isCharging;
 
 
@@ -130,4 +131,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetArrowFired(bool isArrowDrawn);
+
+	UFUNCTION()
+	float GetCurrentCharge();
+	UFUNCTION(Server, Reliable)
+	void SpawnProjectile(FRotator CamRotation, UWorld* WorldRef, FRotator BowRot);
+
+
+	//UFUNCTION(Server, Reliable)
+	//void SpawnProjectile(FRotator CamRotation, UWorld* WorldRef, FRotator BowRot);
 };

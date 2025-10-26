@@ -183,27 +183,40 @@ void AMainCharacterTest::Shoot()
 		UWorld* World = GetWorld();
 		if (World)
 		{//spawn parameters of the arrow
-			FActorSpawnParameters SpawnParams;
+			/*FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
-			SpawnParams.Instigator = GetInstigator();
+			SpawnParams.Instigator = GetInstigator();*/
 			//creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
-			APlayerArrow* Arrow = World->SpawnActor<APlayerArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
-			//if arrow has been succesfully created
-			if (Arrow)
-			{
-				//changes the Bow rotation to be changed into a vector so that it shows a direction
-				FVector LaunchDirection = BowRotation.Vector();
-				//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
-				Arrow->FireInDirection(LaunchDirection, CurrentCharge);
-				//sets the bools for animations and turns off charging and resets the charge
-				SetArrowDrawn(false);
-				SetArrowFired(true);
-				isCharging = false;
-				UE_LOG(LogTemp, Warning, TEXT("Charge: %f Percent"), CurrentCharge);
-				CurrentCharge = 0;
-			}
+			//APlayerArrow* Arrow = World->SpawnActor<APlayerArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
+			////if arrow has been succesfully created
+			//if (Arrow)
+			//{
+			//	//changes the Bow rotation to be changed into a vector so that it shows a direction
+			//	FVector LaunchDirection = BowRotation.Vector();
+			//	//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
+			//	Arrow->FireInDirection(LaunchDirection, CurrentCharge);
+			//	//sets the bools for animations and turns off charging and resets the charge
+			//	SetArrowDrawn(false);
+			//	SetArrowFired(true);
+			//	isCharging = false;
+			//	UE_LOG(LogTemp, Warning, TEXT("Charge: %f Percent"), CurrentCharge);
+			//	CurrentCharge = 0;
+			//}
+
+			SpawnProjectile(CameraRotation, World, BowRotation);
 		}
 	}
+}
+
+void AMainCharacterTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AMainCharacterTest, ArrowDrawn);
+	DOREPLIFETIME(AMainCharacterTest, ArrowFired);
+	DOREPLIFETIME(AMainCharacterTest, MaxCharge);
+	DOREPLIFETIME(AMainCharacterTest, ChargeRate);
+	DOREPLIFETIME(AMainCharacterTest, CurrentCharge);
+	DOREPLIFETIME(AMainCharacterTest, isCharging);
 }
 
 void AMainCharacterTest::DrawBow()
@@ -232,6 +245,36 @@ void AMainCharacterTest::SetArrowFired(bool wasArrowShot)
 {
 	ArrowFired = wasArrowShot;
 }
+
+float AMainCharacterTest::GetCurrentCharge()
+{
+	return CurrentCharge;
+}
+
+void AMainCharacterTest::SpawnProjectile_Implementation(FRotator CamRotation, UWorld* WorldRef, FRotator BowRot)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	APlayerArrow* Arrow = WorldRef->SpawnActor<APlayerArrow>(ArrowClass, BowPosition->GetComponentLocation(), CamRotation, SpawnParams);
+	//if arrow has been succesfully created
+	if (Arrow)
+	{
+		//changes the Bow rotation to be changed into a vector so that it shows a direction
+		FVector LaunchDirection = BowRot.Vector();
+		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
+		Arrow->FireInDirection(LaunchDirection, CurrentCharge);
+		//sets the bools for animations and turns off charging and resets the charge
+		SetArrowDrawn(false);
+		SetArrowFired(true);
+		isCharging = false;
+		UE_LOG(LogTemp, Warning, TEXT("Charge: %f Percent"), CurrentCharge);
+		CurrentCharge = 0;
+	}
+}
+
+
+
 
 void AMainCharacterTest::StopAim()
 {
