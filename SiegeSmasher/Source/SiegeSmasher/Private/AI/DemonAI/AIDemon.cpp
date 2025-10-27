@@ -10,29 +10,15 @@ AAIDemon::AAIDemon()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
-
-	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	SightConfig->SightRadius = 3000;
-	SightConfig->LoseSightRadius = 3500;
-	SightConfig->PeripheralVisionAngleDegrees = 90;
-	SightConfig->SetMaxAge(10.0f);
-	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
-	SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
-
-	AIPerception->ConfigureSense(*SightConfig);
-	AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
-
-	
 }
 
 // Called when the game starts or when spawned
 void AAIDemon::BeginPlay()
 {
 	Super::BeginPlay();
+	
 
-	AIPerception->OnPerceptionUpdated.AddDynamic(this, &AAIDemon::HandlePerceptionUpdate);
+	/*AIPerception->OnPerceptionUpdated.AddDynamic(this, &AAIDemon::HandlePerceptionUpdate);*/
 	//Spline controller stuff.
 	//Get all the spline controllers in the scene.
 	TArray<AActor*> SplineControllerAsActor;
@@ -103,23 +89,43 @@ void AAIDemon::Tick(float DeltaTime)
 	}
 }
 
-void AAIDemon::HandlePerceptionUpdate(const TArray<AActor*>& UpdatedActors)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Seen Tower")));
-	/*for (AActor* Actor : UpdatedActors)
-	{
-		if (Actor)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Perception updated for actor: %s"), *Actor->GetName());
-		}
-	}*/
-}
-
 // Called to bind functionality to input
 void AAIDemon::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AAIDemon::PlayAttack()
+{
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayAttackMontage();
+	}
+
+	else
+	{
+		Multicast_PlayAttackMontage();
+	}
+}
+
+void AAIDemon::Server_PlayAttackMontage_Implementation()
+{
+	Multicast_PlayAttackMontage();
+}
+
+
+void AAIDemon::Multicast_PlayAttackMontage_Implementation()
+{
+	if (AttackAnimation != nullptr)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Playing Animation")));
+			AnimInstance->Montage_Play(AttackAnimation);
+		}
+	}
 }
 
 void AAIDemon::setbCanActorMove(bool bStore)

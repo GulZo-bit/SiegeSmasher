@@ -9,6 +9,10 @@
 #include "Components/TimelineComponent.h"
 #include "Math/MathFwd.h" 
 #include "Math/Vector.h" 
+#include "GenericTeamAgentInterface.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
+#include "GenericTeamAgentInterface.h"
 
 #include "TowerBase.generated.h" 
 
@@ -40,7 +44,7 @@ static inline  int32 operator &  (TowerStatusEffect  other, TowerStatusEffect ot
 }
 
 UCLASS()
-class SIEGESMASHER_API ATowerBase : public AActor
+class SIEGESMASHER_API ATowerBase : public AActor, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 public:
@@ -51,6 +55,7 @@ public:
 	FVector GetPlacementColliderHalfExtents();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
   	bool ResolvePlacement(FVector& SurfaceHalfExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos, FTransform& surfaceTransform);
+
 	
 protected:
 	// Called when the game starts or when spawned
@@ -124,11 +129,15 @@ protected:
 	virtual void TowerActive(float& DeltaTime) ;
 	virtual void ApplyDamage(AEnemyBase* Enemy);
 
+	FGenericTeamId TeamID;
+
+	virtual FGenericTeamId GetGenericTeamId() const override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UAIPerceptionStimuliSourceComponent* StimuliSourceComponent;
 private: 
 
 	FVector FacingDirSum;

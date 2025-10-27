@@ -23,18 +23,20 @@ public:
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
-	void TowerSeen();
+	void DistanceToTower();
+
 public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	UBoxComponent* TowerFindZone;
+	AActor* TowerStore;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
 	UAIPerceptionComponent* AIPerception;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
-	UAISenseConfig_Sight* SightConfig;*/
+	UAISenseConfig_Sight* SightConfig;
 
 	UPROPERTY()
 	APawn* ControlledPawn;
@@ -48,6 +50,9 @@ public:
 
 	/*UFUNCTION()
 	void HandlePerceptionUpdate(const TArray<AActor*>& UpdatedActors);*/
+
+	UFUNCTION()
+	void HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stim);
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;

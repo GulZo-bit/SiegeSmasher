@@ -31,6 +31,14 @@ protected:
 	int32 SplineNum; //Number that will be set randomly based on how many splines are in the scene.
 	float StartTime;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	UAnimMontage* AttackAnimation;
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayAttackMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayAttackMontage();
 
 public:	
 	// Called every frame
@@ -43,13 +51,6 @@ public:
 	void setbCanActorMove(bool bStore);
 	float Count = 0.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
-	UAIPerceptionComponent* AIPerception;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
-	UAISenseConfig_Sight* SightConfig;
-
-	UFUNCTION()
-	void HandlePerceptionUpdate(const TArray<AActor*>& UpdatedActors);
+	void PlayAttack();
 
 };

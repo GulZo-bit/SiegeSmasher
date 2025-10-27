@@ -20,10 +20,11 @@ ATowerBase::ATowerBase()
 	TowerHitBox->SetCollisionProfileName(FName("TowerPreset"));
 	BoxColliderForObjectPlacement->SetCollisionProfileName(FName("TowerPreset"));
 	TowerHitBox->SetBoxExtent(FVector::ZeroVector); 
-	
-   
 
-	
+
+	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
+	StimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass());
+	TeamID = FGenericTeamId(1);
 }
 
 void ATowerBase::DisableTick()
@@ -38,7 +39,6 @@ void ATowerBase::DisableTick()
 // Called when the game starts or when spawned
 void ATowerBase::BeginPlay()
 {
-  
 	Super::BeginPlay();
 	WaitTimeToReset = MaxWaitTimeToReset; 
 	CoolDownAfterReset = MaxCoolDownAfterReset;
@@ -56,7 +56,7 @@ void ATowerBase::BeginPlay()
 
 
 	TowerSetUp();
-
+	
 }
 
 
@@ -352,6 +352,11 @@ void ATowerBase::TowerTimeLineEnd()
 
 
 
+FGenericTeamId ATowerBase::GetGenericTeamId() const
+{
+	return TeamID;
+}
+
 // Called every frame
 void ATowerBase::Tick(float DeltaTime)
 {
@@ -379,4 +384,5 @@ void ATowerBase::Tick(float DeltaTime)
 	
 
 }
+
 

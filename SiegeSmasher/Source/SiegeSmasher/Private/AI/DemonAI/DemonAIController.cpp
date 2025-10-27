@@ -7,7 +7,7 @@
 
 ADemonAIController::ADemonAIController()
 {
-	/*AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
+	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
 
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 	SightConfig->SightRadius = 3000;
@@ -19,8 +19,7 @@ ADemonAIController::ADemonAIController()
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
 
 	AIPerception->ConfigureSense(*SightConfig);
-	AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());*/
-	
+	AIPerception->SetDominantSense(SightConfig->GetSenseImplementation());
 	
 }
 
@@ -32,6 +31,7 @@ void ADemonAIController::BeginPlay()
 	{
 		RunBehaviorTree(AIBehavior);
 		//AIPerception->OnPerceptionUpdated.AddDynamic(this, &ADemonAIController::HandlePerceptionUpdate);
+		AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &ADemonAIController::HandleTargetPerceptionUpdate);
 	}
 	
 }
@@ -61,59 +61,62 @@ void ADemonAIController::OnPossess(APawn* InPawn)
 	TowerFindZone = Demon->FindComponentByClass<UBoxComponent>();
 }
 
+void ADemonAIController::DistanceToTower()
+{
+	FVector TowerLocStore;
+	FVector EnemyLocStore = Demon->GetActorLocation();
+
+	if (TowerStore != nullptr)
+	{
+		TowerLocStore = TowerStore->GetActorLocation();
+		float DistStore = (FMath::Sqrt(((TowerLocStore.X - EnemyLocStore.X) * (TowerLocStore.X - EnemyLocStore.X)) + ((TowerLocStore.Y - EnemyLocStore.Y) * (TowerLocStore.Y - EnemyLocStore.Y)) + ((TowerLocStore.Z - EnemyLocStore.Z) * (TowerLocStore.Z - EnemyLocStore.Z))));
+
+		if (DistStore >= 0 && DistStore <= 300)
+		{
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), true);
+		}
+
+		else
+		{
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
+		}
+	}
+	
+}
+
 void ADemonAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CubeStore != nullptr)
-	{
-		GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
-	}
+	GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
 
-	/*if (AIPerception != nullptr)
+	DistanceToTower();
+
+	if (GetBlackboardComponent()->GetValueAsBool(TEXT("bTowerSeen")) == true && GetBlackboardComponent()->GetValueAsBool(TEXT("bInRange")) == false)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Found Perception")));
-	}*/
-	
-	//TowerSeen();
+		GetBlackboardComponent()->SetValueAsVector(TEXT("TowerLocation"), TowerStore->GetActorLocation());
+	}
 }
 
-/*void ADemonAIController::HandlePerceptionUpdate(const TArray<AActor*>& UpdatedActors)
+void ADemonAIController::HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stim)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Seen Tower")));
-	for (AActor* Actor : UpdatedActors)
+	if (Actor != nullptr)
 	{
-		if (Actor)
+		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Seen Tower")));
+
+		if (Stim.WasSuccessfullySensed())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Perception updated for actor: %s"), *Actor->GetName());
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), true);
+			TowerStore = Actor;
+			Demon->setbCanActorMove(false);
+		}
+		
+		else
+		{
+			GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
+			Demon->setbCanActorMove(true);
 		}
 	}
-}*/
+}
 
-/*void ADemonAIController::TowerSeen()
-{
-	if (TowerFindZone != nullptr)
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Found Tower Find Zone")));
-		TArray<AActor*> AllTowerStore;
-		TowerFindZone->GetOverlappingActors(AllTowerStore);
-
-		for (int i = 0; i < AllTowerStore.Num(); i++)
-		{
-			if (Cast<ATowerBase>(AllTowerStore[i]))
-			{
-				//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Found Tower")));
-				ATowerBase* TempTowerStore = Cast<ATowerBase>(AllTowerStore[i]);
-				GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), true);
-				GetBlackboardComponent()->SetValueAsVector(TEXT("TowerLocation"), TempTowerStore->GetActorLocation());
-			}
-
-			else
-			{
-				GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
-			}
-		}
-
-	}
-}*/
 
