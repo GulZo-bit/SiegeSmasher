@@ -240,8 +240,8 @@ void AAIWitch::Tick(float DeltaTime)
 				if (HasAuthority())
 				{
 					Spell = GetWorld()->SpawnActor<AWitch_Projectile>(HealSpell, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
-					HealEnemy();
 				}
+				HealEnemy();
 				
 				iHealCount++;
 			}
