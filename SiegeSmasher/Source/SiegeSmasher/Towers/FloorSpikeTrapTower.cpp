@@ -15,6 +15,7 @@ AFloorSpikeTrapTower::AFloorSpikeTrapTower()
 
 	SpikesMesh->SetupAttachment(RootComponent);
 	SpikeTrapBaseMesh->SetupAttachment(RootComponent);
+	TowerHitBox->SetupAttachment(SpikesMesh);
 
 
 
@@ -131,7 +132,7 @@ void AFloorSpikeTrapTower::TowerReset()
 
 
 void AFloorSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
-	if (((TowerTimeLine->GetPlaybackPosition() > 0.5f) || RequiresReset )) {
+	if (( RequiresReset || SpikesUp )) {
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT(" Spike Trap Damaging enemy")));
 		Enemy->DamageEnemy(TowerDamage);

@@ -128,11 +128,11 @@ void AMainCharacter::Jumping()
 
 void AMainCharacter::PlaceTower()
 {
-	if (IsPlacingTower) {
+	if (IsPlacingTower ) {
 		
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Placing tower")));
 		ATowerBase * TowerRef =  World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
-		
+	
 
 	}
 

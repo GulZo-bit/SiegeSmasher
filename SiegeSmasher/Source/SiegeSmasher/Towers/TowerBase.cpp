@@ -300,6 +300,11 @@ void ATowerBase::SetHitBoxActive(bool HitBoxActive)
 
 }
 
+UBoxComponent* ATowerBase::GetPlacmentBox()
+{
+	return BoxColliderForObjectPlacement;
+}
+
 void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor* OverlapedActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool SweepBool ,const FHitResult& HitResult) {
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));

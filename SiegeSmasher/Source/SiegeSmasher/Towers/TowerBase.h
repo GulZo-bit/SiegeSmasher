@@ -51,7 +51,7 @@ public:
 	FVector GetPlacementColliderHalfExtents();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
   	bool ResolvePlacement(FVector& SurfaceHalfExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos, FTransform& surfaceTransform);
-	
+	UBoxComponent* GetPlacmentBox();
 protected:
 	// Called when the game starts or when spawned
 
@@ -107,6 +107,8 @@ protected:
 	virtual void TowerTimeLineInterp(float value); 
 
 	void SetHitBoxActive(bool HitBoxActive);
+
+	
 protected:
 
 	
