@@ -156,7 +156,7 @@ void AProjectileTowerBase::TrackEnemies(FVector Location)
 			GLog->Log(FString::Printf(TEXT("Projectile Batch Index Was Too Large For Current Batch Resetting")));
 
 		}
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Starting batch index is %d "), ProjectileBacthIndex));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Starting batch index is %d "), ProjectileBacthIndex));
 		GLog->Log(FString::Printf(TEXT("Starting batch index is %d "), ProjectileBacthIndex));
 		int StartingBatchIndex = ProjectileBacthIndex;
 		int MostOptimalIndex = 0;
@@ -166,7 +166,7 @@ void AProjectileTowerBase::TrackEnemies(FVector Location)
 			if (float dist = FVector::DistSquared(Location, CurrentEnemiesInRange[ProjectileBacthIndex]->GetActorLocation()) < MinDist && 
 				!World->LineTraceSingleByChannel(LOSHitResultForBatching, Location, CurrentEnemiesInRange[ProjectileBacthIndex]->GetActorLocation(), TowerNoLOSChannel)) {
 
-				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy found during LOS batching number %d "), ProjectileBacthIndex));
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy found during LOS batching number %d "), ProjectileBacthIndex));
 				GLog->Log(FString::Printf(TEXT("Enemy found during LOS batching number %d "), ProjectileBacthIndex));
 
 				LOSSuccess = true;
@@ -207,19 +207,6 @@ void AProjectileTowerBase::TrackEnemies(FVector Location)
 
 
 }
-
-
-
-
-
-
-	
-	
-
-
-
-
-
 
 
 
