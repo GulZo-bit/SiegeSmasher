@@ -10,12 +10,14 @@ ATowerBase::ATowerBase()
 	PrimaryActorTick.bCanEverTick = true;
 	BoxColliderForObjectPlacement = CreateDefaultSubobject<UBoxComponent>(TEXT("Box collider for placement"));
 	TowerTimeLine = CreateDefaultSubobject<UTimelineComponent>("TowerTimeLine");
+	
 	RootComponent = BoxColliderForObjectPlacement;
 	TriggerRangeBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger Box For Range"));
 	TriggerRangeBox->SetupAttachment(RootComponent);
 	TriggerRangeBox->SetCollisionResponseToChannel(PlacingSurface, ECollisionResponse::ECR_Ignore);
 	TowerTimeLineCurve = CreateDefaultSubobject<UCurveFloat>("Tower Time Line Curve");
-	TowerHitBox = CreateDefaultSubobject<UBoxComponent>("Tower Hit Box"); 
+	TowerHitBox = CreateDefaultSubobject<UBoxComponent>("Tower Hit Box");
+
 	TriggerRangeBox->SetCollisionProfileName(FName("TowerPreset"));
 	TowerHitBox->SetCollisionProfileName(FName("TowerPreset"));
 	BoxColliderForObjectPlacement->SetCollisionProfileName(FName("TowerPreset"));
@@ -376,7 +378,6 @@ void ATowerBase::Tick(float DeltaTime)
 		}
 		return;
 	}
-	
 	TowerDormant(DeltaTime);
 	
 	

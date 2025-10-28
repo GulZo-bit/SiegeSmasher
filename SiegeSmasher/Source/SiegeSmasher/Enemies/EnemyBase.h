@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyBase.generated.h"
+#ifndef MAX_ENEMY_NUM
+ #define MAX_ENEMY_NUM 150
+#endif // !MAX_ENEMY_NUM
 
 UENUM(BlueprintType)
 enum class EnemyTypes : uint8
