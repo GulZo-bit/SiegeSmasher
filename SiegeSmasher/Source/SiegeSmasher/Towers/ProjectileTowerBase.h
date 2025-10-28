@@ -5,13 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h" 
 #include "TowerBase.h" 
-#include "../TowerProjectiles/TowerProjectileBase.h"
+#include "../TowerProjectiles/TowerProjectileBase.h" 
+#include "Math/Box.h"
 #include "ProjectileTowerBase.generated.h"
 
 #ifndef TowerNoLOSChannel
  #define TowerNoLOSChannel ECC_GameTraceChannel8
 #endif // !TowerNoLOSChannel
-
+#ifndef EnemyObjectChannel
+ #define EnemyObjectChannel ECC_GameTraceChannel3
+#endif // !EnemyObjectChannel
 
 
 
@@ -48,9 +51,15 @@ protected:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	TMap<AActor*, FVector> DirectionsToRegainLos;
-	TArray<AEnemyBase*> EnemiesToTrackForLOS;
-	AEnemyBase* EnemySingleTarget = nullptr;
-	TMap<AEnemyBase*, int> IndicesForEnemiesInRange;
+	TArray<AActor*> EnemiesToTrackForLOS;
+	AActor* EnemySingleTarget = nullptr;
+	TMap<AActor*, int> IndicesForEnemiesInRange; 
+	TSet<FVector> DirectionsLOSWasLostAt;
+	bool CurrentEnemyOutOfRange = true;  
+	FBox TriggerBoxAABB;
+	float HalfTriggerBoxDimLength = 0.0f; 
+	int ProjectileTowerBatchCount = 5; 
+	int ProjectileBacthIndex = 0;
 	//AEnemyBase* EnemyToTrackForLOS = nullptr;
 	UWorld* World = nullptr;
 	FHitResult LOSResult;
@@ -58,11 +67,11 @@ protected:
 	FActorSpawnParameters ProjectileSpawnParameters;
 	void ShootProjectile(FVector Position, FRotator Rotation); 
 	virtual bool HasLineOfSite(FVector To);  
-	void TrackEnemyForLos();
+	void TrackEnemies(FVector Location);
 	bool NoTargetsInRange = true; 
 	TArray<AEnemyBase*> CurrentEnemiesInRange;
 	bool CanLoseLOS = false;
-
+	int MaxEnemiesInRangeIndex = 0;
 	virtual void SortedClosestEnemiesInRange();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override; 

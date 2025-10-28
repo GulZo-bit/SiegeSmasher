@@ -50,7 +50,7 @@ void ASpawnPoint::ResetCoolDownTimer()
 
 	CoolDownTimer = random.FRandRange(CoolDownTimerMin, CoolDownTimerMax);
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("reseting cool donw timer inside of spawn point new value is %f"), CoolDownTimer));
-	GLog->Log(FString::Printf(TEXT("reseting cool donw timer inside of spawn point new value is %f"), CoolDownTimer));
+	//GLog->Log(FString::Printf(TEXT("reseting cool donw timer inside of spawn point new value is %f"), CoolDownTimer));
 
 
 
@@ -63,7 +63,7 @@ bool ASpawnPoint::IsAvailable()
 		ResetCoolDownTimer();
 	}
 	CoolDownTimer -= GetWorld()->GetDeltaSeconds();
-	GLog->Log(FString::Printf(TEXT("current cool donw timer inside of current spawn point is %f"), CoolDownTimer));
+	//GLog->Log(FString::Printf(TEXT("current cool donw timer inside of current spawn point is %f"), CoolDownTimer));
 
 	return CoolDownTimer <= 0.0f;
 }

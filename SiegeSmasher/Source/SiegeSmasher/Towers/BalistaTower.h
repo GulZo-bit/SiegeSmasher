@@ -34,15 +34,24 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaArrow");
 	UStaticMeshComponent* BallistaArrow;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BallistaRecoliTimeLine");
-	UTimelineComponent * BallistaRecoliTimeline;
+	UTimelineComponent * BallistaRecoliTimeline; 
+
 	bool HasLineOfSite(FVector To);
 	void TowerActive(float& DeltaTime);
 	void TowerDormant(float& DeltaTime);
+	virtual void BeginPlay() override;
+
+
+
 
 public:	
 
-private: 
-
+private:
+	FVector LOSRayFiringPoint;
+	TArray<FVector> LineOfSightRays;
+	TArray<FVector> ObstaclePointsForLos;
+	void EstablishLineOfSightRays();
+	float RayDirectionAngleInc = 20.0f;
 
 
 };

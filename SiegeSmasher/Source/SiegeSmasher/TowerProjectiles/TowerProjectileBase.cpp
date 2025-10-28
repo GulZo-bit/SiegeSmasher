@@ -11,7 +11,7 @@ ATowerProjectileBase::ATowerProjectileBase()
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Mesh"); 
 	ProjectileMesh->SetCollisionProfileName(FName("TowerProjectile"));
-
+	RootComponent = ProjectileMesh;
 
 
 	//ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
@@ -64,7 +64,7 @@ void ATowerProjectileBase::Tick(float DeltaTime)
 
 }
 
-void ATowerProjectileBase::SetEnemyTarget(AEnemyBase* Enemy)
+void ATowerProjectileBase::SetEnemyTarget(AActor* Enemy)
 {
 
 	Target = Enemy;
