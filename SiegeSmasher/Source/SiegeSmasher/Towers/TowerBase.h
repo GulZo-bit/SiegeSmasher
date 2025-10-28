@@ -10,6 +10,7 @@
 #include "Math/MathFwd.h" 
 #include "Math/Vector.h" 
 #include "GenericTeamAgentInterface.h"
+#include "Perception/AIPerceptionSystem.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "GenericTeamAgentInterface.h"
@@ -136,12 +137,12 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UAIPerceptionStimuliSourceComponent* StimuliSourceComponent;
 
 	void setHealth(float HealthStore);
-
 	float getHealth();
 
 private: 

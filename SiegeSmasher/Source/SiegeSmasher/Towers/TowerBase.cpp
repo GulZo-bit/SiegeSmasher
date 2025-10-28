@@ -54,9 +54,7 @@ void ATowerBase::BeginPlay()
 
 	}
 
-
 	TowerSetUp();
-	
 }
 
 
@@ -383,6 +381,16 @@ void ATowerBase::Tick(float DeltaTime)
 	
 	
 
+}
+
+void ATowerBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (EndPlayReason == EEndPlayReason::Destroyed)
+	{
+		StimuliSourceComponent->UnregisterFromPerceptionSystem();
+	}
 }
 
 void ATowerBase::setHealth(float HealthStore)

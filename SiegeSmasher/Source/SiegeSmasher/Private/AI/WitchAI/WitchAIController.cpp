@@ -50,7 +50,7 @@ void AWitchAIController::OnPossess(APawn* InPawn)
 		}
 	}
 
-	GetWorldTimerManager().SetTimer(Timer, this, &AWitchAIController::setHealBool, 15.0f, true, 10.0f);
+	GetWorldTimerManager().SetTimer(Timer, this, &AWitchAIController::setHealBool, 12.0f, true, 10.0f);
 	
 }
 

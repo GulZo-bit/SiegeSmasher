@@ -124,18 +124,18 @@ void AAIWitch::HealEnemy()
 	{
 		GLog->Log("Found HealZone");
 
-		TArray<AActor*> ActorVampStore;
+		TArray<AActor*> ActorStore;
 		//TArray<AAICharTest*> VampStore;
-		HealZone->GetOverlappingActors(ActorVampStore);
+		HealZone->GetOverlappingActors(ActorStore);
 
-		for (int i = 0; i < ActorVampStore.Num(); i++)
+		for (int i = 0; i < ActorStore.Num(); i++)
 		{
-			if (ActorVampStore[i] != nullptr)
+			if (ActorStore[i] != nullptr)
 			{
-				if (Cast<AAICharTest>(ActorVampStore[i]))
+				if (Cast<AEnemyBase>(ActorStore[i]))
 				{
 					GLog->Log("Healing Enemies");
-					AAICharTest* AICharTemp = Cast<AAICharTest>(ActorVampStore[i]);
+					AEnemyBase* AICharTemp = Cast<AEnemyBase>(ActorStore[i]);
 					AICharTemp->AddToHealth(20);
 
 					UChildActorComponent* ChildActorStore = Cast<UChildActorComponent>(AICharTemp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));

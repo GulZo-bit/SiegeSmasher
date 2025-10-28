@@ -13,7 +13,7 @@ ADemonAIController::ADemonAIController()
 	SightConfig->SightRadius = 3000;
 	SightConfig->LoseSightRadius = 3500;
 	SightConfig->PeripheralVisionAngleDegrees = 90;
-	SightConfig->SetMaxAge(10.0f);
+	SightConfig->SetMaxAge(30.0f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
@@ -59,7 +59,7 @@ void ADemonAIController::OnPossess(APawn* InPawn)
 	}
 
 	AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &ADemonAIController::HandleTargetPerceptionUpdate);
-
+	AIPerception->OnTargetPerceptionForgotten.AddDynamic(this, &ADemonAIController::HandleTargetPerceptionForgotten);
 }
 
 void ADemonAIController::DistanceToTower()
@@ -67,7 +67,7 @@ void ADemonAIController::DistanceToTower()
 	FVector TowerLocStore;
 	FVector EnemyLocStore = Demon->GetActorLocation();
 
-	if (TowerStore != nullptr)
+	if (TowerStore != nullptr && IsValid(TowerStore))
 	{
 		TowerLocStore = TowerStore->GetActorLocation();
 		float DistStore = (FMath::Sqrt(((TowerLocStore.X - EnemyLocStore.X) * (TowerLocStore.X - EnemyLocStore.X)) + ((TowerLocStore.Y - EnemyLocStore.Y) * (TowerLocStore.Y - EnemyLocStore.Y)) + ((TowerLocStore.Z - EnemyLocStore.Z) * (TowerLocStore.Z - EnemyLocStore.Z))));
@@ -75,17 +75,21 @@ void ADemonAIController::DistanceToTower()
 		if (DistStore >= 0 && DistStore <= 300)
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), true);
+			Demon->setbCanActorMove(false);
 		}
 
 		else
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
+			//Demon->setbCanActorMove(true);
 		}
 	}
 
 	else
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
+		Demon->setbCanActorMove(true);
 	}
 	
 }
@@ -94,18 +98,26 @@ void ADemonAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
-
-	DistanceToTower();
-
+	if (GetBlackboardComponent()->GetValueAsBool(TEXT("bTowerSeen")) == true)
+	{
+		DistanceToTower();
+	}
+	
 	if (GetBlackboardComponent()->GetValueAsBool(TEXT("bTowerSeen")) == true && GetBlackboardComponent()->GetValueAsBool(TEXT("bInRange")) == false)
 	{
 		GetBlackboardComponent()->SetValueAsVector(TEXT("TowerLocation"), TowerStore->GetActorLocation());
+		Demon->setbCanActorMove(true);
 	}
+
+	
+	
+	GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
+	
 }
 
 void ADemonAIController::HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stim)
 {
+	
 	if (Actor != nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Actor is not null")));
@@ -115,26 +127,22 @@ void ADemonAIController::HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus
 			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Seen Tower")));
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), true);
 			TowerStore = Actor;
-			Demon->setbCanActorMove(false);
+			//Demon->setbCanActorMove(false);
 		}
-		
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Cant See tower")));
-			GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
-			TowerStore = nullptr;
-			Demon->setbCanActorMove(true);
-		}
+
 	}
 
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Actor is null")));
-		GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
-		GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
-		TowerStore = nullptr;
-		Demon->setbCanActorMove(true);
-	}
+}
+
+void ADemonAIController::HandleTargetPerceptionForgotten(AActor* Actor)
+{
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Forgotten Tower")));
+	GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
+	GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
+	TowerStore = nullptr;
+	Demon->setbCanActorMove(true);
+	
 }
 
 

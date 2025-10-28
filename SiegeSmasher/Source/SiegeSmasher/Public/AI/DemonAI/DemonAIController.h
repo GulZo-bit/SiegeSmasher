@@ -53,6 +53,9 @@ public:
 
 	UFUNCTION()
 	void HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus Stim);
+
+	UFUNCTION()
+	void HandleTargetPerceptionForgotten(AActor* Actor);
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
