@@ -31,15 +31,16 @@ public:
 protected:
 	void TowerSetUp();
 	void TowerActive(float& DeltaTime);
-	void TowerTimeLineEnd(); 
-	void TowerReset(); 
+	void TowerTimeLineEnd();
+	void TowerReset();
 	void TowerDormant(float& DeltaTime);
-	void HandleNewEnemy(AEnemyBase * Enemy); 
-	void TowerTimeLineInterp(float value); 
+	void HandleNewEnemy(AEnemyBase* Enemy);
+	void TowerTimeLineInterp(float value);
 	void ApplyDamage(AEnemyBase* Enemy);
 
 protected:
 	FVector EulerAnglesOfSpikesOnPlace;
+	bool StartedReset = false;
 
 public:	
 
@@ -49,7 +50,7 @@ private:
 
 	
 	bool IsSwinging = false; 
-	bool StartedReset = false;
+
 
 	void RotateOnTimeLine(float value);
 
