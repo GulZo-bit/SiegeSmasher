@@ -56,7 +56,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
   	bool ResolvePlacement(FVector& SurfaceHalfExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos, FTransform& surfaceTransform);
 
-	
 protected:
 	// Called when the game starts or when spawned
 
@@ -130,14 +129,21 @@ protected:
 	virtual void ApplyDamage(AEnemyBase* Enemy);
 
 	FGenericTeamId TeamID;
-
 	virtual FGenericTeamId GetGenericTeamId() const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Stats")
+	float Health = 100.0f;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UAIPerceptionStimuliSourceComponent* StimuliSourceComponent;
+
+	void setHealth(float HealthStore);
+
+	float getHealth();
+
 private: 
 
 	FVector FacingDirSum;

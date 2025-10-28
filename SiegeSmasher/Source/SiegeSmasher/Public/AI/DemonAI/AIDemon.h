@@ -8,6 +8,7 @@
 #include "../Enemies/EnemyBase.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "AI/DemonAI/DemonFists.h"
 #include "AIDemon.generated.h"
 
 UCLASS()
@@ -53,4 +54,12 @@ public:
 
 	void PlayAttack();
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ADemonFists> DemonFistClass;
+
+	UPROPERTY()
+	ADemonFists* RightFist;
+
+	UPROPERTY()
+	ADemonFists* LeftFist;
 };

@@ -76,7 +76,7 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 
 	
 
-	SortedClosestEnemiesInRange();
+	//SortedClosestEnemiesInRange();
 	bool CanStayActive = false; 
 	bool LostFullLos = false;
 	if (CurrentEnemiesInRange.Num() > 0) {

@@ -17,6 +17,21 @@ void AAIDemon::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	//Attach Fists
+	RightFist = GetWorld()->SpawnActor<ADemonFists>(DemonFistClass);
+	LeftFist = GetWorld()->SpawnActor<ADemonFists>(DemonFistClass);
+
+	if (RightFist != nullptr)
+	{
+		RightFist->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("RightHandSocket"));
+		RightFist->SetOwner(this);
+	}
+
+	if (LeftFist != nullptr)
+	{
+		LeftFist->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("LeftHandSocket"));
+		LeftFist->SetOwner(this);
+	}
 
 	/*AIPerception->OnPerceptionUpdated.AddDynamic(this, &AAIDemon::HandlePerceptionUpdate);*/
 	//Spline controller stuff.

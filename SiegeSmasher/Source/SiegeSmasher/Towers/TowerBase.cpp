@@ -385,4 +385,17 @@ void ATowerBase::Tick(float DeltaTime)
 
 }
 
+void ATowerBase::setHealth(float HealthStore)
+{
+	Health = HealthStore;
 
+	if (Health <= 0.0f)
+	{
+		Destroy();
+	}
+}
+
+float ATowerBase::getHealth()
+{
+	return Health;
+}

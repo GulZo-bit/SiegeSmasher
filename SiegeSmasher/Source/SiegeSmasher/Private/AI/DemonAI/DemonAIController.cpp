@@ -31,7 +31,7 @@ void ADemonAIController::BeginPlay()
 	{
 		RunBehaviorTree(AIBehavior);
 		//AIPerception->OnPerceptionUpdated.AddDynamic(this, &ADemonAIController::HandlePerceptionUpdate);
-		AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &ADemonAIController::HandleTargetPerceptionUpdate);
+		
 	}
 	
 }
@@ -58,7 +58,8 @@ void ADemonAIController::OnPossess(APawn* InPawn)
 		}
 	}
 
-	TowerFindZone = Demon->FindComponentByClass<UBoxComponent>();
+	AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &ADemonAIController::HandleTargetPerceptionUpdate);
+
 }
 
 void ADemonAIController::DistanceToTower()
@@ -81,6 +82,11 @@ void ADemonAIController::DistanceToTower()
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
 		}
 	}
+
+	else
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
+	}
 	
 }
 
@@ -102,10 +108,11 @@ void ADemonAIController::HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus
 {
 	if (Actor != nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Seen Tower")));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Actor is not null")));
 
 		if (Stim.WasSuccessfullySensed())
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Seen Tower")));
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), true);
 			TowerStore = Actor;
 			Demon->setbCanActorMove(false);
@@ -113,9 +120,20 @@ void ADemonAIController::HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus
 		
 		else
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Cant See tower")));
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
+			TowerStore = nullptr;
 			Demon->setbCanActorMove(true);
 		}
+	}
+
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Actor is null")));
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
+		TowerStore = nullptr;
+		Demon->setbCanActorMove(true);
 	}
 }
 
