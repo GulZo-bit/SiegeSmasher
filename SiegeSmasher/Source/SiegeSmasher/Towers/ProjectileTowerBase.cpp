@@ -79,7 +79,10 @@ void AProjectileTowerBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AAc
 		else {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("COULD NOT FIND ENEMY IN MAP NOT REMOVING")));
 		}
-		if ((CurrentEnemyOutOfRange = Enemy == EnemySingleTarget)) {
+
+		CurrentEnemyOutOfRange = Enemy == EnemySingleTarget;
+
+		if (CurrentEnemyOutOfRange) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("CURRENT ENEMY OUT OF RANGE")));
 
 		};
