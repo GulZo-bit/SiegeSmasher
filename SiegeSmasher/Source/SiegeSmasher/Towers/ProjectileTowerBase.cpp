@@ -81,7 +81,7 @@ void AProjectileTowerBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AAc
 		}
 		if ((CurrentEnemyOutOfRange = Enemy == EnemySingleTarget)) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("CURRENT ENEMY OUT OF RANGE")));
-		
+
 		};
 		
 		
