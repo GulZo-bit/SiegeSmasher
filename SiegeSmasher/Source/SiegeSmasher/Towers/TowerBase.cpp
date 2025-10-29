@@ -20,7 +20,9 @@ ATowerBase::ATowerBase()
 
 	TriggerRangeBox->SetCollisionProfileName(FName("TowerPreset"));
 	TowerHitBox->SetCollisionProfileName(FName("TowerPreset"));
-	BoxColliderForObjectPlacement->SetCollisionProfileName(FName("TowerPreset"));
+	BoxColliderForObjectPlacement->SetCollisionProfileName(FName("TowerPreset")); 
+	BoxColliderForObjectPlacement->SetCollisionObjectType(TowerPlacementBox); 
+	BoxColliderForObjectPlacement->SetCollisionResponseToChannel(TowerPlacementBox, ECollisionResponse::ECR_Overlap);
 	TowerHitBox->SetBoxExtent(FVector::ZeroVector); 
 
 
@@ -144,7 +146,7 @@ bool ATowerBase::ResolvePlacement(FVector& SurfaceBoxExtents, FVector& SurfacePo
 	bool CeilingCheck = roundf(TrueNormalSigned.Dot(FVector::UpVector)) != 0.0f;
 	bool IncorrectSurfaceDir = TransformedTowerNormal.Dot(AllowedDirection * normalDir) == 0.0f;
 	if (!Contained ) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
 		
 	/*	SetActorRotation(GetActorRotation() * !(Contained && IncorrectSurfaceDir));*/
 

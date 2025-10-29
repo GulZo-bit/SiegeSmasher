@@ -7,6 +7,10 @@
 #include "Components/BoxComponent.h"
 #include "TowePrePlaceObjectHelper.generated.h"
 
+#ifndef TowerPlacementBoxObjectType
+  #define TowerPlacementBoxObjectType ECC_GameTraceChannel9
+#endif // !TowerPlacementBoxObjectType
+
 UCLASS()
 class SIEGESMASHER_API ATowePrePlaceObjectHelper : public AActor
 {
@@ -33,6 +37,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerSurfaceAlignmentAxis");
 	FVector AlignmentAxis = FVector::ZeroVector;
+	UFUNCTION()
+    void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex ,bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*  OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 public:	
 	// Called every frame
 	bool ResolvePlacement(FVector& SurfaceBoxExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir, FVector& CamPos, FTransform& surfaceTransform);
@@ -40,9 +49,9 @@ public:
 	void DisableTick();
 	virtual void Tick(float DeltaTime) override;
 
-
+	bool GetCanPlaceTower();
 
 private: 
 	FVector FacingDirSum;
-
+	bool CanPlaceTower = true;
 };

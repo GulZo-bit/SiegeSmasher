@@ -4,8 +4,7 @@
 #include "MainCharacter.h"
 #include "GameFramework/Controller.h" 
 #include "DrawDebugHelpers.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h" 
+
 
 
 
@@ -34,16 +33,23 @@ void AMainCharacter::BeginPlay()
 	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(camera == nullptr)));
 	//Adding the input mapping context to the main character
 	/*A reference to the player controller class is being cast to the controller that is currently controlling this actor*/
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	AssignedPlayerController = Cast<APlayerController>(Controller);
+	if (AssignedPlayerController)
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(AssignedPlayerController->GetLocalPlayer());
+		if (InputSubsystem)
 		{
 			//Adding our defaultcontext to the input subsystem that each local player has.
 			//The zero refers to its priority. With zero being the lowest priority.
 			//If we had multiple we would assign them differnt priority with asscending giving them higher priority.
-			Subsystem->AddMappingContext(DefaultContext, 0);
+			InputSubsystem->AddMappingContext(DefaultContext, 0);
+
+		
 		}
-	}
+	} 
+
+   
+
 }
 
 // Called every frame
@@ -79,6 +85,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacter::Look); 
 
 		EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Started, this, &AMainCharacter::PlaceTower);
+
+		EnhancedInputComponent->BindAction(SwitchTowerAction, ETriggerEvent::Started, this, &AMainCharacter::SwitchTowers);
+
 
 
 
@@ -128,7 +137,7 @@ void AMainCharacter::Jumping()
 
 void AMainCharacter::PlaceTower()
 {
-	if (IsPlacingTower ) {
+	if (IsPlacingTower && Selected->GetCanPlaceTower() ) {
 		
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Placing tower")));
 		ATowerBase * TowerRef =  World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
@@ -159,7 +168,7 @@ void AMainCharacter::HandleTowerPlacement()
 {
 
 	if (Selected != nullptr) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,FString::Printf(TEXT("PlayerPlacingTower")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,FString::Printf(TEXT("PlayerPlacingTower")));
 		FVector PlayerCameForward = camera->GetForwardVector();
 
 		FHitResult PlacementSurfaceResult = FHitResult();
@@ -222,12 +231,12 @@ void AMainCharacter::InitialiseTowers()
 	}
 
 
-	if (TowerPrePlacementObjects.Num() > 0) {
+	/*if (TowerPrePlacementObjects.Num() > 0) {
 
 		Selected = TowerPrePlacementObjects[0];
 	 	DisplaySelected();
 
-	}
+	}*/
 
 
 
@@ -290,4 +299,33 @@ void AMainCharacter::setHealth(float HealthStore)
 float AMainCharacter::getHealth()
 {
 	return Health;
+}
+
+void AMainCharacter::SwitchTowers()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Switch  called")));
+
+	TArray<FKey> InputKeysToSwitchTower = InputSubsystem->QueryKeysMappedToAction(SwitchTowerAction);
+	for (int i = 0; i < InputKeysToSwitchTower.Num(); i++) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Switch tower called")));
+		
+		if (i < TowerPrePlacementObjects.Num() && 
+			AssignedPlayerController->WasInputKeyJustPressed(InputKeysToSwitchTower[i])) {
+			    
+		    if (Selected != nullptr) {
+				HideSelected();
+			}
+			    
+			SelectedTowerIndex = i;
+			Selected = TowerPrePlacementObjects[SelectedTowerIndex];
+			DisplaySelected();
+			break;
+			
+		}
+
+	}
+	
+
+
+
 }
