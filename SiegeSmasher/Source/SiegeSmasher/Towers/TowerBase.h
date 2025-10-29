@@ -18,8 +18,14 @@
 #include "TowerBase.generated.h" 
 
 
+#ifndef PlacingSurface
+ #define PlacingSurface ECC_GameTraceChannel1
+#endif // !PlacingSurface
 
-#define PlacingSurface ECC_GameTraceChannel1
+#ifndef TowerPlacementBox
+ #define TowerPlacementBox ECC_GameTraceChannel9
+#endif // !TowerPlacementBox
+
 
 
 // enum bit flags for chekcing if an enemy already has a status effect we can have each enum go up in a power of two as that will give 
@@ -80,8 +86,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CoolDownAfterReset");
 	float MaxCoolDownAfterReset = 0.0f;
 	float CoolDownAfterReset = 0.0f;
-	
-    
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerCost"); 
+	float TowerCost = 0.0f;
 	UFUNCTION()
 	virtual void TowerTimeLineEnd();
 	virtual void TowerDormant(float& DeltaTime);

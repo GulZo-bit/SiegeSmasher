@@ -16,7 +16,9 @@ AWallSpikeTrapTower::AWallSpikeTrapTower()
 	WallTrapSpikes->SetupAttachment(RootComponent);
 
 	TriggerRangeBox->SetupAttachment(WallTrapHinge);
-	TowerHitBox->SetupAttachment(WallTrapSpikes);
+	TowerHitBox->SetupAttachment(WallTrapSpikes); 
+	WallTrapSpikes->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WallTrapHinge->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 
 
@@ -39,6 +41,7 @@ void AWallSpikeTrapTower::TowerSetUp() {
 	
 
 }
+
 
 
 void AWallSpikeTrapTower::TowerTimeLineInterp(float value) {

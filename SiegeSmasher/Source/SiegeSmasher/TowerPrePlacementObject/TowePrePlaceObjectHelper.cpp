@@ -6,14 +6,14 @@
 // Sets default values
 ATowePrePlaceObjectHelper::ATowePrePlaceObjectHelper()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	BoxColliderForObjectPlacement = CreateDefaultSubobject<UBoxComponent>("BoxColliderForObjectPlacement");
-	RootComponent = BoxColliderForObjectPlacement; 
+	RootComponent = BoxColliderForObjectPlacement;
 
 	BoxColliderForObjectPlacement->SetCollisionProfileName(FName("TowerPrePlacement"));
-}
 
+}
 // Called when the game starts or when spawned
 void ATowePrePlaceObjectHelper::BeginPlay()
 {
@@ -23,7 +23,13 @@ void ATowePrePlaceObjectHelper::BeginPlay()
 		FacingDirSum += AllowedDirections[i];
 
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Begin play called for tower pre place helper")));
+
+	BoxColliderForObjectPlacement->OnComponentBeginOverlap.AddDynamic(this, &ATowePrePlaceObjectHelper::OnComponentBeginOverlap);
+	BoxColliderForObjectPlacement->OnComponentEndOverlap.AddDynamic(this, &ATowePrePlaceObjectHelper::OnComponentEndOverlap);
+
 }
+
 
 
 // Called every frame
@@ -33,11 +39,47 @@ void ATowePrePlaceObjectHelper::Tick(float DeltaTime)
 
 }
 
+bool ATowePrePlaceObjectHelper::GetCanPlaceTower()
+{
+	TArray<UPrimitiveComponent*> OverlappedTowers = {};
+	BoxColliderForObjectPlacement->GetOverlappingComponents(OverlappedTowers); 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Attemted to place tower number of towers overlapping %d"), OverlappedTowers.Num()));
+	return OverlappedTowers.Num() == 0;
+}
+
 FVector ATowePrePlaceObjectHelper::GetPlacementColliderHalfExtents()
 {
 	return  BoxColliderForObjectPlacement->GetCollisionShape().GetExtent();
 
 }
+void ATowePrePlaceObjectHelper::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Ghost placement box overlapped component")));
+
+	if (OtherComp->GetCollisionObjectType() == TowerPlacementBoxObjectType) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Ghost Placement box overlapping cant place tower")));
+
+		CanPlaceTower = false;
+
+	}
+
+
+
+}
+
+void ATowePrePlaceObjectHelper::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Ghost placement box ended overlap with component")));
+
+	if (OtherComp->GetCollisionObjectType() == TowerPlacementBoxObjectType) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Ghost Placement box end overlap can place tower")));
+
+		CanPlaceTower = true;
+
+	}
+}
+
+
 bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir, FVector& CamPos, FTransform& surfaceTransform)
 {
 
@@ -116,7 +158,7 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 	bool CeilingCheck = roundf(TrueNormalSigned.Dot(FVector::UpVector)) != 0.0f;
 	bool IncorrectSurfaceDir = TransformedTowerNormal.Dot(AllowedDirection * normalDir) == 0.0f;
 	if (!Contained) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
 
 		/*	SetActorRotation(GetActorRotation() * !(Contained && IncorrectSurfaceDir));*/
 

@@ -17,7 +17,7 @@ AFloorSpikeTrapTower::AFloorSpikeTrapTower()
 	SpikeTrapBaseMesh->SetupAttachment(RootComponent);
 	TowerHitBox->SetupAttachment(SpikesMesh);
 
-
+	SpikesMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 }
 
