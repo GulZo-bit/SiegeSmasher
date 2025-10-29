@@ -39,6 +39,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
+
 	//==========================================================================================================================
 	//Animation replication.
 	//Requires a remote procedure call (RPC) to tell all the clients to play the animation at the exact same time.
@@ -57,6 +60,11 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayAttackMontage();
 
+	UFUNCTION(Server, Reliable)
+	void Server_PlayDeathMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayDeathMontage();
 
 public:	
 	// Called every frame
@@ -68,6 +76,7 @@ public:
 	bool bCanActorMove = true;
 	void setbCanActorMove(bool bStore);
 	float Count = 0.0f;
+	UAnimInstance* AnimInstance;
 
 	TArray<AActor*> getCheckpoints();
 
@@ -79,6 +88,5 @@ public:
 
 	//The public function that other classes will call to play the attack animation.
 	void PlayAttackMontage();
-
-	UWorld* World;
+	void PlayDeathMontage();
 };

@@ -55,6 +55,15 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayLightTimeLine(AHealAuraLight* LightStore);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayDeathMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayDeathMontage();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -73,6 +82,7 @@ public:
 	int32 iHealCount = 0;
 	void HealEnemy();
 	void PlayHealSpellMontage();
+	void PlayDeathMontage();
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AWitch_Projectile> SpellClass;

@@ -189,11 +189,48 @@ void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 
 }
 
+void AAIWitch::PlayDeathMontage()
+{
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayDeathMontage();
+	}
+
+	else
+	{
+		Multicast_PlayDeathMontage();
+	}
+}
+
+void AAIWitch::Server_PlayDeathMontage_Implementation()
+{
+	Multicast_PlayDeathMontage();
+}
+
+void AAIWitch::Multicast_PlayDeathMontage_Implementation()
+{
+	this->GetController()->UnPossess();
+	bCanActorMove = false;
+	if (DeathMontage != nullptr)
+	{
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(DeathMontage);
+		}
+	}
+
+}
+
 
 // Called every frame
 void AAIWitch::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (this->GetHealth() <= 0)
+	{
+		PlayDeathMontage();
+	}
 
 	if (bCanActorMove == true)
 	{

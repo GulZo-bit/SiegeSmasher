@@ -8,7 +8,6 @@ AEnemyBase::AEnemyBase()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -16,6 +15,14 @@ void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//this->OnActorBeginOverlap.AddDynamic(this, &AEnemyBase::OnOverLapBegin);
+	CapsuleStore = this->GetCapsuleComponent();
+	if (CapsuleStore != nullptr)
+	{
+		CapsuleStore->OnComponentBeginOverlap.AddDynamic(this, &AEnemyBase::OnOverLapBegin);
+		GLog->Log("Found capsule for enemy base");
+	}
+	
 }
 
 int AEnemyBase::EnemyTest()
@@ -106,3 +113,17 @@ EnemyTypes AEnemyBase::GetEnemyWaveType()
 	return EnemyType;
 }
 
+void AEnemyBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//GLog->Log("Enemy base is overlapping");
+
+	if (OtherActor && (OtherActor != this))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Overlap Begun with: %s"), *OtherActor->GetName());
+	}
+	if (Cast<APlayerArrow>(OtherActor))
+	{
+		GLog->Log("Overlapped with arrow");
+		this->SetHealth(GetHealth() - 50);
+	}
+}

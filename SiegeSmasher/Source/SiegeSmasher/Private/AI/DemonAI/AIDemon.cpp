@@ -76,12 +76,19 @@ void AAIDemon::BeginPlay()
 			}
 		}
 	}
+
+	AnimInstance = GetMesh()->GetAnimInstance();
 }
 
 // Called every frame
 void AAIDemon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (this->GetHealth() <= 0)
+	{
+		PlayDeathMontage();
+	}
 
 	if (bCanActorMove == true)
 	{
@@ -134,13 +141,44 @@ void AAIDemon::Multicast_PlayAttackMontage_Implementation()
 {
 	if (AttackAnimation != nullptr)
 	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance != nullptr)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Playing Animation")));
 			AnimInstance->Montage_Play(AttackAnimation);
 		}
 	}
+}
+
+void AAIDemon::PlayDeathMontage()
+{
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayDeathMontage();
+	}
+
+	else
+	{
+		Multicast_PlayDeathMontage();
+	}
+}
+
+void AAIDemon::Server_PlayDeathMontage_Implementation()
+{
+	Multicast_PlayDeathMontage();
+}
+
+void AAIDemon::Multicast_PlayDeathMontage_Implementation()
+{
+	this->GetController()->UnPossess();
+	bCanActorMove = false;
+	if (DeathMontage != nullptr)
+	{
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(DeathMontage);
+		}
+	}
+
 }
 
 void AAIDemon::setbCanActorMove(bool bStore)

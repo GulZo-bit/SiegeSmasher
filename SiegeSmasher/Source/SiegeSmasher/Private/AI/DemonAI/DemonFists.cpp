@@ -51,10 +51,6 @@ void ADemonFists::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AAct
 
 void ADemonFists::OnOverLapEnd(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor && (OtherActor != this))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlap Ended with: %s"), *OtherActor->GetName());
-	}
 	if (Cast<ATowerBase>(OtherActor))
 	{
 		bHit = false;

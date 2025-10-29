@@ -41,6 +41,15 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayAttackMontage();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayDeathMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayDeathMontage();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -52,7 +61,9 @@ public:
 	void setbCanActorMove(bool bStore);
 	float Count = 0.0f;
 
+	UAnimInstance* AnimInstance;
 	void PlayAttack();
+	void PlayDeathMontage();
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ADemonFists> DemonFistClass;

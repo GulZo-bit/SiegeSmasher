@@ -72,7 +72,7 @@ void ADemonAIController::DistanceToTower()
 		TowerLocStore = TowerStore->GetActorLocation();
 		float DistStore = (FMath::Sqrt(((TowerLocStore.X - EnemyLocStore.X) * (TowerLocStore.X - EnemyLocStore.X)) + ((TowerLocStore.Y - EnemyLocStore.Y) * (TowerLocStore.Y - EnemyLocStore.Y)) + ((TowerLocStore.Z - EnemyLocStore.Z) * (TowerLocStore.Z - EnemyLocStore.Z))));
 
-		if (DistStore >= 0 && DistStore <= 300)
+		if (DistStore >= 0 && DistStore <= 325)
 		{
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), true);
 			Demon->setbCanActorMove(false);
@@ -89,6 +89,7 @@ void ADemonAIController::DistanceToTower()
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
+		TowerStore = nullptr;
 		Demon->setbCanActorMove(true);
 	}
 	
@@ -126,7 +127,12 @@ void ADemonAIController::HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Seen Tower")));
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), true);
-			TowerStore = Actor;
+
+			if (TowerStore == nullptr)
+			{
+				TowerStore = Actor;
+			}
+			
 			//Demon->setbCanActorMove(false);
 		}
 
