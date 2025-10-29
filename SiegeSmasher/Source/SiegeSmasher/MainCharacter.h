@@ -5,7 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h" 
 #include "Camera/CameraComponent.h"
-#include "InputActionValue.h" 
+#include "InputActionValue.h"  
+#include "../TowerPrePlacementObject/TowePrePlaceObjectHelper.h"
 #include "Towers/TowerBase.h"
 #include "MainCharacter.generated.h"
 
@@ -52,6 +53,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowersTypesToSpawn");
 	TArray<TSubclassOf<ATowerBase>> TowerTypesToSpawn;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlacementObjects")
+	TArray<TSubclassOf<ATowePrePlaceObjectHelper>> TowerPrePlacementObjectsToSpawn;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Placement distances");
 	FVector PlayerPlacementDistances;
 
@@ -82,8 +86,8 @@ public:
 private:
 
 	UCameraComponent* camera;
-	TArray<ATowerBase*> TowersToSpawn;
-	ATowerBase* Selected;
+	TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects;
+	ATowePrePlaceObjectHelper* Selected;
 	UWorld* World; 
 	FActorSpawnParameters TowerSpawnParameters;
 	int SelectedTowerIndex = 0;

@@ -141,7 +141,8 @@ void AMainCharacter::PlaceTower()
 void AMainCharacter::DisplaySelected()
 {
 	Selected->SetActorHiddenInGame(false);
-	
+	Selected->SetActorEnableCollision(true);
+
 
 }
 
@@ -158,6 +159,7 @@ void AMainCharacter::HandleTowerPlacement()
 {
 
 	if (Selected != nullptr) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,FString::Printf(TEXT("PlayerPlacingTower")));
 		FVector PlayerCameForward = camera->GetForwardVector();
 
 		FHitResult PlacementSurfaceResult = FHitResult();
@@ -201,17 +203,17 @@ void AMainCharacter::HandleTowerPlacement()
 void AMainCharacter::InitialiseTowers()
 {
 
-	ATowerBase* currentInstance = nullptr;
+	ATowePrePlaceObjectHelper* currentInstance = nullptr;
 	UWorld* world = GetWorld();
 	FTransform SpawnTransForm = FTransform();
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
 
 	GLog->Log(FString::Printf(TEXT("towers types to spawn count:%d"), TowerTypesToSpawn.Num()));
-	for (TSubclassOf<ATowerBase>& towerType : TowerTypesToSpawn) {
+	for (TSubclassOf<ATowePrePlaceObjectHelper>& towerType : TowerPrePlacementObjectsToSpawn ) {
 
-		currentInstance = world->SpawnActor<ATowerBase>(towerType, SpawnTransForm, SpawnParameters);
-		TowersToSpawn.Add(currentInstance);
+		currentInstance = world->SpawnActor<ATowePrePlaceObjectHelper>(towerType, SpawnTransForm, SpawnParameters);
+		TowerPrePlacementObjects.Add(currentInstance);
 		currentInstance->SetActorHiddenInGame(true);
 		currentInstance->SetActorEnableCollision(false);
 		currentInstance->DisableTick();
@@ -220,9 +222,9 @@ void AMainCharacter::InitialiseTowers()
 	}
 
 
-	if (TowersToSpawn.Num() > 0) {
+	if (TowerPrePlacementObjects.Num() > 0) {
 
-		Selected = TowersToSpawn[0];
+		Selected = TowerPrePlacementObjects[0];
 	 	DisplaySelected();
 
 	}
