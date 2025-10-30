@@ -28,6 +28,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementSize");
 	float PlacementSize = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AllowedPlacementDirectionsCanBeNegative"); 
+	bool ShouldSignAllowedDirection = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StartingFacingDirection");
 	TArray<FVector> AllowedDirections;

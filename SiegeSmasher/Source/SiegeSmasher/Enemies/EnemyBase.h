@@ -80,4 +80,12 @@ public:
 
 	UFUNCTION()
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+private:
+		int* WaveEnemyAliveCountRef;
+
+		void SetEnemyAliveCountref(int* WaveEnemyAliveCount); 
+		void DecrementWaveEnemyAliveCount();
+
+
+
 };
