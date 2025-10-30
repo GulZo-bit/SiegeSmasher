@@ -78,10 +78,25 @@ void AAICharTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*if (this->GetHealth() <= 0)
+	if (this->GetHealth() <= 0)
 	{
-		PlayDeathMontage();
-	}*/
+		if (AnimInstance != nullptr)
+		{
+			if (AnimInstance->Montage_IsPlaying(DeathMontage))
+			{
+				float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
+
+				if (MontageTimeStore >= 2.5f)
+				{
+					this->ResetEnemyOnDeath();
+					CubeStore->SetActorHiddenInGame(false);
+					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+					StartTime = 0.0f;
+					Count = 0.0f;
+				}
+			}
+		}
+	}
 
 	if (bCanActorMove == true)
 	{
@@ -169,11 +184,10 @@ void AAICharTest::Multicast_PlayDeathMontage_Implementation()
 {
 	//this->GetController()->UnPossess();
 
-	if (this->GetController() != nullptr)
+	/*if (this->GetController() != nullptr)
 	{
 		this->GetController()->UnPossess();
-	}
-	bCanActorMove = false;
+	}*/
 	if (DeathMontage != nullptr)
 	{
 		if (AnimInstance != nullptr)

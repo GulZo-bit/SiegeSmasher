@@ -64,11 +64,11 @@ void AWaveManager::UpdateCurrentWave(float DeltaTime)
 bool AWaveManager::CheckWaveEnd() {
 
 	if (WaveEnemyCount == TotalEnemiesSpawned && AliveEnemyCount == 0) {
-
+		GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Red, FString::Printf(TEXT("Total enemies spawned at end of wave %d"), TotalEnemiesSpawned));
 		WaveNumber++;
 		BeginWave();
 		WaveGlobalWaitTimer = WaveGlobalWaitTimerMax;
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("wave global wait timer reset to %f"), WaveGlobalWaitTimer));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("wave global wait timer reset to %f"), WaveGlobalWaitTimer));
 
 		//GLog->Log(FString::Printf(TEXT("wave global wait timer reset to %f"), WaveGlobalWaitTimer));
 		return true;
@@ -81,7 +81,7 @@ bool AWaveManager::CheckWaveEnd() {
 void AWaveManager::BeginWave()
 {
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" beggining wave, wave number is %d"), WaveNumber));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" beggining wave, wave number is %d"), WaveNumber));
 
 	EnemySetUp();
 	CurrentSpawnPointCap = ceil((float)WaveEnemyCount / (float)SpawnPoints.Num());
@@ -183,8 +183,8 @@ void AWaveManager::EnemySetUp()
 	AliveEnemyCount = WaveEnemyCount;
 
 
-	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-		FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));*/
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta,
+		FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));
 	//GLog->Log(FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));
 
 
@@ -256,9 +256,9 @@ AEnemyBase* AWaveManager::GetExistingInstance(EnemyTypes EnemyType)
 	if (availableIndex != EnemyPools[EnemyType].Num() && !EnemyPools[EnemyType][availableIndex]->IsActorTickEnabled()) {
 
 		availableIndex++;
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-			FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));*/
-		//GLog->Log(FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+			FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));
+		GLog->Log(FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));
 
 		return CurrentSpawnPoint->SpawnAndResetExistingEnemyInstance(EnemyPools[EnemyType][availableIndex - 1]);
 

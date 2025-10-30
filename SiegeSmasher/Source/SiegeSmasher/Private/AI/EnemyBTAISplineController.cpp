@@ -45,6 +45,11 @@ void AEnemyBTAISplineController::CheckDeath()
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
 	}
+
+	else
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), false);
+	}
 }
 
 void AEnemyBTAISplineController::OnPossess(APawn* InPawn)
