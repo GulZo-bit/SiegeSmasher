@@ -87,7 +87,22 @@ void AAIDemon::Tick(float DeltaTime)
 
 	if (this->GetHealth() <= 0)
 	{
-		PlayDeathMontage();
+		if (AnimInstance != nullptr)
+		{
+			if (AnimInstance->Montage_IsPlaying(DeathMontage))
+			{
+				float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
+
+				if (MontageTimeStore >= 4.0f)
+				{
+					this->ResetEnemyOnDeath();
+					CubeStore->SetActorHiddenInGame(false);
+					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+					Count = StartTime;
+					bCanActorMove = true;
+				}
+			}
+		}
 	}
 
 	if (bCanActorMove == true)
@@ -169,13 +184,16 @@ void AAIDemon::Server_PlayDeathMontage_Implementation()
 
 void AAIDemon::Multicast_PlayDeathMontage_Implementation()
 {
-	//this->GetController()->UnPossess();
 	bCanActorMove = false;
 	if (DeathMontage != nullptr)
 	{
 		if (AnimInstance != nullptr)
 		{
+			UBoolAnimInstance* BoolAnimInstance = Cast<UBoolAnimInstance>(AnimInstance);
+			if (BoolAnimInstance != nullptr) { BoolAnimInstance->setIsDeadBool(true); }
+
 			AnimInstance->Montage_Play(DeathMontage);
+			bCanActorMove = false;
 		}
 	}
 

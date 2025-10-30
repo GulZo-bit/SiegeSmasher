@@ -2,6 +2,7 @@
 
 
 #include "EnemyBase.h"
+#include "AI/BoolAnimInstance.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -90,7 +91,8 @@ void AEnemyBase::ResetOnSpawn()
 	SetActorEnableCollision(true);
 	SetActorTickEnabled(true);
 	CurrentHealth = MaxHealth;
-
+	UBoolAnimInstance* Temp = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
+	Temp->setIsDeadBool(false);
 
 }
 

@@ -8,6 +8,7 @@
 #include "../Enemies/EnemyBase.h"
 #include "WitchAI/Witch_Projectile.h"
 #include "AI/HealAuraLight.h"
+#include "AI/BoolAnimInstance.h"
 #include "AIWitch.generated.h"
 
 UCLASS()

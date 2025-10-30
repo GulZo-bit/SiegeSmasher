@@ -9,6 +9,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "AI/DemonAI/DemonFists.h"
+#include "AI/BoolAnimInstance.h"
 #include "AIDemon.generated.h"
 
 UCLASS()

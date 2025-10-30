@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/WitchAI/WitchAttackBTTaskNode.h"
+#include "AI/WitchAI/WitchDeathBTTaskNode.h"
 #include "AIController.h"
 
-EBTNodeResult::Type UWitchAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UWitchDeathBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
@@ -20,7 +20,7 @@ EBTNodeResult::Type UWitchAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& 
 	if (ControlledPawn != nullptr)
 	{
 		AAIWitch* Witch = Cast<AAIWitch>(ControlledPawn);
-		Witch->PlayAttack();
+		Witch->PlayDeathMontage();
 		return EBTNodeResult::Succeeded;
 	}
 

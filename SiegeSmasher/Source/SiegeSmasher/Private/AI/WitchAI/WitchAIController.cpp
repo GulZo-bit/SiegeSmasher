@@ -58,6 +58,8 @@ void AWitchAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	CheckDeath();
+
 	//Switch for checking line of sight to each player.
 	switch (PlayerActorArray.Num())
 	{
@@ -263,5 +265,18 @@ void AWitchAIController::Tick(float DeltaTime)
 void AWitchAIController::setHealBool()
 {
 	GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), true);
+}
+
+void AWitchAIController::CheckDeath()
+{
+	if (Witch->GetHealth() <= 0)
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
+	}
+
+	else
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), false);
+	}
 }
 

@@ -70,7 +70,6 @@ void AAICharTest::BeginPlay()
 	}
 
 	AnimInstance = GetMesh()->GetAnimInstance();
-
 }
 
 // Called every frame
@@ -91,8 +90,8 @@ void AAICharTest::Tick(float DeltaTime)
 					this->ResetEnemyOnDeath();
 					CubeStore->SetActorHiddenInGame(false);
 					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
-					StartTime = 0.0f;
-					Count = 0.0f;
+					Count = StartTime;
+					bCanActorMove = true;
 				}
 			}
 		}
@@ -182,18 +181,15 @@ void AAICharTest::Server_PlayDeathMontage_Implementation()
 
 void AAICharTest::Multicast_PlayDeathMontage_Implementation()
 {
-	//this->GetController()->UnPossess();
-
-	/*if (this->GetController() != nullptr)
-	{
-		this->GetController()->UnPossess();
-	}*/
 	if (DeathMontage != nullptr)
 	{
 		if (AnimInstance != nullptr)
 		{
-			GLog->Log("Playing Death");
+			UBoolAnimInstance* BoolAnimInstance = Cast<UBoolAnimInstance>(AnimInstance);
+			if (BoolAnimInstance != nullptr) { BoolAnimInstance->setIsDeadBool(true); }
+
 			AnimInstance->Montage_Play(DeathMontage);
+			bCanActorMove = false;
 		}
 	}
 }

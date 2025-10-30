@@ -99,6 +99,8 @@ void ADemonAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	CheckDeath();
+
 	if (GetBlackboardComponent()->GetValueAsBool(TEXT("bTowerSeen")) == true)
 	{
 		DistanceToTower();
@@ -149,6 +151,19 @@ void ADemonAIController::HandleTargetPerceptionForgotten(AActor* Actor)
 	TowerStore = nullptr;
 	Demon->setbCanActorMove(true);
 	
+}
+
+void ADemonAIController::CheckDeath()
+{
+	if (Demon->GetHealth() <= 0)
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
+	}
+
+	else
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), false);
+	}
 }
 
 
