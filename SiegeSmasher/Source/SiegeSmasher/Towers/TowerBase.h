@@ -56,6 +56,7 @@ class SIEGESMASHER_API ATowerBase : public AActor, public IGenericTeamAgentInter
 	GENERATED_BODY()
 public:
 	// Sets default values for this actor's properties
+	
 	ATowerBase(); 
 	void DisableTick();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
@@ -75,7 +76,7 @@ protected:
 	FOnTimelineEvent TowerEndAction;  
 	FOnTimelineFloat TowerTimeLineInterpEvent;
 	bool RequiresReset = false; 
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerWaitTimeToReset");
 	float MaxWaitTimeToReset;
 

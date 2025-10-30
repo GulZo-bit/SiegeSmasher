@@ -140,12 +140,11 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 
 	bool Contained = (CollisionResNormal.X + CollisionResNormal.Y + CollisionResNormal.Z) > 0;
 
-	FVector AllowedDirection = CollisionResNormal + FacingDirSum - FVector::OneVector;
 
+	
 
 	FVector TransformedNormal = WorldRotation.RotateVector(CollisionResNormal);
 
-	FVector TransformedTowerNormal = WorldRotation.RotateVector(AllowedDirection);
 
 
 
@@ -156,14 +155,8 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 	SetActorLocation(ResolvedPosition);
 	FVector TrueNormalSigned = CollisionResNormal * normalDir;
 	bool CeilingCheck = roundf(TrueNormalSigned.Dot(FVector::UpVector)) != 0.0f;
-	bool IncorrectSurfaceDir = TransformedTowerNormal.Dot(AllowedDirection * normalDir) == 0.0f;
-	if (!Contained) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
-
-		/*	SetActorRotation(GetActorRotation() * !(Contained && IncorrectSurfaceDir));*/
-
-		return false;
-	}
+	
+	
 
 
 	FVector currentAxisUp = FVector::UpVector * (1.0f - CeilingCheck) + FVector::RightVector * CeilingCheck;
@@ -182,12 +175,35 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 	FVector opposite = (axisOfRotation.Cross(currentAxisUp)) * ((float)CheckOppositeRotation);
 
 
-	if (CheckOppositeRotation) {
-		axisOfRotation = (axisOfRotation.Cross(currentAxisUp)) * (1.0f - CeilingCheck) + axisOfRotation * CeilingCheck;
 
+
+	VectorRegister4Float RoundedNormal = VectorRound(MakeVectorRegisterFloat(TransformedNormal.X, TransformedNormal.Y, TransformedNormal.Z, 0.0f));
+	FVector TransformNormalRounded = FVector();
+	VectorStoreFloat3(RoundedNormal, &TransformNormalRounded);
+
+
+	FVector AllowedDirectionSign = (FacingDirSum *(1.0f-ShouldSignAllowedDirection)) + (FacingDirSum * (TransformNormalRounded * ShouldSignAllowedDirection));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("rounded normal multipled by facing dir sum")));
+
+	if (CheckOppositeRotation) {
+		
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("opposite rotation")));
+		axisOfRotation = (axisOfRotation.Cross(currentAxisUp)) * (1.0f - CeilingCheck) + axisOfRotation * CeilingCheck;
+		
 	}
 
+	float CheckValidSurfaceDot = roundf(TransformNormalRounded.Dot((AllowedDirectionSign)));
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("check valid surface dot %f"), CheckValidSurfaceDot));
+
+	bool IsCorrectSurfaceDir = CheckValidSurfaceDot > 0.0f;
+	if (!Contained || !IsCorrectSurfaceDir) {
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
+		SetActorRotation(FRotator());
+		/*	SetActorRotation(GetActorRotation() * !(Contained && IncorrectSurfaceDir));*/
+
+		return false;
+	}
 
 	DrawDebugLine(GetWorld(), PlacementPosition, PlacementPosition + axisOfRotation * FVector(400.0f, 400.0f, 400.0f), FColor::Yellow);
 
@@ -224,7 +240,8 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 		FQuat PicthRotationForAlignment = FQuat(AlignmentAxisCros, abs(PitchAngleForAlingment));
 		SetActorRotation(AligmentRotation.Rotator() + PicthRotationForAlignment.Rotator());
 
-
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Is correct surface %d"), (int)IsCorrectSurfaceDir));
+			
 		return true;
 
 	}
@@ -299,7 +316,7 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + TransformedNormal * FVector(700.0f, 700.0f, 700.0f), FColor::Blue);
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + AlignedAlignmentVector * FVector(700.0f, 700.0f, 700.0f), FColor::Green);
 	SetActorRotation(RotatorPitch + YawRot.Rotator());
-
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Is correct surface %d"), (int)IsCorrectSurfaceDir));
 	return true;
 } 
 

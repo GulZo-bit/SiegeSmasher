@@ -127,3 +127,24 @@ void AEnemyBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActo
 		this->SetHealth(GetHealth() - 50);
 	}
 }
+
+void AEnemyBase::SetEnemyAliveCountref(int* WaveEnemyAliveCount)
+{
+	WaveEnemyAliveCountRef = WaveEnemyAliveCount;
+
+}
+
+void AEnemyBase::DecrementWaveEnemyAliveCount()
+{
+
+	if (WaveEnemyAliveCountRef != nullptr) {
+
+		(*WaveEnemyAliveCountRef)--;
+		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Orange, FString::Printf(TEXT("Enemy alive count decremented by enemy new count %d"), (*WaveEnemyAliveCountRef)));
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("WAVE ENEMY ALIVE COUNT ON ENEMY WAS NULL")));
+
+
+	}
+}

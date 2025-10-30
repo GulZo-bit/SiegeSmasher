@@ -183,9 +183,9 @@ void AWaveManager::EnemySetUp()
 	AliveEnemyCount = WaveEnemyCount;
 
 
-	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-		FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));*/
-	//GLog->Log(FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));
+	GLog->Log(FString::Printf(TEXT(" total enemies for this wave : % d"), AliveEnemyCount));
 
 
 }
