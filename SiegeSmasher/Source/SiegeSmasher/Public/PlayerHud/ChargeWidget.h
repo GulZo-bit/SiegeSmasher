@@ -19,15 +19,12 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float Charge;
 
-	UPROPERTY()
-	ACharacter* CharacterRef;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<ACharacter> CharacterRef;
 
 	UFUNCTION(BlueprintCallable)
 	void SetChargeAmount(float ChargeAmount);
 
 	UFUNCTION(BlueprintCallable)
 	float GetChargePercent();
-
-	//UFUNCTION()
-	//void GetPlayerReference(AMainCharacterTest* PlayerReference);
 };

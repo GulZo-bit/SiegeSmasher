@@ -75,12 +75,16 @@ void AMainCharacterTest::BeginPlay()
 	//checks if the reference to the player hud is not empty
 	if (PlayerHUD != nullptr) 
 	{
-		//creates the widget of the ChargeWidget class in the current world
-	ChargeWidget = CreateWidget<UChargeWidget>(GetWorld(), PlayerHUD);
-		//if the widget was created successfully, add it to viewport
-		if (ChargeWidget != nullptr) 
+
+		if (IsLocallyControlled()) 
 		{
-			ChargeWidget->AddToViewport();
+			//creates the widget of the ChargeWidget class in the current world
+			ChargeWidget = CreateWidget<UChargeWidget>(GetWorld(), PlayerHUD);
+			//if the widget was created successfully, add it to viewport
+			if (ChargeWidget != nullptr)
+			{
+				ChargeWidget->AddToViewport();
+			}
 		}
 	}
 }
@@ -183,11 +187,11 @@ void AMainCharacterTest::Shoot()
 		UWorld* World = GetWorld();
 		if (World)
 		{//spawn parameters of the arrow
-			/*FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = GetInstigator();*/
-			//creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
-			//APlayerArrow* Arrow = World->SpawnActor<APlayerArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
+			//FActorSpawnParameters SpawnParams;
+			//SpawnParams.Owner = this;
+			//SpawnParams.Instigator = GetInstigator();
+			////creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
+			//AMCArrow* Arrow = World->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
 			////if arrow has been succesfully created
 			//if (Arrow)
 			//{
@@ -199,11 +203,41 @@ void AMainCharacterTest::Shoot()
 			//	SetArrowDrawn(false);
 			//	SetArrowFired(true);
 			//	isCharging = false;
-			//	UE_LOG(LogTemp, Warning, TEXT("Charge: %f Percent"), CurrentCharge);
-			//	CurrentCharge = 0;
+			//	UE_LOG(LogTemp, Warning, TEXT("Client Charge: %f Percent"), CurrentCharge);
 			//}
+			if (!HasAuthority())
+			{
+				//on client 
+				Server_UpdateCharge(CurrentCharge);
+				//Server_SpawnProjectile(CameraRotation, BowRotation);
+				Server_SpawnProjectile(CameraRotation, BowRotation);
+				CurrentCharge = 0;
+			}
 
-			SpawnProjectile(CameraRotation, World, BowRotation);
+			else
+			{
+				//on Server
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.Instigator = GetInstigator();
+				//creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
+				AMCArrow* Arrow = World->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
+				//if arrow has been succesfully created
+				if (Arrow)
+				{
+					//changes the Bow rotation to be changed into a vector so that it shows a direction
+					FVector LaunchDirection = BowRotation.Vector();
+					//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
+					Arrow->FireInDirection(LaunchDirection, CurrentCharge);
+					//sets the bools for animations and turns off charging and resets the charge
+					SetArrowDrawn(false);
+					SetArrowFired(true);
+					isCharging = false;
+					//UE_LOG(LogTemp, Warning, TEXT("Function called on the server The Charge: %f Percent"), CurrentCharge);
+					CurrentCharge = 0;
+
+				}
+			}
 		}
 	}
 }
@@ -215,8 +249,10 @@ void AMainCharacterTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME(AMainCharacterTest, ArrowFired);
 	DOREPLIFETIME(AMainCharacterTest, MaxCharge);
 	DOREPLIFETIME(AMainCharacterTest, ChargeRate);
-	DOREPLIFETIME(AMainCharacterTest, CurrentCharge);
+	//DOREPLIFETIME(AMainCharacterTest, CurrentCharge);
 	DOREPLIFETIME(AMainCharacterTest, isCharging);
+	DOREPLIFETIME(AMainCharacterTest, ArrowClass);
+	DOREPLIFETIME(AMainCharacterTest, ChargeFinal);
 }
 
 void AMainCharacterTest::DrawBow()
@@ -251,30 +287,97 @@ float AMainCharacterTest::GetCurrentCharge()
 	return CurrentCharge;
 }
 
-void AMainCharacterTest::SpawnProjectile_Implementation(FRotator CamRotation, UWorld* WorldRef, FRotator BowRot)
+void AMainCharacterTest::Server_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot)
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
-	APlayerArrow* Arrow = WorldRef->SpawnActor<APlayerArrow>(ArrowClass, BowPosition->GetComponentLocation(), CamRotation, SpawnParams);
+	AMCArrow* Arrow = GetWorld()->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CamRotation, SpawnParams);
 	//if arrow has been succesfully created
 	if (Arrow)
 	{
 		//changes the Bow rotation to be changed into a vector so that it shows a direction
 		FVector LaunchDirection = BowRot.Vector();
 		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
-		Arrow->FireInDirection(LaunchDirection, CurrentCharge);
+		Arrow->FireInDirection(LaunchDirection, ChargeFinal);
 		//sets the bools for animations and turns off charging and resets the charge
 		SetArrowDrawn(false);
 		SetArrowFired(true);
 		isCharging = false;
-		UE_LOG(LogTemp, Warning, TEXT("Charge: %f Percent"), CurrentCharge);
+		//UE_LOG(LogTemp, Warning, TEXT("Server Charge: %f Percent"), ChargeFinal);
+		//Multi_SpawnProjectile(CamRotation, BowRot);
 		CurrentCharge = 0;
 	}
 }
 
+bool AMainCharacterTest::Server_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot)
+{
+	return true;
+}
 
+void AMainCharacterTest::Server_ChargeShot_Implementation(float DeltaTime)
+{
+	if (isCharging == true)
+	{
+		CurrentCharge += ChargeRate * DeltaTime;
+		CurrentCharge = FMath::Clamp(CurrentCharge, 0.0f, MaxCharge);
+	}
+}
 
+bool AMainCharacterTest::Server_ChargeShot_Validate(float DeltaTime)
+{
+	return true;
+}
+
+void AMainCharacterTest::Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot)
+{
+	Multi_UpdateCharge();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	AMCArrow* Arrow = GetWorld()->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CamRotation, SpawnParams);
+	//if arrow has been succesfully created
+	if (Arrow)
+	{
+		//changes the Bow rotation to be changed into a vector so that it shows a direction
+		FVector LaunchDirection = BowRot.Vector();
+		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
+		Arrow->FireInDirection(LaunchDirection, ChargeFinal);
+		//sets the bools for animations and turns off charging and resets the charge
+		SetArrowDrawn(false);
+		SetArrowFired(true);
+		isCharging = false;
+		//UE_LOG(LogTemp, Warning, TEXT("Multi Charge: %f Percent"), ChargeFinal);
+		CurrentCharge = 0;
+	}
+}
+
+bool AMainCharacterTest::Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot)
+{
+	return true;
+}
+
+void AMainCharacterTest::Multi_UpdateCharge_Implementation()
+{
+	ChargeFinal = CurrentCharge;
+	//UE_LOG(LogTemp, Warning, TEXT("Update Charge Called Current Charge Is: %f Percent"), ChargeFinal);
+}
+
+bool AMainCharacterTest::Multi_UpdateCharge_Validate()
+{
+	return true;
+}
+
+void AMainCharacterTest::Server_UpdateCharge_Implementation(float ClientCharge)
+{
+	ChargeFinal = ClientCharge;
+	//UE_LOG(LogTemp, Warning, TEXT("Server Charge: %f Percent"), ChargeFinal);
+}
+
+bool AMainCharacterTest::Server_UpdateCharge_Validate(float ClientCharge)
+{
+	return true;
+}
 
 void AMainCharacterTest::StopAim()
 {

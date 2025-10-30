@@ -6,6 +6,7 @@
 void UChargeWidget::SetChargeAmount(float ChargeAmount)
 {
 	Charge = ChargeAmount;
+	UE_LOG(LogTemp, Warning, TEXT("WidgetCharge: %f Percent"), Charge);
 }
 
 float UChargeWidget::GetChargePercent()

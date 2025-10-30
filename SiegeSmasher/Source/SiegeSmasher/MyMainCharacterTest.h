@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PlayerArrow.h"
+#include "Public/MCArrow.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
@@ -61,6 +61,9 @@ public:
 	UPROPERTY(Replicated);
 	bool isCharging;
 
+	UPROPERTY(Replicated);
+	float ChargeFinal;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputMappingContext* DefaultContext; //The defult input mapping context. This will change depending on what context the player is in such as driving.
@@ -97,8 +100,8 @@ public:
 	class UInputAction* StopAimAction;
 
 	//Projectile class to spawn.
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class APlayerArrow> ArrowClass;
+	UPROPERTY(EditDefaultsOnly, Replicated,  Category = "Projectile")
+	TSubclassOf<class AMCArrow> ArrowClass;
 	//Static mesh that serves as a spawning point for the arrows
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay");
 	UStaticMeshComponent* BowPosition;
@@ -134,10 +137,29 @@ public:
 
 	UFUNCTION()
 	float GetCurrentCharge();
-	UFUNCTION(Server, Reliable)
-	void SpawnProjectile(FRotator CamRotation, UWorld* WorldRef, FRotator BowRot);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SpawnProjectile(FRotator CamRotation, FRotator BowRot);
+	void Server_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot);
+	bool Server_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_ChargeShot(float DeltaTime);
+	void Server_ChargeShot_Implementation(float DeltaTime);
+	bool Server_ChargeShot_Validate(float DeltaTime);
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void Multi_SpawnProjectile(FRotator CamRotation, FRotator BowRot);
+	void Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot);
+	bool Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot);
 
 
-	//UFUNCTION(Server, Reliable)
-	//void SpawnProjectile(FRotator CamRotation, UWorld* WorldRef, FRotator BowRot);
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void Multi_UpdateCharge();
+	void Multi_UpdateCharge_Implementation();
+	bool Multi_UpdateCharge_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_UpdateCharge(float ClientCharge);
+	void Server_UpdateCharge_Implementation(float ClientCharge);
+	bool Server_UpdateCharge_Validate(float ClientCharge);
 };
