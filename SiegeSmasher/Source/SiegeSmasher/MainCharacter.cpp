@@ -13,7 +13,7 @@ AMainCharacter::AMainCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+	bReplicates = true;
 	TowerSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
 	
 
@@ -27,6 +27,9 @@ void AMainCharacter::BeginPlay()
 	camera = GetComponentByClass<UCameraComponent>();
 	World = GetWorld();
 	InitialiseTowers(); 
+
+
+    
     
 	TraceParams = FCollisionQueryParams();
 	TraceParams.AddIgnoredActor(this);
@@ -48,7 +51,24 @@ void AMainCharacter::BeginPlay()
 		}
 	} 
 
-   
+
+	
+
+	/*if (AServerObject* InstanceServerObject = 
+		Cast<AServerObject>(UGameplayStatics::GetActorOfClass(World, AServerObject::StaticClass()))) {
+		
+		AssignServerObject(InstanceServerObject);
+		
+		SetPlayerId(InstanceServerObject->GetPlayerCurrentId());
+		InstanceServerObject->IncrementPlayerId();
+		
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Found server object")));
+	
+	
+
+	}*/
+	
+
 
 }
 
@@ -92,6 +112,35 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 
 	}
+}
+
+void AMainCharacter::Server_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("server ownership of actor changed to player character")));
+	Multicast_SetPlayerOwnerShip(ActorToOwn);
+
+
+}
+
+void AMainCharacter::SetPlayerOwnerShip(AActor* ActorToOwn)
+{
+
+	if (HasAuthority()) {
+		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on local")));
+		Multicast_SetPlayerOwnerShip(ActorToOwn);
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on server for client")));
+		Server_SetPlayerOwnerShip(ActorToOwn);
+	}
+
+}
+
+void AMainCharacter::Multicast_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
+{
+
+	ActorToOwn->SetOwner(Controller);
+
 }
 
 void AMainCharacter::Move(const FInputActionValue& Value)
@@ -243,6 +292,8 @@ void AMainCharacter::InitialiseTowers()
 
 }
 
+
+
 void AMainCharacter::AlignTowerBeforePlacement()
 {
 	 
@@ -272,6 +323,9 @@ void AMainCharacter::AlignTowerBeforePlacement()
 
 
 }
+
+
+
 
 void AMainCharacter::CallCreateLobby()
 {
@@ -308,24 +362,88 @@ void AMainCharacter::SwitchTowers()
 	TArray<FKey> InputKeysToSwitchTower = InputSubsystem->QueryKeysMappedToAction(SwitchTowerAction);
 	for (int i = 0; i < InputKeysToSwitchTower.Num(); i++) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Switch tower called")));
-		
-		if (i < TowerPrePlacementObjects.Num() && 
+
+		if (i < TowerPrePlacementObjects.Num() &&
 			AssignedPlayerController->WasInputKeyJustPressed(InputKeysToSwitchTower[i])) {
-			    
-		    if (Selected != nullptr) {
+
+			if (Selected != nullptr) {
 				HideSelected();
 			}
-			    
+
 			SelectedTowerIndex = i;
 			Selected = TowerPrePlacementObjects[SelectedTowerIndex];
 			DisplaySelected();
 			break;
-			
+
 		}
 
 	}
-	
+
 
 
 
 }
+
+void AMainCharacter::Server_SetPlayerId_Implementation(int Id)
+{ 
+
+	Multicast_SetPlayerId(Id);
+
+
+}
+void AMainCharacter::Multicast_SetPlayerId_Implementation(int Id)
+{
+
+	PlayerId = Id;
+
+}
+void AMainCharacter::SetPlayerId(int Id)
+{
+
+	if (GetLocalRole() < ROLE_Authority) {
+
+
+		Server_SetPlayerId(Id);
+		
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f,FColor::Cyan ,FString::Printf(TEXT("Setting PlayerId on Server for client new client id is %d "), PlayerId));
+
+		return;
+	}
+	Multicast_SetPlayerId(Id);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Setting player id local host machine and multi casting from server for clients new host id is %d "), PlayerId));
+
+
+}
+
+
+
+//void AMainCharacter::AssignServerObject(AServerObject* ServerObjectInstance) {
+//
+//	
+//	
+//		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, FString::Printf(TEXT("assigning server object to client")));
+//		if (!HasAuthority()) {
+//			Server_AssignServerObject(ServerObjectInstance);
+//			return;
+//		}
+//		Multicast_AssignServerObject(ServerObjectInstance);
+//	
+//	/*GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, FString::Printf(TEXT("assigning server object to host")));
+//
+//	Multicast_AssignServerObject(ServerObjectInstance);*/
+//
+//}
+//
+//
+//void AMainCharacter::Server_AssignServerObject_Implementation(AServerObject* ServerObjectInstance)
+//{
+//	//Multicast_AssignServerObject(ServerObjectInstance);
+//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("server side assing serve obejct caled")));
+//	ServerObjectInstance->SetOwner(Controller);
+//}
+//
+//void AMainCharacter::Multicast_AssignServerObject_Implementation(AServerObject* ServerObjectInstance)
+//{
+//   
+//	ServerObjectInstance->SetOwner(Controller);
+//}
