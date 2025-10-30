@@ -162,4 +162,14 @@ public:
 	void Server_UpdateCharge(float ClientCharge);
 	void Server_UpdateCharge_Implementation(float ClientCharge);
 	bool Server_UpdateCharge_Validate(float ClientCharge);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_DrawBow();
+	void Server_DrawBow_Implementation();
+	bool Server_DrawBow_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_StopAim();
+	void Server_StopAim_Implementation();
+	bool Server_StopAim_Validate();
 };
