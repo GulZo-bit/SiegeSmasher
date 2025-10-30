@@ -22,7 +22,7 @@ void AEnemyBase::BeginPlay()
 		CapsuleStore->OnComponentBeginOverlap.AddDynamic(this, &AEnemyBase::OnOverLapBegin);
 		GLog->Log("Found capsule for enemy base");
 	}
-	
+	CurrentHealth = MaxHealth;
 }
 
 int AEnemyBase::EnemyTest()
@@ -33,6 +33,7 @@ int AEnemyBase::EnemyTest()
 void AEnemyBase::DamageEnemy(float Damage)
 {
 	CurrentHealth -= Damage;
+	GLog->Log(FString::Printf(TEXT("Current Health: %f"), CurrentHealth));
 }
 
 void AEnemyBase::SetHealth(float Health)

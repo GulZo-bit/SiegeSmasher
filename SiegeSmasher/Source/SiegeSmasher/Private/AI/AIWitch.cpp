@@ -209,7 +209,7 @@ void AAIWitch::Server_PlayDeathMontage_Implementation()
 
 void AAIWitch::Multicast_PlayDeathMontage_Implementation()
 {
-	this->GetController()->UnPossess();
+	//this->GetController()->UnPossess();
 	bCanActorMove = false;
 	if (DeathMontage != nullptr)
 	{

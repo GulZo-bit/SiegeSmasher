@@ -78,10 +78,10 @@ void AAICharTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (this->GetHealth() <= 0)
+	/*if (this->GetHealth() <= 0)
 	{
 		PlayDeathMontage();
-	}
+	}*/
 
 	if (bCanActorMove == true)
 	{
@@ -167,12 +167,18 @@ void AAICharTest::Server_PlayDeathMontage_Implementation()
 
 void AAICharTest::Multicast_PlayDeathMontage_Implementation()
 {
-	this->GetController()->UnPossess();
+	//this->GetController()->UnPossess();
+
+	if (this->GetController() != nullptr)
+	{
+		this->GetController()->UnPossess();
+	}
 	bCanActorMove = false;
 	if (DeathMontage != nullptr)
 	{
 		if (AnimInstance != nullptr)
 		{
+			GLog->Log("Playing Death");
 			AnimInstance->Montage_Play(DeathMontage);
 		}
 	}

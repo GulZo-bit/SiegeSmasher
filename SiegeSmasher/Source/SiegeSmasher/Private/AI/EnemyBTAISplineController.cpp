@@ -30,10 +30,21 @@ void AEnemyBTAISplineController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	CheckDeath();
+
 	GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
 
 	CheckDistanceAndDirectionToPlayer();
 	
+}
+
+void AEnemyBTAISplineController::CheckDeath()
+{
+
+	if (Vampire->GetHealth() <= 0)
+	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
+	}
 }
 
 void AEnemyBTAISplineController::OnPossess(APawn* InPawn)
