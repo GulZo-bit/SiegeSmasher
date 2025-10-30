@@ -57,6 +57,7 @@ void AAIWitch::BeginPlay()
 
 				StartTime = GetWorld()->GetTimeSeconds();
 				Count = GetWorld()->GetTimeSeconds();
+
 			}
 
 			
@@ -92,6 +93,7 @@ void AAIWitch::Server_PlayAttackMontage_Implementation()
 	Multicast_PlayAttackMontage();
 }
 
+
 void AAIWitch::Multicast_PlayAttackMontage_Implementation()
 {
 	if (AttackSpellMontage != nullptr)
@@ -106,7 +108,54 @@ void AAIWitch::Multicast_PlayAttackMontage_Implementation()
 	}
 }
 
+void AAIWitch::Server_PlayLightTimeLine_Implementation(AHealAuraLight* LightStore)
+{
+	Multicast_PlayLightTimeLine(LightStore);
+}
+
+void AAIWitch::Multicast_PlayLightTimeLine_Implementation(AHealAuraLight* LightStore)
+{
+	LightStore->getLightTimeLineComp()->PlayFromStart();
+}
+
 void AAIWitch::HealEnemy()
+{
+	if (HealZone != nullptr)
+	{
+		GLog->Log("Found HealZone");
+
+		TArray<AActor*> ActorStore;
+		//TArray<AAICharTest*> VampStore;
+		HealZone->GetOverlappingActors(ActorStore);
+
+		for (int i = 0; i < ActorStore.Num(); i++)
+		{
+			if (ActorStore[i] != nullptr)
+			{
+				if (Cast<AEnemyBase>(ActorStore[i]))
+				{
+					GLog->Log("Healing Enemies");
+					AEnemyBase* AICharTemp = Cast<AEnemyBase>(ActorStore[i]);
+					AICharTemp->AddToHealth(20);
+
+					UChildActorComponent* ChildActorStore = Cast<UChildActorComponent>(AICharTemp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
+					if (ChildActorStore != nullptr)
+					{
+						AHealAuraLight* HealAuraLightStore = Cast<AHealAuraLight>(ChildActorStore->GetChildActor());
+						if (HealAuraLightStore != nullptr)
+						{
+							GLog->Log("Found Heal Aura");
+							Server_PlayLightTimeLine(HealAuraLightStore);
+						}
+
+					}
+				}
+			}
+		}
+	}
+}
+
+void AAIWitch::PlayHealSpellMontage()
 {
 	if (GetLocalRole() < ROLE_Authority)
 	{
@@ -126,37 +175,6 @@ void AAIWitch::Server_PlayHealSpellMontage_Implementation()
 
 void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 {
-	if (HealZone != nullptr)
-	{
-		GLog->Log("Found HealZone");
-
-		TArray<AActor*> ActorVampStore;
-		//TArray<AAICharTest*> VampStore;
-		HealZone->GetOverlappingActors(ActorVampStore);
-
-		for (int i = 0; i < ActorVampStore.Num(); i++)
-		{
-			if (ActorVampStore[i] != nullptr)
-			{
-				if (Cast<AAICharTest>(ActorVampStore[i]))
-				{
-					GLog->Log("Healing Enemies");
-					AAICharTest* Temp = Cast<AAICharTest>(ActorVampStore[i]);
-					Temp->AddToHealth(20);
-					UChildActorComponent* Store = Cast<UChildActorComponent>(Temp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
-
-					if (Store != nullptr)
-					{
-						GLog->Log("Found Heal Aura");
-						Store->SetVisibility(true, true);
-						//Store->BeginPlay();
-						
-
-					}
-				}
-			}
-		}
-	}
 
 	if (HealSpellMontage != nullptr)
 	{
@@ -168,6 +186,39 @@ void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 			iHealCount = 0;
 		}
 	}
+
+}
+
+void AAIWitch::PlayDeathMontage()
+{
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayDeathMontage();
+	}
+
+	else
+	{
+		Multicast_PlayDeathMontage();
+	}
+}
+
+void AAIWitch::Server_PlayDeathMontage_Implementation()
+{
+	Multicast_PlayDeathMontage();
+}
+
+void AAIWitch::Multicast_PlayDeathMontage_Implementation()
+{
+	this->GetController()->UnPossess();
+	bCanActorMove = false;
+	if (DeathMontage != nullptr)
+	{
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(DeathMontage);
+		}
+	}
+
 }
 
 
@@ -175,6 +226,11 @@ void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 void AAIWitch::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (this->GetHealth() <= 0)
+	{
+		PlayDeathMontage();
+	}
 
 	if (bCanActorMove == true)
 	{
@@ -222,6 +278,7 @@ void AAIWitch::Tick(float DeltaTime)
 				{
 					Spell = GetWorld()->SpawnActor<AWitch_Projectile>(HealSpell, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
 				}
+				HealEnemy();
 				
 				iHealCount++;
 			}

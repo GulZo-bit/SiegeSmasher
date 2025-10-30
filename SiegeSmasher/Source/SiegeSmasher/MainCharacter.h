@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h" 
 #include "Camera/CameraComponent.h"
-#include "InputActionValue.h" 
+#include "InputActionValue.h"  
+#include "../TowerPrePlacementObject/TowePrePlaceObjectHelper.h"
 #include "Towers/TowerBase.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h" 
 #include "MainCharacter.generated.h"
 
 UCLASS()
@@ -49,13 +52,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input"); 
+	class UInputAction* SwitchTowerAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowersTypesToSpawn");
 	TArray<TSubclassOf<ATowerBase>> TowerTypesToSpawn;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlacementObjects")
+	TArray<TSubclassOf<ATowePrePlaceObjectHelper>> TowerPrePlacementObjectsToSpawn;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Placement distances");
 	FVector PlayerPlacementDistances;
-
-
 
 
 	//Calling for movement input
@@ -70,7 +77,9 @@ public:
 
 	void setHealth(float HealthStore);
 
-	float getHealth(); 
+	float getHealth();  
+
+	void SwitchTowers();
 
 
 	//Online Lobby 
@@ -81,12 +90,15 @@ public:
 	void CallClientTravel(const FString& Address);
 private:
 
-	UCameraComponent* camera;
-	TArray<ATowerBase*> TowersToSpawn;
-	ATowerBase* Selected;
-	UWorld* World; 
+	UCameraComponent* camera = nullptr;  
+	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
+	TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects;
+	ATowePrePlaceObjectHelper* Selected = nullptr;
+	UWorld* World = nullptr; 
+	APlayerController* AssignedPlayerController = nullptr;
 	FActorSpawnParameters TowerSpawnParameters;
-	int SelectedTowerIndex = 0;
+	int SelectedTowerIndex = -1; 
+	
 	float Health = 100.0f; 
 	bool IsPlacingTower = false;
 

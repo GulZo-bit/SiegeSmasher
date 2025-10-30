@@ -9,12 +9,23 @@
 #include "Components/TimelineComponent.h"
 #include "Math/MathFwd.h" 
 #include "Math/Vector.h" 
+#include "GenericTeamAgentInterface.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
+#include "GenericTeamAgentInterface.h"
 
 #include "TowerBase.generated.h" 
 
 
+#ifndef PlacingSurface
+ #define PlacingSurface ECC_GameTraceChannel1
+#endif // !PlacingSurface
 
-#define PlacingSurface ECC_GameTraceChannel1
+#ifndef TowerPlacementBox
+ #define TowerPlacementBox ECC_GameTraceChannel9
+#endif // !TowerPlacementBox
+
 
 
 // enum bit flags for chekcing if an enemy already has a status effect we can have each enum go up in a power of two as that will give 
@@ -40,7 +51,7 @@ static inline  int32 operator &  (TowerStatusEffect  other, TowerStatusEffect ot
 }
 
 UCLASS()
-class SIEGESMASHER_API ATowerBase : public AActor
+class SIEGESMASHER_API ATowerBase : public AActor, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 public:
@@ -51,7 +62,8 @@ public:
 	FVector GetPlacementColliderHalfExtents();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
   	bool ResolvePlacement(FVector& SurfaceHalfExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos, FTransform& surfaceTransform);
-	
+
+	UBoxComponent* GetPlacmentBox();
 protected:
 	// Called when the game starts or when spawned
 
@@ -74,8 +86,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CoolDownAfterReset");
 	float MaxCoolDownAfterReset = 0.0f;
 	float CoolDownAfterReset = 0.0f;
-	
-    
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerCost"); 
+	float TowerCost = 0.0f;
 	UFUNCTION()
 	virtual void TowerTimeLineEnd();
 	virtual void TowerDormant(float& DeltaTime);
@@ -107,6 +119,8 @@ protected:
 	virtual void TowerTimeLineInterp(float value); 
 
 	void SetHitBoxActive(bool HitBoxActive);
+
+	
 protected:
 
 	
@@ -124,10 +138,21 @@ protected:
 	virtual void TowerActive(float& DeltaTime) ;
 	virtual void ApplyDamage(AEnemyBase* Enemy);
 
+	FGenericTeamId TeamID;
+	virtual FGenericTeamId GetGenericTeamId() const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Stats")
+	float Health = 100.0f;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UAIPerceptionStimuliSourceComponent* StimuliSourceComponent;
+
+	void setHealth(float HealthStore);
+	float getHealth();
 
 private: 
 

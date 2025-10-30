@@ -7,6 +7,7 @@
 #include "AI/SplineController.h"
 #include "../Enemies/EnemyBase.h"
 #include "WitchAI/Witch_Projectile.h"
+#include "AI/HealAuraLight.h"
 #include "AIWitch.generated.h"
 
 UCLASS()
@@ -48,6 +49,21 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayHealSpellMontage();
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayLightTimeLine(AHealAuraLight* LightStore);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayLightTimeLine(AHealAuraLight* LightStore);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayDeathMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayDeathMontage();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -65,6 +81,8 @@ public:
 	UBoxComponent* HealZone;
 	int32 iHealCount = 0;
 	void HealEnemy();
+	void PlayHealSpellMontage();
+	void PlayDeathMontage();
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AWitch_Projectile> SpellClass;
@@ -79,4 +97,6 @@ public:
 	AWitch_Projectile* getSpell();
 	bool getbCanActorMove();
 	float Count = 0.0f;
+
+	UWorld* World;
 };

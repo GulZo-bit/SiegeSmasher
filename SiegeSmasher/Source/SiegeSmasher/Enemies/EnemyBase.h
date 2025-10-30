@@ -4,7 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PlayerArrow.h"
+#include "Components/CapsuleComponent.h"
 #include "EnemyBase.generated.h"
+#ifndef MAX_ENEMY_NUM
+ #define MAX_ENEMY_NUM 150
+#endif // !MAX_ENEMY_NUM
 
 UENUM(BlueprintType)
 enum class EnemyTypes : uint8
@@ -13,6 +18,7 @@ enum class EnemyTypes : uint8
 	BASE1 UMETA(DisplayName = "BASE1"),
 	VAMPIRE UMETA(DisplayName = "VAMPIRE"),
 	WITCH UMETA(DisplayName = "WITCH"),
+	DEMON UMETA(DisplayName = "Demon")
 
 };
 
@@ -68,4 +74,10 @@ public:
 	void AddToHealth(float Increase);
 	void ResetEnemyOnDeath();
 	EnemyTypes GetEnemyWaveType();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "default")
+	UCapsuleComponent* CapsuleStore;
+
+	UFUNCTION()
+	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

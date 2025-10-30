@@ -34,7 +34,7 @@ protected:
 	UFUNCTION()
 	virtual void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	AEnemyBase* Target = nullptr; 
+	AActor* Target = nullptr; 
 	float InitalPitch = 0.0f;
 
 	
@@ -44,7 +44,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetEnemyTarget(AEnemyBase * Enemy); 
+	void SetEnemyTarget(AActor * Enemy); 
 
 	virtual void MoveToTarget(float DeltaTime); 
 	void SetInitialPitch(float Pitch); 

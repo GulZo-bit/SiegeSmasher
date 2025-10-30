@@ -10,20 +10,25 @@ ATowerBase::ATowerBase()
 	PrimaryActorTick.bCanEverTick = true;
 	BoxColliderForObjectPlacement = CreateDefaultSubobject<UBoxComponent>(TEXT("Box collider for placement"));
 	TowerTimeLine = CreateDefaultSubobject<UTimelineComponent>("TowerTimeLine");
+	
 	RootComponent = BoxColliderForObjectPlacement;
 	TriggerRangeBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger Box For Range"));
 	TriggerRangeBox->SetupAttachment(RootComponent);
 	TriggerRangeBox->SetCollisionResponseToChannel(PlacingSurface, ECollisionResponse::ECR_Ignore);
 	TowerTimeLineCurve = CreateDefaultSubobject<UCurveFloat>("Tower Time Line Curve");
-	TowerHitBox = CreateDefaultSubobject<UBoxComponent>("Tower Hit Box"); 
+	TowerHitBox = CreateDefaultSubobject<UBoxComponent>("Tower Hit Box");
+
 	TriggerRangeBox->SetCollisionProfileName(FName("TowerPreset"));
 	TowerHitBox->SetCollisionProfileName(FName("TowerPreset"));
-	BoxColliderForObjectPlacement->SetCollisionProfileName(FName("TowerPreset"));
+	BoxColliderForObjectPlacement->SetCollisionProfileName(FName("TowerPreset")); 
+	BoxColliderForObjectPlacement->SetCollisionObjectType(TowerPlacementBox); 
+	BoxColliderForObjectPlacement->SetCollisionResponseToChannel(TowerPlacementBox, ECollisionResponse::ECR_Overlap);
 	TowerHitBox->SetBoxExtent(FVector::ZeroVector); 
-	
-   
 
-	
+
+	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
+	StimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass());
+	TeamID = FGenericTeamId(1);
 }
 
 void ATowerBase::DisableTick()
@@ -38,7 +43,6 @@ void ATowerBase::DisableTick()
 // Called when the game starts or when spawned
 void ATowerBase::BeginPlay()
 {
-  
 	Super::BeginPlay();
 	WaitTimeToReset = MaxWaitTimeToReset; 
 	CoolDownAfterReset = MaxCoolDownAfterReset;
@@ -54,9 +58,7 @@ void ATowerBase::BeginPlay()
 
 	}
 
-
 	TowerSetUp();
-
 }
 
 
@@ -144,7 +146,7 @@ bool ATowerBase::ResolvePlacement(FVector& SurfaceBoxExtents, FVector& SurfacePo
 	bool CeilingCheck = roundf(TrueNormalSigned.Dot(FVector::UpVector)) != 0.0f;
 	bool IncorrectSurfaceDir = TransformedTowerNormal.Dot(AllowedDirection * normalDir) == 0.0f;
 	if (!Contained ) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Tower cannot be placed on this surface")));
 		
 	/*	SetActorRotation(GetActorRotation() * !(Contained && IncorrectSurfaceDir));*/
 
@@ -298,6 +300,11 @@ void ATowerBase::SetHitBoxActive(bool HitBoxActive)
 
 }
 
+UBoxComponent* ATowerBase::GetPlacmentBox()
+{
+	return BoxColliderForObjectPlacement;
+}
+
 void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor* OverlapedActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool SweepBool ,const FHitResult& HitResult) {
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
@@ -352,6 +359,11 @@ void ATowerBase::TowerTimeLineEnd()
 
 
 
+FGenericTeamId ATowerBase::GetGenericTeamId() const
+{
+	return TeamID;
+}
+
 // Called every frame
 void ATowerBase::Tick(float DeltaTime)
 {
@@ -373,10 +385,33 @@ void ATowerBase::Tick(float DeltaTime)
 		}
 		return;
 	}
-	
 	TowerDormant(DeltaTime);
 	
 	
 
 }
 
+void ATowerBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (EndPlayReason == EEndPlayReason::Destroyed)
+	{
+		StimuliSourceComponent->UnregisterFromPerceptionSystem();
+	}
+}
+
+void ATowerBase::setHealth(float HealthStore)
+{
+	Health = HealthStore;
+
+	if (Health <= 0.0f)
+	{
+		Destroy();
+	}
+}
+
+float ATowerBase::getHealth()
+{
+	return Health;
+}

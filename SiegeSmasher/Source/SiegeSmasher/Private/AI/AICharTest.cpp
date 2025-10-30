@@ -47,6 +47,7 @@ void AAICharTest::BeginPlay()
 	this->GetComponents(ChildActors, true);
 	SplineNum = FMath::RandRange(0, SplineControllerStore.Num() - 1);
 
+	
 	//Loop through the array.
 	for (int i = 0; i < ChildActors.Num(); i++)
 	{
@@ -68,6 +69,7 @@ void AAICharTest::BeginPlay()
 		}
 	}
 
+	AnimInstance = GetMesh()->GetAnimInstance();
 
 }
 
@@ -75,6 +77,11 @@ void AAICharTest::BeginPlay()
 void AAICharTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (this->GetHealth() <= 0)
+	{
+		PlayDeathMontage();
+	}
 
 	if (bCanActorMove == true)
 	{
@@ -113,7 +120,7 @@ void AAICharTest::PlayAttackMontage()
 	if (GetLocalRole() < ROLE_Authority)
 	{
 		//If it is then we play the attack animation on the server.
-		//This is also here to validate the request by the client initiating the action then it calls the multicast.
+		//This is also here to validate the request by the client initiating the action, then it calls the multicast.
 		Server_PlayAttackMontage();
 	}
 	else
@@ -133,7 +140,6 @@ void AAICharTest::Multicast_PlayAttackMontage_Implementation()
 {
 	if (AttackMontage != nullptr)
 	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance != nullptr)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
@@ -141,6 +147,36 @@ void AAICharTest::Multicast_PlayAttackMontage_Implementation()
 	}
 }
 
+void AAICharTest::PlayDeathMontage()
+{
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		Server_PlayDeathMontage();
+	}
+
+	else
+	{
+		Multicast_PlayDeathMontage();
+	}
+}
+
+void AAICharTest::Server_PlayDeathMontage_Implementation()
+{
+	Multicast_PlayDeathMontage();
+}
+
+void AAICharTest::Multicast_PlayDeathMontage_Implementation()
+{
+	this->GetController()->UnPossess();
+	bCanActorMove = false;
+	if (DeathMontage != nullptr)
+	{
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(DeathMontage);
+		}
+	}
+}
 
 
 void AAICharTest::setbCanActorMove(bool bStore)
