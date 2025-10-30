@@ -180,31 +180,11 @@ void AMainCharacterTest::Shoot()
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
-		// Transform BowOffset from camera space to world space.
-		//FVector BowLocation = CameraLocation + FTransform(CameraRotation).TransformVector(BowOffset);
 		FRotator BowRotation = CameraRotation;
 		//gets the world the player is in
 		UWorld* World = GetWorld();
 		if (World)
 		{//spawn parameters of the arrow
-			//FActorSpawnParameters SpawnParams;
-			//SpawnParams.Owner = this;
-			//SpawnParams.Instigator = GetInstigator();
-			////creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
-			//AMCArrow* Arrow = World->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
-			////if arrow has been succesfully created
-			//if (Arrow)
-			//{
-			//	//changes the Bow rotation to be changed into a vector so that it shows a direction
-			//	FVector LaunchDirection = BowRotation.Vector();
-			//	//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
-			//	Arrow->FireInDirection(LaunchDirection, CurrentCharge);
-			//	//sets the bools for animations and turns off charging and resets the charge
-			//	SetArrowDrawn(false);
-			//	SetArrowFired(true);
-			//	isCharging = false;
-			//	UE_LOG(LogTemp, Warning, TEXT("Client Charge: %f Percent"), CurrentCharge);
-			//}
 			if (!HasAuthority())
 			{
 				//on client 
@@ -255,13 +235,6 @@ void AMainCharacterTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME(AMainCharacterTest, ChargeFinal);
 }
 
-void AMainCharacterTest::DrawBow()
-{
-	SetArrowFired(false);
-	SetArrowDrawn(true);
-	isCharging = true;
-}
-
 bool AMainCharacterTest::GetArrowDrawn()
 {
 	return ArrowDrawn;
@@ -305,7 +278,6 @@ void AMainCharacterTest::Server_SpawnProjectile_Implementation(FRotator CamRotat
 		SetArrowFired(true);
 		isCharging = false;
 		//UE_LOG(LogTemp, Warning, TEXT("Server Charge: %f Percent"), ChargeFinal);
-		//Multi_SpawnProjectile(CamRotation, BowRot);
 		CurrentCharge = 0;
 	}
 }
@@ -360,7 +332,6 @@ bool AMainCharacterTest::Multi_SpawnProjectile_Validate(FRotator CamRotation, FR
 void AMainCharacterTest::Multi_UpdateCharge_Implementation()
 {
 	ChargeFinal = CurrentCharge;
-	//UE_LOG(LogTemp, Warning, TEXT("Update Charge Called Current Charge Is: %f Percent"), ChargeFinal);
 }
 
 bool AMainCharacterTest::Multi_UpdateCharge_Validate()
@@ -379,11 +350,62 @@ bool AMainCharacterTest::Server_UpdateCharge_Validate(float ClientCharge)
 	return true;
 }
 
-void AMainCharacterTest::StopAim()
+void AMainCharacterTest::Server_DrawBow_Implementation()
+{
+	SetArrowFired(false);
+	SetArrowDrawn(true);
+	isCharging = true;
+}
+
+bool AMainCharacterTest::Server_DrawBow_Validate()
+{
+	return true;
+}
+
+void AMainCharacterTest::Server_StopAim_Implementation()
 {
 	SetArrowDrawn(false);
 	SetArrowFired(true);
 	isCharging = false;
+}
+
+bool AMainCharacterTest::Server_StopAim_Validate()
+{
+	return true;
+}
+
+void AMainCharacterTest::DrawBow()
+{
+	if (!HasAuthority())
+	{
+		//Client
+		Server_DrawBow();
+
+	}
+	else
+	{
+		//Server
+		SetArrowFired(false);
+		SetArrowDrawn(true);
+		isCharging = true;
+	}
+}
+
+void AMainCharacterTest::StopAim()
+{
+	if (!HasAuthority()) 
+	{
+		//Client
+		Server_StopAim();
+	}
+
+	else 
+	{
+		//Server
+		SetArrowDrawn(false);
+		SetArrowFired(true);
+		isCharging = false;
+	}
 }
 
 void AMainCharacterTest::ChargeShot(float DeltaTime)
