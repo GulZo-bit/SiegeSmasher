@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h" 
 #include "../MainCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "ServerObject.generated.h"
 
 UCLASS()

@@ -119,14 +119,13 @@ void AMainCharacter::Server_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("server ownership of actor changed to player character")));
 	Multicast_SetPlayerOwnerShip(ActorToOwn);
 
-
 }
 
 void AMainCharacter::SetPlayerOwnerShip(AActor* ActorToOwn)
 {
 
 	if (HasAuthority()) {
-		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on local")));
+		//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on local")));
 		Multicast_SetPlayerOwnerShip(ActorToOwn);
 	}
 	else {
@@ -138,7 +137,7 @@ void AMainCharacter::SetPlayerOwnerShip(AActor* ActorToOwn)
 
 void AMainCharacter::Multicast_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
 {
-
+	
 	ActorToOwn->SetOwner(Controller);
 
 }
@@ -245,6 +244,7 @@ void AMainCharacter::HandleTowerPlacement()
 			return;
 		} 
 
+		
 		
 
 
@@ -417,6 +417,12 @@ void AMainCharacter::SetPlayerId(int Id)
 
 
 
+
+
+
+
+
+
 //void AMainCharacter::AssignServerObject(AServerObject* ServerObjectInstance) {
 //
 //	
@@ -446,4 +452,4 @@ void AMainCharacter::SetPlayerId(int Id)
 //{
 //   
 //	ServerObjectInstance->SetOwner(Controller);
-//}
+ //}

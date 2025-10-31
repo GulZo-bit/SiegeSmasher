@@ -67,7 +67,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_SetPlayerOwnerShip(AActor* ActorToOwn);
-
+	
 	UFUNCTION(NetMulticast,Reliable)
 	void Multicast_SetPlayerOwnerShip(AActor* ActorToOwn);
 
@@ -92,7 +92,6 @@ public:
 	void SetPlayerId(int Id);
 
 	
-
 	UFUNCTION(Server,Reliable)
 	void Server_SetPlayerId(int Id); 
 	UFUNCTION(NetMulticast,Reliable)

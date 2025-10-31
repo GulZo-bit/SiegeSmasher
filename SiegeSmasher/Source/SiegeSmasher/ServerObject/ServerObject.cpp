@@ -46,15 +46,14 @@ void AServerObject::BeginPlay()
 			if (AMainCharacter* MainChar = Cast<AMainCharacter>(UGameplayStatics::GetActorOfClass(World, AMainCharacter::StaticClass())))
 			{
 
-				//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT(" Found local character num %d"),MainChars.Num()));
-			/*	MainChar->SetPlayerOwnerShip(this);
-				if (MainChar->GetOwner() == this)
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Owner ship was set to server object")));
-					IncrementPlayerId();
-				}*/
+				GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT(" Found local character num %d"),MainChars.Num()));
+				MainChar->SetPlayerOwnerShip(this);
+				
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Owner ship was set to SERVER OBJECT")));
+				IncrementPlayerId();
+				
 
-				MultiCast_IncrementPlayerId();
+				//MultiCast_IncrementPlayerId();
 
 
 
@@ -109,6 +108,8 @@ void AServerObject::Server_AssignOwner_Implementation(APlayerController* Control
 void AServerObject::MultiCast_IncrementPlayerId_Implementation()
 {
 	CurrentPlayerId = (CurrentPlayerId + 1) % MaxPlayerIdCount;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incremeting player id new id is %d"),CurrentPlayerId));
+
 	if (HasAuthority()) {
 
 
