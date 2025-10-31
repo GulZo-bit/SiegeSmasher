@@ -75,6 +75,8 @@ public:
 	
 	UFUNCTION(Server,Reliable)
 	void Server_SpawnSelected();
+	void Server_SpawnSelected_Implementation();
+
 
 	//Calling for movement input
 	void Move(const FInputActionValue& Value);

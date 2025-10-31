@@ -215,6 +215,34 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetPlayerId(int Id);
 
+	void SpawnSelected();
+
+
+
+	void TowerPlacementHandle();
+
+	UFUNCTION(Server,Reliable)
+	void Server_HandleTowerPlacement(FVector CamForward,FVector CamPosition); 
+
+	void Server_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_HandleTowerPlacement(FVector CamForward, FVector CamPosition);
+
+	void Multicast_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
+
+
+
+
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnSelected();
+	void Server_SpawnSelected_Implementation();
+
+	UFUNCTION(Server,Reliable) 
+	void Server_SwitchTower(int SelectedIndex); 
+	
+	void Server_SwitchTower_Implementation(int SelectedIndex);
+
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)
 	void CallCreateLobby();
@@ -224,16 +252,20 @@ public:
 
 	private:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
-		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects;
-		ATowePrePlaceObjectHelper* Selected = nullptr;
+		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 
+		
+		UPROPERTY(Replicated);
+		ATowePrePlaceObjectHelper* Selected = nullptr; 
+
 		UWorld* World = nullptr;
 		APlayerController* AssignedPlayerController = nullptr;
 		FActorSpawnParameters TowerSpawnParameters;
 		int PlayerId = 0;
-
+		UPROPERTY(Replicated);
 		int SelectedTowerIndex = -1;
 
 		float Health = 100.0f;
+		UPROPERTY(Replicated);
 		bool IsPlacingTower = false;
 
 		FCollisionQueryParams TraceParams;

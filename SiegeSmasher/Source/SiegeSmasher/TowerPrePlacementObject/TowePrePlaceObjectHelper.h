@@ -51,6 +51,8 @@ public:
 	bool GetCanPlaceTower();
 
 private: 
-	FVector FacingDirSum;
+	FVector FacingDirSum; 
+	
 	bool CanPlaceTower = true;
+
 };

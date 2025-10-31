@@ -65,8 +65,10 @@ void AMainCharacterTest::BeginPlay()
 	AssignedPlayerController = Cast<APlayerController>(Controller);
 	if (AssignedPlayerController)
 	{
-		InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(AssignedPlayerController->GetLocalPlayer());
 
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Bgeing play called for character ")));
+		InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(AssignedPlayerController->GetLocalPlayer());
+		
 
 		if (InputSubsystem)
 		{
@@ -111,8 +113,7 @@ void AMainCharacterTest::Tick(float DeltaTime)
 	{
 		ChargeWidget->SetChargeAmount(CurrentCharge);
 	}
-
-	HandleTowerPlacement();
+	TowerPlacementHandle();
 }
 
 // Called to bind functionality to input
@@ -247,10 +248,14 @@ void AMainCharacterTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME(AMainCharacterTest, ArrowFired);
 	DOREPLIFETIME(AMainCharacterTest, MaxCharge);
 	DOREPLIFETIME(AMainCharacterTest, ChargeRate);
+	DOREPLIFETIME(AMainCharacterTest, Selected);
+	DOREPLIFETIME(AMainCharacterTest, SelectedTowerIndex);
+	DOREPLIFETIME(AMainCharacterTest, IsPlacingTower);
 	//DOREPLIFETIME(AMainCharacterTest, CurrentCharge);
 	DOREPLIFETIME(AMainCharacterTest, isCharging);
 	DOREPLIFETIME(AMainCharacterTest, ArrowClass);
-	DOREPLIFETIME(AMainCharacterTest, ChargeFinal);
+	DOREPLIFETIME(AMainCharacterTest, ChargeFinal); 
+	
 }
 
 bool AMainCharacterTest::GetArrowDrawn()
@@ -470,11 +475,10 @@ void AMainCharacterTest::Multicast_SetPlayerOwnerShip_Implementation(AActor* Act
 
 void AMainCharacterTest::PlaceTower()
 {
-	if (IsPlacingTower && Selected->GetCanPlaceTower()) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Placing tower")));
-		ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
-	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Input to place tower called")));
+	SpawnSelected();
 }
 
 void AMainCharacterTest::DisplaySelected()
@@ -506,7 +510,10 @@ void AMainCharacterTest::HandleTowerPlacement()
 
 
 		if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
-		{
+		{ 
+			DrawDebugLine(World, start, end, FColor::Blue);
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("line trace hit")));
+
 			UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
 
 			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
@@ -602,7 +609,12 @@ void AMainCharacterTest::SwitchTowers()
 			break;
 
 		}
+		}
+	
+	if(!HasAuthority()) {
+		Server_SwitchTower(SelectedTowerIndex);
 	}
+	
 }
 
 void AMainCharacterTest::Server_SetPlayerId_Implementation(int Id)
@@ -624,4 +636,113 @@ void AMainCharacterTest::SetPlayerId(int Id)
 	}
 	Multicast_SetPlayerId(Id);
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Setting player id local host machine and multi casting from server for clients new host id is %d "), PlayerId));
+}
+
+
+
+void AMainCharacterTest::TowerPlacementHandle()
+{
+	if (!HasAuthority()) {
+		
+
+		Server_HandleTowerPlacement(TPSCameraComponent->GetForwardVector(),TPSCameraComponent->GetComponentLocation());
+	}
+	else {
+
+		HandleTowerPlacement();
+
+	}
+
+
+
+}
+
+void AMainCharacterTest::Server_HandleTowerPlacement_Implementation(FVector CamFoward, FVector CamPosition)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Tower placement server called")));
+	if (Selected != nullptr) {
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("PlayerPlacingTower")));
+		FVector PlayerCameForward = CamFoward;
+
+		FHitResult PlacementSurfaceResult = FHitResult();
+
+		FVector start = CamPosition + PlayerCameForward;
+
+		FVector end = start + PlayerCameForward * PlayerPlacementDistances;
+		IsPlacingTower = false;
+
+
+		if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
+		{
+			DrawDebugLine(World, start, end, FColor::Blue);
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("line trace hit")));
+
+			UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
+
+			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
+			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
+			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
+			FVector CamPos = TPSCameraComponent->GetComponentLocation();
+			DrawDebugLine(World, start, end, FColor::Blue);
+			DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
+			IsPlacingTower = Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward, CamPos, SurfaceTransform);
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("is placing tower is %d"), (int)IsPlacingTower));
+			//Selected->SetActorHiddenInGame(IsPlacingTower);
+
+			return;
+		}
+	}
+
+}
+
+void AMainCharacterTest::Multicast_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition)
+{
+
+
+}
+
+
+void AMainCharacterTest::SpawnSelected()
+{
+
+	if (HasAuthority()) {
+		if (IsPlacingTower && Selected->GetCanPlaceTower()) {
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("local host Placing tower")));
+			ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
+		}
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client  tower")));
+
+		Server_SpawnSelected();
+	}
+
+}
+void AMainCharacterTest::Server_SpawnSelected_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower selected get can place tower %d"), (int)Selected->GetCanPlaceTower()));
+
+	if (IsPlacingTower && Selected->GetCanPlaceTower()) {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower")));
+		ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
+	}
+	
+}
+
+void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex)
+{
+	 
+
+	if (Selected != nullptr) {
+		HideSelected();
+	}
+	SelectedTowerIndex = NewSelectedIndex;
+	Selected = TowerPrePlacementObjects[SelectedTowerIndex];
+	DisplaySelected();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("updating selected index on client %d "),SelectedTowerIndex));
+
+
+	
+
+
 }
