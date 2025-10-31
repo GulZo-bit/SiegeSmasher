@@ -142,6 +142,41 @@ void AMainCharacter::Multicast_SetPlayerOwnerShip_Implementation(AActor* ActorTo
 
 }
 
+void AMainCharacter::SpawnSelected()
+{
+	
+	if (IsPlacingTower && Selected->GetCanPlaceTower()) {
+		 
+		if (HasAuthority()) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("local host Placing tower")));
+			ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
+			
+		}
+		else {
+			Server_SpawnSelected();
+		}
+	
+
+	}
+
+
+
+
+
+
+}
+
+
+
+void AMainCharacter::Server_SpawnSelected_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Client called server Placing tower")));
+	ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
+
+
+
+}
+
 void AMainCharacter::Move(const FInputActionValue& Value)
 {
 	//Input is a Vector2d
@@ -185,14 +220,7 @@ void AMainCharacter::Jumping()
 
 void AMainCharacter::PlaceTower()
 {
-	if (IsPlacingTower && Selected->GetCanPlaceTower() ) {
-		
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Placing tower")));
-		ATowerBase * TowerRef =  World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
-	
-
-	}
-
+	SpawnSelected();
 }
 
 void AMainCharacter::DisplaySelected()

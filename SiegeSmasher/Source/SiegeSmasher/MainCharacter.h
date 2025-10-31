@@ -71,7 +71,10 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void Multicast_SetPlayerOwnerShip(AActor* ActorToOwn);
 
+	void SpawnSelected();
 	
+	UFUNCTION(Server,Reliable)
+	void Server_SpawnSelected();
 
 	//Calling for movement input
 	void Move(const FInputActionValue& Value);

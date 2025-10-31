@@ -25,11 +25,8 @@ void ATowePrePlaceObjectHelper::BeginPlay()
 		FacingDirSum += AllowedDirections[i];
 
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Begin play called for tower pre place helper")));
-
-	BoxColliderForObjectPlacement->OnComponentBeginOverlap.AddDynamic(this, &ATowePrePlaceObjectHelper::OnComponentBeginOverlap);
-	BoxColliderForObjectPlacement->OnComponentEndOverlap.AddDynamic(this, &ATowePrePlaceObjectHelper::OnComponentEndOverlap);
-
+	
+	
 }
 
 
@@ -54,32 +51,9 @@ FVector ATowePrePlaceObjectHelper::GetPlacementColliderHalfExtents()
 	return  BoxColliderForObjectPlacement->GetCollisionShape().GetExtent();
 
 }
-void ATowePrePlaceObjectHelper::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Ghost placement box overlapped component")));
-
-	if (OtherComp->GetCollisionObjectType() == TowerPlacementBoxObjectType) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Ghost Placement box overlapping cant place tower")));
-
-		CanPlaceTower = false;
-
-	}
 
 
 
-}
-
-void ATowePrePlaceObjectHelper::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Ghost placement box ended overlap with component")));
-
-	if (OtherComp->GetCollisionObjectType() == TowerPlacementBoxObjectType) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Ghost Placement box end overlap can place tower")));
-
-		CanPlaceTower = true;
-
-	}
-}
 
 
 bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir, FVector& CamPos, FTransform& surfaceTransform)
@@ -185,18 +159,18 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 
 
 	FVector AllowedDirectionSign = (FacingDirSum *(1.0f-ShouldSignAllowedDirection)) + (FacingDirSum * (TransformNormalRounded * ShouldSignAllowedDirection));
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("rounded normal multipled by facing dir sum")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("rounded normal multipled by facing dir sum")));
 
 	if (CheckOppositeRotation) {
 		
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("opposite rotation")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("opposite rotation")));
 		axisOfRotation = (axisOfRotation.Cross(currentAxisUp)) * (1.0f - CeilingCheck) + axisOfRotation * CeilingCheck;
 		
 	}
 
 	float CheckValidSurfaceDot = roundf(TransformNormalRounded.Dot((AllowedDirectionSign)));
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("check valid surface dot %f"), CheckValidSurfaceDot));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("check valid surface dot %f"), CheckValidSurfaceDot));
 
 	bool IsCorrectSurfaceDir = CheckValidSurfaceDot > 0.0f;
 	if (!Contained || !IsCorrectSurfaceDir) {
@@ -318,7 +292,7 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + TransformedNormal * FVector(700.0f, 700.0f, 700.0f), FColor::Blue);
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + AlignedAlignmentVector * FVector(700.0f, 700.0f, 700.0f), FColor::Green);
 	SetActorRotation(RotatorPitch + YawRot.Rotator());
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Is correct surface %d"), (int)IsCorrectSurfaceDir));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Is correct surface %d"), (int)IsCorrectSurfaceDir));
 	return true;
 } 
 
