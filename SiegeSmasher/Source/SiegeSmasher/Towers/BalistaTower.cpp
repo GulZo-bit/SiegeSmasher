@@ -6,7 +6,8 @@
 // Sets default values
 ABalistaTower::ABalistaTower()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	bReplicates = true;
+	SetReplicateMovement(true);
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = BoxColliderForObjectPlacement;
 	BallistaBase = CreateDefaultSubobject<UStaticMeshComponent>("BallistaBase"); 

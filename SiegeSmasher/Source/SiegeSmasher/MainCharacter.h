@@ -103,12 +103,10 @@ public:
 	void CallCreateLobby();
 
 	
-
+	UCameraComponent* camera = nullptr;
 	UFUNCTION(BlueprintCallable)
 	void CallClientTravel(const FString& Address);
 private:
-
-	UCameraComponent* camera = nullptr;  
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 	TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects;
 	ATowePrePlaceObjectHelper* Selected = nullptr;

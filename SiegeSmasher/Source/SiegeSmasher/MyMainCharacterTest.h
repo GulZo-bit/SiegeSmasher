@@ -14,6 +14,10 @@
 #include "PlayerHud/ChargeWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Net/UnrealNetwork.h"
+#include "../TowerPrePlacementObject/TowePrePlaceObjectHelper.h"
+#include "Towers/TowerBase.h" 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h" 
 #include "MyMainCharacterTest.generated.h"
 
 UCLASS()
@@ -24,6 +28,7 @@ class SIEGESMASHER_API AMainCharacterTest : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AMainCharacterTest();
+	void SetPlayerOwnerShip(AActor* ActorToOwn);
 
 protected:
 	// Called when the game starts or when spawned
@@ -80,6 +85,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	class UInputAction* TowerPlacementAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	class UInputAction* SwitchTowerAction;
+
 	//Calling for movement input
 	void Move(const FInputActionValue& Value);
 
@@ -88,6 +99,25 @@ public:
 
 	//calling for Jump input
 	void Jumping();
+
+	//function that handles shooting
+	void Shoot();
+	//sets bools for animations and starts the charging of the arrow
+	void DrawBow();
+	//same as draw bow but in reverse
+	void StopAim();
+	//increments the Current Charge variable
+	void ChargeShot(float DeltaTime);
+
+	void PlaceTower();
+
+	void setHealth(float HealthStore);
+
+	float getHealth();
+
+	void SwitchTowers();
+
+	void SetPlayerId(int Id);
 
 	//input for triggering the shooting action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
@@ -112,15 +142,16 @@ public:
 	UPROPERTY()
 	class UChargeWidget* ChargeWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowersTypesToSpawn");
+	TArray<TSubclassOf<ATowerBase>> TowerTypesToSpawn;
 
-	//function that handles shooting
-	void Shoot();
-	//sets bools for animations and starts the charging of the arrow
-	void DrawBow();
-	//same as draw bow but in reverse
-	void StopAim();
-	//increments the Current Charge variable
-	void ChargeShot(float DeltaTime);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlacementObjects")
+	TArray<TSubclassOf<ATowePrePlaceObjectHelper>> TowerPrePlacementObjectsToSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Placement distances");
+	FVector PlayerPlacementDistances;
+
+
 
 	//getters and seeters for the bools for the animation blueprint
 	UFUNCTION(BlueprintCallable)
@@ -172,4 +203,43 @@ public:
 	void Server_StopAim();
 	void Server_StopAim_Implementation();
 	bool Server_StopAim_Validate();
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetPlayerOwnerShip(AActor* ActorToOwn);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetPlayerOwnerShip(AActor* ActorToOwn);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetPlayerId(int Id);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetPlayerId(int Id);
+
+	//Online Lobby 
+	UFUNCTION(BlueprintCallable)
+	void CallCreateLobby();
+
+	UFUNCTION(BlueprintCallable)
+	void CallClientTravel(const FString& Address);
+
+	private:
+		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
+		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects;
+		ATowePrePlaceObjectHelper* Selected = nullptr;
+		UWorld* World = nullptr;
+		APlayerController* AssignedPlayerController = nullptr;
+		FActorSpawnParameters TowerSpawnParameters;
+		int PlayerId = 0;
+
+		int SelectedTowerIndex = -1;
+
+		float Health = 100.0f;
+		bool IsPlacingTower = false;
+
+		FCollisionQueryParams TraceParams;
+		void DisplaySelected();
+		void HideSelected();
+
+		void HandleTowerPlacement();
+		void InitialiseTowers();
 };
