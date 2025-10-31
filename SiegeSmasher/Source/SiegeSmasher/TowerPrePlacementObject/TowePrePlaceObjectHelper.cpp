@@ -7,6 +7,8 @@
 ATowePrePlaceObjectHelper::ATowePrePlaceObjectHelper()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	bReplicates = true;
+	SetReplicateMovement(true);
 	PrimaryActorTick.bCanEverTick = true;
 	BoxColliderForObjectPlacement = CreateDefaultSubobject<UBoxComponent>("BoxColliderForObjectPlacement");
 	RootComponent = BoxColliderForObjectPlacement;

@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h" 
-#include "Components/BoxComponent.h"
+#include "Components/BoxComponent.h" 
+#include  "Net/UnrealNetwork.h"
 #include "TowePrePlaceObjectHelper.generated.h"
 
 #ifndef TowerPlacementBoxObjectType
