@@ -120,14 +120,16 @@ void AEnemyBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActo
 {
 	//GLog->Log("Enemy base is overlapping");
 
-	if (OtherActor && (OtherActor != this))
+	/*if (OtherActor && (OtherActor != this))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Overlap Begun with: %s"), *OtherActor->GetName());
-	}
-	if (Cast<APlayerArrow>(OtherActor))
+	}*/
+	if (Cast<AMCArrow>(OtherActor))
 	{
-		GLog->Log("Overlapped with arrow");
-		this->SetHealth(GetHealth() - 50);
+		AMCArrow* TempArrow = Cast<AMCArrow>(OtherActor);
+		//GLog->Log(FString::Printf(TEXT("Arrow Damage: %f"), TempArrow->getDamage()));
+		this->SetHealth(GetHealth() - TempArrow->getDamage());
+		OtherActor->Destroy();
 	}
 }
 

@@ -88,6 +88,7 @@ void AAICharTest::Tick(float DeltaTime)
 				if (MontageTimeStore >= 2.5f)
 				{
 					this->ResetEnemyOnDeath();
+					Sword->ResetSwordOnDeath();
 					CubeStore->SetActorHiddenInGame(false);
 					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
 					Count = StartTime;
@@ -97,26 +98,29 @@ void AAICharTest::Tick(float DeltaTime)
 		}
 	}
 
-	if (bCanActorMove == true)
+	else
 	{
-		//How long the current spline has been going for.
-		float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
+		Sword->ResetSwordOnRespawn();
+		if (bCanActorMove == true)
+		{
+			//How long the current spline has been going for.
+			float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
 
-		//Find the distance we are along the spline.
-		float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
+			//Find the distance we are along the spline.
+			float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
 
-		//Translate that distance into world space. Then move the cube to it,
-		FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-		CubeStore->SetActorLocation(Position);
+			//Translate that distance into world space. Then move the cube to it,
+			FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+			CubeStore->SetActorLocation(Position);
 
-		//Rotate the cube in world space.
-		FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-		FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
-		CubeStore->SetActorRotation(Rotator);
+			//Rotate the cube in world space.
+			FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+			FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
+			CubeStore->SetActorRotation(Rotator);
 
-		Count += 1.0f * DeltaTime;
+			Count += 1.0f * DeltaTime;
+		}
 	}
-
 	
 	
 }

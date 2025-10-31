@@ -57,3 +57,17 @@ void ADemonFists::OnOverLapEnd(UPrimitiveComponent* OverlappedComp, class AActor
 	}
 	
 }
+
+void ADemonFists::ResetFistsOnDeath()
+{
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+}
+
+void ADemonFists::ResetFistsOnSpawn()
+{
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	SetActorTickEnabled(true);
+}

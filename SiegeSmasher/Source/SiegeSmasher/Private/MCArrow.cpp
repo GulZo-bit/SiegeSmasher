@@ -37,8 +37,8 @@ AMCArrow::AMCArrow()
 		ArrowMovement =
 			CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 		ArrowMovement->SetUpdatedComponent(ArrowCollision);
-		ArrowMovement->InitialSpeed = 1000.0f;
-		ArrowMovement->MaxSpeed = 1000.0f;
+		ArrowMovement->InitialSpeed = 5000.0f;
+		ArrowMovement->MaxSpeed = 5000.0f;
 		ArrowMovement->bRotationFollowsVelocity = true;
 		ArrowMovement->bShouldBounce = false;
 		ArrowMovement->ProjectileGravityScale = 0.5f;
@@ -92,9 +92,15 @@ void AMCArrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPri
 void AMCArrow::FireInDirection(const FVector& ShootDirection, float Charge)
 {
 	float ArrowSpeed = ArrowMovement->InitialSpeed * (Charge / 100);
+	ArrowDamage = ArrowDamage * (Charge/10);
 	//UE_LOG(LogTemp, Warning, TEXT("ArrowSpeed: %f"), ArrowSpeed);
 	//UE_LOG(LogTemp, Warning, TEXT("Arrow Function FireInDirection called"));
 	ArrowMovement->Velocity = ShootDirection * ArrowSpeed;
+}
+
+float AMCArrow::getDamage()
+{
+	return ArrowDamage;
 }
 
 
