@@ -119,14 +119,13 @@ void AMainCharacter::Server_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("server ownership of actor changed to player character")));
 	Multicast_SetPlayerOwnerShip(ActorToOwn);
 
-
 }
 
 void AMainCharacter::SetPlayerOwnerShip(AActor* ActorToOwn)
 {
 
 	if (HasAuthority()) {
-		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on local")));
+		//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on local")));
 		Multicast_SetPlayerOwnerShip(ActorToOwn);
 	}
 	else {
@@ -138,8 +137,43 @@ void AMainCharacter::SetPlayerOwnerShip(AActor* ActorToOwn)
 
 void AMainCharacter::Multicast_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
 {
-
+	
 	ActorToOwn->SetOwner(Controller);
+
+}
+
+void AMainCharacter::SpawnSelected()
+{
+	
+	if (IsPlacingTower && Selected->GetCanPlaceTower()) {
+		 
+		if (HasAuthority()) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("local host Placing tower")));
+			ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
+			
+		}
+		else {
+			Server_SpawnSelected();
+		}
+	
+
+	}
+
+
+
+
+
+
+}
+
+
+
+void AMainCharacter::Server_SpawnSelected_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Client called server Placing tower")));
+	ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
+
+
 
 }
 
@@ -186,14 +220,7 @@ void AMainCharacter::Jumping()
 
 void AMainCharacter::PlaceTower()
 {
-	if (IsPlacingTower && Selected->GetCanPlaceTower() ) {
-		
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Placing tower")));
-		ATowerBase * TowerRef =  World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
-	
-
-	}
-
+	SpawnSelected();
 }
 
 void AMainCharacter::DisplaySelected()
@@ -245,6 +272,7 @@ void AMainCharacter::HandleTowerPlacement()
 			return;
 		} 
 
+		
 		
 
 
@@ -417,6 +445,12 @@ void AMainCharacter::SetPlayerId(int Id)
 
 
 
+
+
+
+
+
+
 //void AMainCharacter::AssignServerObject(AServerObject* ServerObjectInstance) {
 //
 //	
@@ -446,4 +480,4 @@ void AMainCharacter::SetPlayerId(int Id)
 //{
 //   
 //	ServerObjectInstance->SetOwner(Controller);
-//}
+ //}

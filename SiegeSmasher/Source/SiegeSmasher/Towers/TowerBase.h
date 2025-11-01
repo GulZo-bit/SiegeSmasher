@@ -14,7 +14,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "GenericTeamAgentInterface.h"
-
+#include "Net/UnrealNetwork.h"
 #include "TowerBase.generated.h" 
 
 

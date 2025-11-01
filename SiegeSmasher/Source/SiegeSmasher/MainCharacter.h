@@ -67,11 +67,16 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_SetPlayerOwnerShip(AActor* ActorToOwn);
-
+	
 	UFUNCTION(NetMulticast,Reliable)
 	void Multicast_SetPlayerOwnerShip(AActor* ActorToOwn);
 
+	void SpawnSelected();
 	
+	UFUNCTION(Server,Reliable)
+	void Server_SpawnSelected();
+	void Server_SpawnSelected_Implementation();
+
 
 	//Calling for movement input
 	void Move(const FInputActionValue& Value);
@@ -92,7 +97,6 @@ public:
 	void SetPlayerId(int Id);
 
 	
-
 	UFUNCTION(Server,Reliable)
 	void Server_SetPlayerId(int Id); 
 	UFUNCTION(NetMulticast,Reliable)
@@ -103,12 +107,10 @@ public:
 	void CallCreateLobby();
 
 	
-
+	UCameraComponent* camera = nullptr;
 	UFUNCTION(BlueprintCallable)
 	void CallClientTravel(const FString& Address);
 private:
-
-	UCameraComponent* camera = nullptr;  
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 	TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects;
 	ATowePrePlaceObjectHelper* Selected = nullptr;

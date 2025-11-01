@@ -6,7 +6,8 @@
 // Sets default values
 ATowerBase::ATowerBase()
 {
-	
+	bReplicates = true;
+	SetReplicateMovement(true);
 	PrimaryActorTick.bCanEverTick = true;
 	BoxColliderForObjectPlacement = CreateDefaultSubobject<UBoxComponent>(TEXT("Box collider for placement"));
 	TowerTimeLine = CreateDefaultSubobject<UTimelineComponent>("TowerTimeLine");
