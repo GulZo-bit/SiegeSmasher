@@ -167,8 +167,22 @@ void AEnemyBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AEnemyBase, CurrentHealth);
+	DOREPLIFETIME(AEnemyBase, CurrentStatusEffects);
 
 
 
 
 }
+
+int32 AEnemyBase::CheckHasStatusEffect(EnemyStatusEffect StatusEffect)
+{
+	return (CurrentStatusEffects & StatusEffect)  ;
+}
+
+void AEnemyBase::ApplyStatusEffect(EnemyStatusEffect StatusEffect) {
+	if (HasAuthority()) {
+		CurrentStatusEffects = CurrentStatusEffects | StatusEffect;
+
+	}
+}
+

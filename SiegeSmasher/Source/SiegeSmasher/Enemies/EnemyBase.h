@@ -21,7 +21,27 @@ enum class EnemyTypes : uint8
 	DEMON UMETA(DisplayName = "Demon")
 
 };
+// enum bit flags for chekcing if an enemy already has a status effect we can have each enum go up in a power of two as that will give 
+// us a binary number of 32 bits where only one bit is positive allowing us to easily combine bit field flags using bitwise operators
+// to check if an enemy already has a status effect applied to them(so we dont reapply status effects or add them when its not neccessary)
+UENUM()
+enum class EnemyStatusEffect : int32
+{
+	PHYSCIALDOT = 1,
+	
 
+};
+
+static inline  EnemyStatusEffect operator |  (EnemyStatusEffect  other, EnemyStatusEffect other1) {
+
+	return static_cast<EnemyStatusEffect>(static_cast<int32>(other) | static_cast<int32>(other1));
+
+}
+static inline  int32 operator &  (EnemyStatusEffect  other, EnemyStatusEffect other1) {
+
+	return (static_cast<int32>(other) & static_cast<int32>(other1));
+
+}
 
 UCLASS()
 class SIEGESMASHER_API AEnemyBase : public ACharacter
@@ -38,6 +58,8 @@ protected:
 	int EnemyTest();
 	int EnemyStartingCount = 8;
 	
+
+
 	float WavePolynomialConstantOne = 0.7f;
 	float WavePolynomialConstantTwo = 0.2f;
 	int CurrentWaveContribution = 0;
@@ -54,7 +76,8 @@ protected:
 	float MaxHealth = 100.0f;
 
 	int StartingWave = 0; // wave 0 = 1(starts counting from 0) 
-
+	int32 CheckHasStatusEffect(EnemyStatusEffect StatusEffect); 
+	void ApplyStatusEffect(EnemyStatusEffect  StatusEffect);
 
 	
 
@@ -83,11 +106,17 @@ public:
 
 	UFUNCTION()
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UPROPERTY(Replicated);
+	EnemyStatusEffect CurrentStatusEffects;
+
 private:
 		int* WaveEnemyAliveCountRef;
 
 		void SetEnemyAliveCountref(int* WaveEnemyAliveCount); 
 		void DecrementWaveEnemyAliveCount();
+
+	
+
 
 
 
