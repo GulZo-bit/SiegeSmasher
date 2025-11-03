@@ -35,7 +35,7 @@ AMainCharacterTest::AMainCharacterTest()
 	isCharging = false;
 	MaxCharge = 100.0f;
 	CurrentCharge = 0.0f;
-	ChargeRate = 10.0f;
+	ChargeRate = 50.0f;
 }
 
 // Called when the game starts or when spawned

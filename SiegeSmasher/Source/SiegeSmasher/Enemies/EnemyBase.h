@@ -44,8 +44,11 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyVariables")
 	EnemyTypes EnemyType = EnemyTypes::BASE;
-
+	UPROPERTY(Replicated)
 	float CurrentHealth = 100.0f; 
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyVariables")
 	float MaxHealth = 100.0f;
