@@ -40,6 +40,12 @@ protected:
 	void TowerDormant(float& DeltaTime);
 	virtual void BeginPlay() override;
 
+	UFUNCTION(NetMulticast,Reliable) 
+	void Multicast_SetArrowHidden(bool HideBallistaArrow);
+	void Multicast_SetArrowHidden_Implementation(bool HideBallistaArrow);
+
+
+	void HideArrow(bool ShouldHideArrow);
 
 
 

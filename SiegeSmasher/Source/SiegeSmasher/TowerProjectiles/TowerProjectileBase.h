@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h" 
-#include "../Enemies/EnemyBase.h"
+#include "../Enemies/EnemyBase.h" 
+#include "Net/UnrealNetwork.h"
 #include "TowerProjectileBase.generated.h"
 
 UCLASS()
@@ -34,11 +35,12 @@ protected:
 	UFUNCTION()
 	virtual void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UPROPERTY(Replicated)
 	AActor* Target = nullptr; 
+	UPROPERTY(Replicated)
 	float InitalPitch = 0.0f;
-
 	
-	
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 public:	
 	// Called every frame

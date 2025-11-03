@@ -57,7 +57,7 @@ void AWallSpikeTrapTower::TowerTimeLineEnd() {
 
 
 
-	if (TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
+	if ( TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower time line end called %f"), TowerTimeLine->GetPlaybackPosition()));
 
 		RequiresReset = true;

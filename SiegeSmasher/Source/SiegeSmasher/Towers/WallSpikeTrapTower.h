@@ -40,7 +40,7 @@ protected:
 
 protected:
 	FVector EulerAnglesOfSpikesOnPlace;
-	bool StartedReset = false;
+
 
 public:	
 
