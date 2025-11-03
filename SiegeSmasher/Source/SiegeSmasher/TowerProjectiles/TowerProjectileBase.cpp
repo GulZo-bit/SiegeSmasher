@@ -7,6 +7,8 @@
 ATowerProjectileBase::ATowerProjectileBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	bReplicates = true;
+	SetReplicateMovement(true);
 	PrimaryActorTick.bCanEverTick = true;
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Mesh"); 
@@ -18,9 +20,20 @@ ATowerProjectileBase::ATowerProjectileBase()
 
 }
 
+
+void ATowerProjectileBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const {
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ATowerProjectileBase, InitalPitch); 
+	DOREPLIFETIME(ATowerProjectileBase, Target);
+
+	
+}
+
 // Called when the game starts or when spawned
 void ATowerProjectileBase::BeginPlay()
 {
+
 	Super::BeginPlay();
 	ProjectileMesh->OnComponentBeginOverlap.AddDynamic(this, &ATowerProjectileBase::OnOverLapBegin);
 	World = GetWorld();
@@ -29,16 +42,19 @@ void ATowerProjectileBase::BeginPlay()
 
 void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 
-	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor) ) {
+	
+		if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
 
 
-		Enemy->DamageEnemy(Damage);
-		
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Tower projectile hitting enemy")));
-		
+			Enemy->DamageEnemy(Damage);
+
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Tower projectile hitting enemy")));
 
 
-	}
+
+		}
+	
+	
 
 	
 	World->DestroyActor(this);

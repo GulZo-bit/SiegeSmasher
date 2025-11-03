@@ -36,10 +36,11 @@ protected:
 	void TowerTimeLineInterp(float value);
 	void TowerTimeLineEnd();
 	void TowerDormant(float& DeltaTime);
-	void ApplyDamage(AEnemyBase* Enemy);
-	bool StartedReset = false; 
+	void ApplyDamage(AEnemyBase* Enemy); 
+	UPROPERTY(Replicated);
 	bool SpikesUp = false;  
 	float CurrentDeltaTime = 0.0f; 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 	FVector SpikesStartPos;
 public:	
