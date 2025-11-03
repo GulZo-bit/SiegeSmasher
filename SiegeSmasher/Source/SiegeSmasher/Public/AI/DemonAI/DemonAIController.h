@@ -56,6 +56,8 @@ public:
 
 	UFUNCTION()
 	void HandleTargetPerceptionForgotten(AActor* Actor);
+
+	void CheckDeath();
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;

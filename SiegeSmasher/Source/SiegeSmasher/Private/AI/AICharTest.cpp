@@ -70,7 +70,6 @@ void AAICharTest::BeginPlay()
 	}
 
 	AnimInstance = GetMesh()->GetAnimInstance();
-
 }
 
 // Called every frame
@@ -80,29 +79,48 @@ void AAICharTest::Tick(float DeltaTime)
 
 	if (this->GetHealth() <= 0)
 	{
-		PlayDeathMontage();
+		if (AnimInstance != nullptr)
+		{
+			if (AnimInstance->Montage_IsPlaying(DeathMontage))
+			{
+				float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
+
+				if (MontageTimeStore >= 2.5f)
+				{
+					this->ResetEnemyOnDeath();
+					Sword->ResetSwordOnDeath();
+					CubeStore->SetActorHiddenInGame(false);
+					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+					Count = StartTime;
+					bCanActorMove = true;
+				}
+			}
+		}
 	}
 
-	if (bCanActorMove == true)
+	else
 	{
-		//How long the current spline has been going for.
-		float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
+		Sword->ResetSwordOnRespawn();
+		if (bCanActorMove == true)
+		{
+			//How long the current spline has been going for.
+			float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
 
-		//Find the distance we are along the spline.
-		float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
+			//Find the distance we are along the spline.
+			float Distance = SplineControllerStore[SplineNum]->getSpline()->GetSplineLength() * CurrentSplineTime;
 
-		//Translate that distance into world space. Then move the cube to it,
-		FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-		CubeStore->SetActorLocation(Position);
+			//Translate that distance into world space. Then move the cube to it,
+			FVector Position = SplineControllerStore[SplineNum]->getSpline()->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+			CubeStore->SetActorLocation(Position);
 
-		//Rotate the cube in world space.
-		FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-		FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
-		CubeStore->SetActorRotation(Rotator);
+			//Rotate the cube in world space.
+			FVector Direction = SplineControllerStore[SplineNum]->getSpline()->GetDirectionAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+			FRotator Rotator = FRotationMatrix::MakeFromX(Direction).Rotator();
+			CubeStore->SetActorRotation(Rotator);
 
-		Count += 1.0f * DeltaTime;
+			Count += 1.0f * DeltaTime;
+		}
 	}
-
 	
 	
 }
@@ -167,13 +185,15 @@ void AAICharTest::Server_PlayDeathMontage_Implementation()
 
 void AAICharTest::Multicast_PlayDeathMontage_Implementation()
 {
-	this->GetController()->UnPossess();
-	bCanActorMove = false;
 	if (DeathMontage != nullptr)
 	{
 		if (AnimInstance != nullptr)
 		{
+			UBoolAnimInstance* BoolAnimInstance = Cast<UBoolAnimInstance>(AnimInstance);
+			if (BoolAnimInstance != nullptr) { BoolAnimInstance->setIsDeadBool(true); }
+
 			AnimInstance->Montage_Play(DeathMontage);
+			bCanActorMove = false;
 		}
 	}
 }

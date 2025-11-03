@@ -43,4 +43,7 @@ public:
 
 	float Damage = 5;
 	bool bHit = false;
+
+	void ResetFistsOnDeath();	
+	void ResetFistsOnSpawn();
 };

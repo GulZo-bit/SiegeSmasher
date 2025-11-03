@@ -24,5 +24,5 @@ EBTNodeResult::Type UWitchAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& 
 		return EBTNodeResult::Succeeded;
 	}
 
-	return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }

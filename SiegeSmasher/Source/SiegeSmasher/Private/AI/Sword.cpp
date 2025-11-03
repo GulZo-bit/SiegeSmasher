@@ -75,7 +75,7 @@ void ASword::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			AMainCharacter* MainChar = Cast<AMainCharacter>(OtherActor);
 			MainChar->setHealth(MainChar->getHealth() - Damage);
 			bHit = true;
-			//GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
+			GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
 		}
 
 	}
@@ -93,6 +93,20 @@ void ASword::OnOverLapEnd(UPrimitiveComponent* OverlappedComp, class AActor* Oth
 void ASword::ResetHit()
 {
 	bHitDetected = false;
+}
+
+void ASword::ResetSwordOnDeath()
+{
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+}
+
+void ASword::ResetSwordOnRespawn()
+{
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	SetActorTickEnabled(true);
 }
 
 void ASword::setCollisionEnemy()

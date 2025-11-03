@@ -45,4 +45,8 @@ public:
 	UMaterialInstanceDynamic* ArrowMaterialInstance;
 	//function that initialises the arrow in the shoot direction
 	void FireInDirection(const FVector& ShootDirection, float Charge);
+
+	float ArrowDamage = 20.0f;
+
+	float getDamage();
 };

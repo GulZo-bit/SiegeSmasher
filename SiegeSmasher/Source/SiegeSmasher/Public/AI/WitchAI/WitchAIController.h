@@ -39,6 +39,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void setHealBool();
+	void CheckDeath();
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;

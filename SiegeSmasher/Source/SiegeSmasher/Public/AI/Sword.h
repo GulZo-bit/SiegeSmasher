@@ -50,6 +50,9 @@ public:
 	FString ColStore = "";
 	bool bHit = false;
 	void ResetHit();
+
+	void ResetSwordOnDeath();
+	void ResetSwordOnRespawn();
 private:
 	
 };

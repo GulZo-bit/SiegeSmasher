@@ -41,6 +41,8 @@ public:
 
 	UPROPERTY()
 	AAICharTest* Vampire;
+
+	void CheckDeath();
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;

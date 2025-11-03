@@ -7,6 +7,7 @@
 #include "CheckPointTest.h"
 #include "AI/SplineController.h"
 #include "../Enemies/EnemyBase.h"
+#include "AI/BoolAnimInstance.h"
 #include "AICharTest.generated.h"
 
 class ASword;
