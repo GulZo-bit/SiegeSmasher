@@ -38,12 +38,18 @@ void AWallSpikeTrapTower::TowerSetUp() {
 	TowerTimeLine->SetTimelineFinishedFunc(TowerEndAction);
 	TowerTimeLine->AddInterpFloat(TowerTimeLineCurve, TowerTimeLineInterpEvent,FName("Alpha"), FName("Alpha"));
 	EulerAnglesOfSpikesOnPlace = WallTrapSpikes->GetComponentRotation().Euler(); 
-	TowerTimeLine->SetPlayRate(1.55f);
+	TowerTimeLine->SetPlayRate(SwingPlayBackSpeed);
 	TowerTimeLine->SetLooping(false); 
 	
 
 }
+void AWallSpikeTrapTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const {
 
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AWallSpikeTrapTower, IsSwinging);
+	DOREPLIFETIME(AWallSpikeTrapTower, HasSwung);
+
+}
 
 
 void AWallSpikeTrapTower::TowerTimeLineInterp(float value) {
@@ -57,9 +63,9 @@ void AWallSpikeTrapTower::TowerTimeLineEnd() {
 
 
 
-	if ( TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
+	if (HasAuthority() && TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower time line end called %f"), TowerTimeLine->GetPlaybackPosition()));
-
+		HasSwung = true;
 		RequiresReset = true;
 		IsSwinging = false;
 	}
@@ -72,12 +78,12 @@ void AWallSpikeTrapTower::TowerDormant(float& DeltaTime) {
 	
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("TowerRest timer %f"), CoolDownAfterReset));
-	if (StartedReset && !TowerTimeLine->IsReversing() && (CoolDownAfterReset -= DeltaTime) <= 0.0f){
+	if (HasAuthority() && StartedReset && !TowerTimeLine->IsReversing() && (CoolDownAfterReset -= DeltaTime) <= 0.0f){
 		 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower fully reset")));
 		CoolDownAfterReset = MaxCoolDownAfterReset; 
-		TriggerRangeBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		StartedReset = false; 
+		Multicast_SetTriggerBoxCollision(ECollisionEnabled::QueryOnly);
+		StartedReset = false;
 		
 		
 	}
@@ -88,10 +94,11 @@ void AWallSpikeTrapTower::TowerDormant(float& DeltaTime) {
 void AWallSpikeTrapTower::TowerActive(float& DeltaTime) {
 
 	
-	if (!RequiresReset && !IsSwinging && !TowerTimeLine->IsReversing()) {
+	if (HasAuthority() && !RequiresReset && !IsSwinging && !TowerTimeLine->IsReversing()) {
 	      
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower begin swing ")));*/
-		TowerTimeLine->PlayFromStart();
+		
+		Multicast_PlayTowerTimeLine(SwingPlayBackSpeed);
 		IsSwinging = true;
 		   
 	}
@@ -108,12 +115,15 @@ void AWallSpikeTrapTower::TowerActive(float& DeltaTime) {
 
 void AWallSpikeTrapTower::TowerReset()
 {
-	StartedReset = true;
-	TowerTimeLine->ReverseFromEnd();
-	TriggerRangeBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CurrentyActive = false;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower starting reset ")));
-	
+	if (HasAuthority()) {
+		StartedReset = true;
+		Multicast_ReverseTowerTimeLine(SwingPlayBackSpeed);
+		Multicast_SetTriggerBoxCollision(ECollisionEnabled::NoCollision);
+		CurrentyActive = false;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower starting reset ")));
+		HasSwung = false;
+	}
+
 
 }
 
@@ -132,7 +142,7 @@ void AWallSpikeTrapTower::RotateOnTimeLine(float value)
 
 
 void AWallSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
-	if ((IsSwinging || RequiresReset)) { 
+	if ((IsSwinging || HasSwung ||RequiresReset)) { 
 
 		  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Wall Spike Trap Damaging enemy")));
 		  Enemy->DamageEnemy(TowerDamage);
