@@ -6,10 +6,24 @@
 void UChargeWidget::SetChargeAmount(float ChargeAmount)
 {
 	Charge = ChargeAmount;
-	UE_LOG(LogTemp, Warning, TEXT("WidgetCharge: %f Percent"), Charge);
 }
 
 float UChargeWidget::GetChargePercent()
 {
 	return Charge/100;
+}
+
+void UChargeWidget::SetHealthAmount(float HealthAmount)
+{
+	Health = HealthAmount;
+}
+
+float UChargeWidget::GetHealthAmount()
+{
+	return Health;
+}
+
+float UChargeWidget::GetHealthPercent()
+{
+	return Health/100;
 }

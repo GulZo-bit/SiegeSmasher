@@ -19,12 +19,21 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float Charge;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<ACharacter> CharacterRef;
+	UPROPERTY(BlueprintReadOnly)
+	float Health;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void SetChargeAmount(float ChargeAmount);
 
 	UFUNCTION(BlueprintCallable)
 	float GetChargePercent();
+
+	UFUNCTION()
+	void SetHealthAmount(float HealthAmount);
+
+	UFUNCTION(BlueprintCallable)
+	float GetHealthAmount();
+
+	UFUNCTION(BlueprintCallable)
+	float GetHealthPercent();
 };
