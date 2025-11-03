@@ -215,7 +215,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetPlayerId(int Id);
 
-	void SpawnSelected();
 
 
 
@@ -225,7 +224,7 @@ public:
 	void Server_HandleTowerPlacement(FVector CamForward,FVector CamPosition); 
 
 	void Server_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
-
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_HandleTowerPlacement(FVector CamForward, FVector CamPosition);
 
@@ -233,15 +232,38 @@ public:
 
 
 
-
+	UFUNCTION(Server,Reliable) 
+	void Server_SetPlaceTower(bool PlaceTower); 
+	void Server_SetPlaceTower_Implementation(bool PlaceTower);
 	UFUNCTION(Server, Reliable)
-	void Server_SpawnSelected();
-	void Server_SpawnSelected_Implementation();
+	void Server_LogPlaceTower();
+	void Server_LogPlaceTower_Implementation();
+
+	UFUNCTION(Server, Unreliable) 
+	void Server_PushSelected(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
+	void Server_PushSelected_Implementation(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
+
+	UFUNCTION(NetMulticast,Unreliable) 
+	void Multicast_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
+	void Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
+
+	void SpawnSelected();
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnSelected(bool PlacingTower);
+	void Server_SpawnSelected_Implementation(bool PlacingTower);
 
 	UFUNCTION(Server,Reliable) 
 	void Server_SwitchTower(int SelectedIndex); 
 	
 	void Server_SwitchTower_Implementation(int SelectedIndex);
+	
+	UFUNCTION(Server,Reliable) 
+	void Server_HideSelected(); 
+	void Server_HideSelected_Implementation();
+
+	UFUNCTION(Server, Reliable)
+	void Server_DisplaySelected();
+	void Server_DisplaySelected_Implementation();
 
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)
@@ -254,7 +276,6 @@ public:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 
 		
-		UPROPERTY(Replicated);
 		ATowePrePlaceObjectHelper* Selected = nullptr; 
 
 		UWorld* World = nullptr;
@@ -271,7 +292,12 @@ public:
 		FCollisionQueryParams TraceParams;
 		void DisplaySelected();
 		void HideSelected();
+		void ClientSwitchTower(); 
 
 		void HandleTowerPlacement();
-		void InitialiseTowers();
+		void InitialiseTowers(); 
+
+
+
+		void ClientTowerPlacment();
 };

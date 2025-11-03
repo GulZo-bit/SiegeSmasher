@@ -115,17 +115,20 @@ float AProjectileTowerBase::GetTargetingRangeSqr()
 void AProjectileTowerBase::ShootProjectile(FVector Position,FRotator Rotation)
 {
 	
-	ATowerProjectileBase * ProjectilRef =  World->SpawnActor<ATowerProjectileBase>(Projectile, FTransform(Rotation, Position, FVector::OneVector), ProjectileSpawnParameters);
-	
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Ballista shooting projectile")));
-	if (ProjectilRef != nullptr) {
-		ProjectilRef->SetInitialPitch(Rotation.Pitch);
-		ProjectilRef->SetEnemyTarget(EnemySingleTarget);
+	if (HasAuthority()) {
+		ATowerProjectileBase* ProjectilRef = World->SpawnActor<ATowerProjectileBase>(Projectile, FTransform(Rotation, Position, FVector::OneVector), ProjectileSpawnParameters);
 
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Ballista shooting projectile")));
+		if (ProjectilRef != nullptr) {
+			ProjectilRef->SetInitialPitch(Rotation.Pitch);
+			ProjectilRef->SetEnemyTarget(EnemySingleTarget);
+
+		}
+
+		
 	}
-	
-	RequiresReset = true; 
-	
+
+	RequiresReset = true;
 
 }
 

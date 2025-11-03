@@ -6,7 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
 #include "../Enemies/EnemyBase.h" 
-#include "Components/TimelineComponent.h"
+#include "Components/TimelineComponent.h" 
+#include "Net/UnrealNetwork.h"
 #include "Math/MathFwd.h" 
 #include "Math/Vector.h" 
 #include "GenericTeamAgentInterface.h"
@@ -74,18 +75,30 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementCollider");
 	UBoxComponent* BoxColliderForObjectPlacement;
 	FOnTimelineEvent TowerEndAction;  
-	FOnTimelineFloat TowerTimeLineInterpEvent;
+	FOnTimelineFloat TowerTimeLineInterpEvent; 
 	bool RequiresReset = false; 
-	
+	bool StartedReset = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerWaitTimeToReset");
 	float MaxWaitTimeToReset;
-
 	float WaitTimeToReset = 0.0f;
+	
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_PlayTowerTimeLine(float PlayBackSpeed);
+	void Multicast_PlayTowerTimeLine_Implementation(float PlayBackSpeed);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ReverseTowerTimeLine(float PlayBackSpeed);
+	void Multicast_ReverseTowerTimeLine_Implementation(float PlayBackSpeed); 
+
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_SetTriggerBoxCollision(ECollisionEnabled::Type ColType); 
+	void Multicast_SetTriggerBoxCollision_Implementation(ECollisionEnabled::Type ColType);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerHitBox");  
 	UBoxComponent* TowerHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CoolDownAfterReset");
-	float MaxCoolDownAfterReset = 0.0f;
+	float MaxCoolDownAfterReset = 0.0f; 
+	UPROPERTY(Replicated);
 	float CoolDownAfterReset = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerCost"); 
 	float TowerCost = 0.0f;
@@ -115,7 +128,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerDamage");
 	float TowerDamage = 0.0f;
-
+	
 	UFUNCTION() 
 	virtual void TowerTimeLineInterp(float value); 
 
@@ -144,6 +157,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Stats")
 	float Health = 100.0f;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -156,7 +171,6 @@ public:
 	float getHealth();
 
 private: 
-
 	FVector FacingDirSum;
 
 

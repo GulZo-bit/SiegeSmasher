@@ -28,7 +28,8 @@ ATowerBase::ATowerBase()
 
 
 	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
-	StimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass());
+	StimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass()); 
+	TowerTimeLine->SetIsReplicated(true);
 	TeamID = FGenericTeamId(1);
 }
 
@@ -38,6 +39,11 @@ void ATowerBase::DisableTick()
 	PrimaryActorTick.SetTickFunctionEnable(false);
 }
 
+void ATowerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const {
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+}
 
 
 
@@ -308,18 +314,16 @@ UBoxComponent* ATowerBase::GetPlacmentBox()
 
 void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor* OverlapedActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool SweepBool ,const FHitResult& HitResult) {
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
-
-	if (AEnemyBase* EnemyTOHandle = Cast<AEnemyBase>(OverlapedActor)) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin hit ")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
+	if (HasAuthority() ) {
+		if (AEnemyBase* EnemyTOHandle = Cast<AEnemyBase>(OverlapedActor)) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin hit ")));
 
 			CurrentyActive = true;
+		}
 	}
-		
-		
-
-
 	
+
 
 	
 }
@@ -328,7 +332,7 @@ void ATowerBase::OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, AActor* Ot
 {
 
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit enemy")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit enemy")));
 
 		ApplyDamage(Enemy);
 
@@ -348,12 +352,48 @@ void ATowerBase::ApplyDamage(AEnemyBase* Enemy){}
 void ATowerBase::TowerDormant(float& DeltaTime) {}
 void ATowerBase::TowerSetUp(){}
 
+void ATowerBase::Multicast_PlayTowerTimeLine_Implementation(float PlayBackSpeed)
+{
+	/*if (HasAuthority()) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Multi cast play timeline host called")));
+
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast reverse timeline called")));
+
+	}
+	*/
+	TowerTimeLine->SetPlayRate(PlayBackSpeed); 
+	TowerTimeLine->PlayFromStart();
+}
+
+void ATowerBase::Multicast_ReverseTowerTimeLine_Implementation(float PlayBackSpeed)
+{
+	/*if (HasAuthority()) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Multi cast reverse timeline host called")));
+
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast reverse timeline called")));
+
+	}*/
+
+	TowerTimeLine->SetPlayRate(PlayBackSpeed);
+	TowerTimeLine->ReverseFromEnd();
+}
+
+void ATowerBase::Multicast_SetTriggerBoxCollision_Implementation(ECollisionEnabled::Type ColType)
+{
+
+	TriggerRangeBox->SetCollisionEnabled(ColType);
+}
+
 // generic method for resseting towers once they have finished there timeline based animation
 //this is bound to the TowerTimeLine component via method pointer in this base class(can be overriden if needed)
 void ATowerBase::TowerTimeLineEnd() 
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("tower time line end ")));
-
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("tower time line end ")));
+	
 	RequiresReset = true;
 }
 
@@ -376,8 +416,22 @@ void ATowerBase::Tick(float DeltaTime)
 	 
 
 		TowerActive(DeltaTime); 
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("waitimeToReset is %f requires reset is %d"), WaitTimeToReset,(int)RequiresReset));
-		if (RequiresReset && (WaitTimeToReset -= DeltaTime)<=0.0f) {
+		/*if (HasAuthority()) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Server wait time to reset %f"), WaitTimeToReset));
+		}
+		else {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("client wait time to reset %f"), WaitTimeToReset));
+
+		}*/
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("waitimeToReset is %f requires reset is %d"), WaitTimeToReset,(int)RequiresReset));
+		if (HasAuthority()) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("wait time to reset %f"), WaitTimeToReset));
+
+		}
+		
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("wait time to reset %f"), WaitTimeToReset));
+		if (HasAuthority() && RequiresReset && (WaitTimeToReset -= DeltaTime) <= 0.0f) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("reset called  wait time to reset %f"), WaitTimeToReset));
 
 			RequiresReset = false;
 			WaitTimeToReset = MaxWaitTimeToReset;
