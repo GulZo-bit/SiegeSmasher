@@ -90,6 +90,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* SwitchTowerAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	class UInputAction* ToggleTowerPlacementAction;
+
 
 	//Calling for movement input
 	void Move(const FInputActionValue& Value);
@@ -110,6 +113,8 @@ public:
 	void ChargeShot(float DeltaTime);
 
 	void PlaceTower();
+
+	void ToggleTowerPlacement();
 
 	void setHealth(float HealthStore);
 
@@ -249,13 +254,13 @@ public:
 
 	void SpawnSelected();
 	UFUNCTION(Server, Reliable)
-	void Server_SpawnSelected(bool PlacingTower);
-	void Server_SpawnSelected_Implementation(bool PlacingTower);
+	void Server_SpawnSelected(bool PlacingTower, bool ToggleTower);
+	void Server_SpawnSelected_Implementation(bool PlacingTower, bool ToggleTower);
 
 	UFUNCTION(Server,Reliable) 
-	void Server_SwitchTower(int SelectedIndex); 
+	void Server_SwitchTower(int SelectedIndex, bool ToggleTower); 
 	
-	void Server_SwitchTower_Implementation(int SelectedIndex);
+	void Server_SwitchTower_Implementation(int SelectedIndex,bool ToggleTower);
 	
 	UFUNCTION(Server,Reliable) 
 	void Server_HideSelected(); 
@@ -265,6 +270,9 @@ public:
 	void Server_DisplaySelected();
 	void Server_DisplaySelected_Implementation();
 
+	UFUNCTION(Server,Reliable)
+	void Server_ToggleTowers(bool ToggleTower);
+	void Server_ToggleTowers_Implementation(bool ToggleTower);
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)
 	void CallCreateLobby();
@@ -288,6 +296,8 @@ public:
 		float Health = 100.0f;
 		UPROPERTY(Replicated);
 		bool IsPlacingTower = false;
+
+		bool TogglePlacingTowers = false;
 
 		FCollisionQueryParams TraceParams;
 		void DisplaySelected();

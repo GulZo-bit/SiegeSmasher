@@ -152,6 +152,8 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Started, this, &AMainCharacterTest::PlaceTower);
 
 		EnhancedInputComponent->BindAction(SwitchTowerAction, ETriggerEvent::Started, this, &AMainCharacterTest::SwitchTowers);
+		
+		EnhancedInputComponent->BindAction(ToggleTowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleTowerPlacement);
 
 	}
 }
@@ -493,6 +495,30 @@ void AMainCharacterTest::PlaceTower()
 	SpawnSelected();
 }
 
+void AMainCharacterTest::ToggleTowerPlacement()
+{
+	TogglePlacingTowers = !TogglePlacingTowers;
+	
+	if (!HasAuthority()) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Toggle place tower client %d"), (int)TogglePlacingTowers));
+
+		Server_ToggleTowers(TogglePlacingTowers);
+
+	}
+	else { 
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Toggle place tower local hosts %d"),(int)TogglePlacingTowers));
+		if (Selected != nullptr && !TogglePlacingTowers) {
+			HideSelected();
+		}
+	}
+
+}
+	
+
+
+
+
+
 void AMainCharacterTest::DisplaySelected()
 {
 	if (HasAuthority()) {
@@ -529,7 +555,7 @@ void AMainCharacterTest::ClientSwitchTower()
 
 
 
-	Server_SwitchTower(index);
+	Server_SwitchTower(index,TogglePlacingTowers);
 
 
 
@@ -538,7 +564,7 @@ void AMainCharacterTest::ClientSwitchTower()
 void AMainCharacterTest::HandleTowerPlacement()
 {
 
-	if (Selected != nullptr) {
+	if (TogglePlacingTowers && Selected != nullptr) {
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,FString::Printf(TEXT("PlayerPlacingTower")));
 		FVector PlayerCameForward = TPSCameraComponent->GetForwardVector();
 
@@ -606,7 +632,7 @@ void AMainCharacterTest::InitialiseTowers()
 void AMainCharacterTest::ClientTowerPlacment()
 {
 
-	if (Selected != nullptr) {
+	if (TogglePlacingTowers && Selected != nullptr) {
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,FString::Printf(TEXT("PlayerPlacingTower")));
 		FVector PlayerCamForward = TPSCameraComponent->GetForwardVector();
 
@@ -686,8 +712,10 @@ void AMainCharacterTest::SwitchTowers()
 
 			SelectedTowerIndex = i;
 			Selected = TowerPrePlacementObjects[SelectedTowerIndex];
-			
+			if (TogglePlacingTowers) {
 				DisplaySelected();
+			}
+		
 			
 			
 			break;
@@ -798,7 +826,7 @@ void AMainCharacterTest::SpawnSelected()
 {
 
 	if (HasAuthority() && IsLocallyControlled()) {
-		if (IsPlacingTower && Selected->GetCanPlaceTower()) {
+		if (TogglePlacingTowers && IsPlacingTower && Selected->GetCanPlaceTower()) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("local host Placing tower")));
 			ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
 			if (TowerRef) {
@@ -809,8 +837,8 @@ void AMainCharacterTest::SpawnSelected()
 	}
 	else {
 		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client  tower")));
-
-		Server_SpawnSelected(IsPlacingTower);
+		
+		Server_SpawnSelected(IsPlacingTower,TogglePlacingTowers);
 	}
 
 }
@@ -880,11 +908,11 @@ void AMainCharacterTest::Multicast_PushSelected_Implementation(FTransform Client
 
 
 }
-void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower)
+void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,bool ToggleTower)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower selected get can place tower %d"), (int)IsPlacingTower));
 	
-	if (IsPlacingTower && Selected->GetCanPlaceTower()) {
+	if (ToggleTower && IsPlacingTower && Selected->GetCanPlaceTower()) {
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower")));
 		ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
 	}
@@ -893,7 +921,7 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower)
 
 
 
-void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex)
+void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex, bool ToggleTower)
 {
 	 
 
@@ -902,8 +930,10 @@ void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex)
 	}
 	SelectedTowerIndex = NewSelectedIndex;
 	Selected = TowerPrePlacementObjects[SelectedTowerIndex];
-	
-	DisplaySelected();
+	if (ToggleTower) {
+		DisplaySelected();
+	}
+
     
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("updating selected index on client %d "),SelectedTowerIndex));
@@ -926,6 +956,17 @@ void AMainCharacterTest::Server_HideSelected_Implementation()
 void AMainCharacterTest::Server_DisplaySelected_Implementation()
 {
 	DisplaySelected();
+
+
+}
+
+void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
+{
+	if (Selected != nullptr && !ToggleTower) {
+
+		HideSelected();
+
+	}
 
 
 }
