@@ -101,6 +101,8 @@ void AMainCharacterTest::BeginPlay()
 	TraceParams.AddIgnoredActor(this);
 	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(TPSCameraComponent == nullptr)));
 
+	
+
 }
 
 // Called every frame
