@@ -37,10 +37,16 @@ protected:
 	void HandleNewEnemy(AEnemyBase* Enemy);
 	void TowerTimeLineInterp(float value);
 	void ApplyDamage(AEnemyBase* Enemy);
-
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+	UPROPERTY(Replicated);
+	bool HasSwung = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SwingPlayBackSpeed"); 
+	float SwingPlayBackSpeed = 0.0f;
+	UPROPERTY(Replicated); 
+	bool IsSwinging = false;
 protected:
 	FVector EulerAnglesOfSpikesOnPlace;
-	bool StartedReset = false;
+
 
 public:	
 
@@ -49,7 +55,7 @@ public:
 private: 
 
 	
-	bool IsSwinging = false; 
+	
 
 
 	void RotateOnTimeLine(float value);

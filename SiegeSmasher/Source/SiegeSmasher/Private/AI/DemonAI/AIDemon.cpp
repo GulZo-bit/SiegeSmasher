@@ -76,7 +76,6 @@ void AAIDemon::BeginPlay()
 			}
 		}
 	}
-
 	AnimInstance = GetMesh()->GetAnimInstance();
 }
 
@@ -85,6 +84,7 @@ void AAIDemon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UE_LOG(LogTemp, Warning, TEXT("Demon Current Health: %f Percent"), CurrentHealth);
 	if (this->GetHealth() <= 0)
 	{
 		if (AnimInstance != nullptr)

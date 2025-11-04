@@ -33,6 +33,27 @@ void ABalistaTower::BeginPlay() {
 
 }
 
+void ABalistaTower::Multicast_SetArrowHidden_Implementation(bool HideBallistaArrow)
+{
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("setting ballista arrow hidden %d "), (int)HideBallistaArrow));
+	BallistaArrow->SetHiddenInGame(HideBallistaArrow);
+
+
+}
+
+void ABalistaTower::HideArrow(bool ShouldHideArrow)
+{
+
+	if (BallistaArrow->bHiddenInGame != ShouldHideArrow) {
+
+		Multicast_SetArrowHidden(ShouldHideArrow);
+
+	}
+
+
+}
+
 void ABalistaTower::TowerActive(float& DeltaTime) {
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Ballista Tower Active ")));
@@ -67,12 +88,12 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 
 		if (Alignment > FovSnappingThreshold && !RequiresReset) {
 
-			BallistaArrow->SetHiddenInGame(true);
+			HideArrow(true);
 			ShootProjectile(BallistaArrow->GetComponentLocation(), RequiredRotation.Rotator());
 
 		}
 		if (WaitTimeToReset <= MaxWaitTimeToReset * ProjectileReappearPercent) {
-			BallistaArrow->SetHiddenInGame(false);
+			HideArrow(false);
 
 		}
 
@@ -90,6 +111,9 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 
 	
 } 
+
+
+
 
 void ABalistaTower::TowerDormant(float& DeltaTime) {
 

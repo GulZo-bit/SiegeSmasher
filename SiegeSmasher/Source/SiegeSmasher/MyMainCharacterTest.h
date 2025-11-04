@@ -90,6 +90,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* SwitchTowerAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	class UInputAction* ToggleTowerPlacementAction;
+
 
 	//Calling for movement input
 	void Move(const FInputActionValue& Value);
@@ -110,6 +113,8 @@ public:
 	void ChargeShot(float DeltaTime);
 
 	void PlaceTower();
+
+	void ToggleTowerPlacement();
 
 	void setHealth(float HealthStore);
 
@@ -215,7 +220,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetPlayerId(int Id);
 
-	void SpawnSelected();
 
 
 
@@ -225,7 +229,7 @@ public:
 	void Server_HandleTowerPlacement(FVector CamForward,FVector CamPosition); 
 
 	void Server_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
-
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_HandleTowerPlacement(FVector CamForward, FVector CamPosition);
 
@@ -233,16 +237,42 @@ public:
 
 
 
-
+	UFUNCTION(Server,Reliable) 
+	void Server_SetPlaceTower(bool PlaceTower); 
+	void Server_SetPlaceTower_Implementation(bool PlaceTower);
 	UFUNCTION(Server, Reliable)
-	void Server_SpawnSelected();
-	void Server_SpawnSelected_Implementation();
+	void Server_LogPlaceTower();
+	void Server_LogPlaceTower_Implementation();
+
+	UFUNCTION(Server, Unreliable) 
+	void Server_PushSelected(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
+	void Server_PushSelected_Implementation(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
+
+	UFUNCTION(NetMulticast,Unreliable) 
+	void Multicast_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
+	void Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
+
+	void SpawnSelected();
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnSelected(bool PlacingTower, bool ToggleTower);
+	void Server_SpawnSelected_Implementation(bool PlacingTower, bool ToggleTower);
 
 	UFUNCTION(Server,Reliable) 
-	void Server_SwitchTower(int SelectedIndex); 
+	void Server_SwitchTower(int SelectedIndex, bool ToggleTower); 
 	
-	void Server_SwitchTower_Implementation(int SelectedIndex);
+	void Server_SwitchTower_Implementation(int SelectedIndex,bool ToggleTower);
+	
+	UFUNCTION(Server,Reliable) 
+	void Server_HideSelected(); 
+	void Server_HideSelected_Implementation();
 
+	UFUNCTION(Server, Reliable)
+	void Server_DisplaySelected();
+	void Server_DisplaySelected_Implementation();
+
+	UFUNCTION(Server,Reliable)
+	void Server_ToggleTowers(bool ToggleTower);
+	void Server_ToggleTowers_Implementation(bool ToggleTower);
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)
 	void CallCreateLobby();
@@ -254,7 +284,6 @@ public:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 
 		
-		UPROPERTY(Replicated);
 		ATowePrePlaceObjectHelper* Selected = nullptr; 
 
 		UWorld* World = nullptr;
@@ -268,10 +297,17 @@ public:
 		UPROPERTY(Replicated);
 		bool IsPlacingTower = false;
 
+		bool TogglePlacingTowers = false;
+
 		FCollisionQueryParams TraceParams;
 		void DisplaySelected();
 		void HideSelected();
+		void ClientSwitchTower(); 
 
 		void HandleTowerPlacement();
-		void InitialiseTowers();
+		void InitialiseTowers(); 
+
+
+
+		void ClientTowerPlacment();
 };

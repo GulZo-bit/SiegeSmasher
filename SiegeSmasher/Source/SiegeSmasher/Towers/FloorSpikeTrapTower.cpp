@@ -30,13 +30,19 @@ void AFloorSpikeTrapTower::BeginPlay()
 	
 	
 }
+void AFloorSpikeTrapTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const {
 
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AFloorSpikeTrapTower, SpikesUp);
+
+
+}
 // Called every frame
 void AFloorSpikeTrapTower::Tick(float DeltaTime)
 {
+
 	Super::Tick(DeltaTime);
 	CurrentDeltaTime = DeltaTime;
-
 
 }
 
@@ -59,14 +65,19 @@ void AFloorSpikeTrapTower::TowerSetUp() {
 
 void AFloorSpikeTrapTower::TowerTimeLineInterp(float value) {
 
-	SpikesMesh->SetWorldLocation(FMath::Lerp(SpikesStartPos, SpikeTrapBaseMesh->GetComponentLocation(),value));
+	     
+		SpikesMesh->SetWorldLocation(FMath::Lerp(SpikesStartPos, SpikeTrapBaseMesh->GetComponentLocation(), value));
+
+	
+
+
 	
 }
 void AFloorSpikeTrapTower::TowerTimeLineEnd() {
 
 
 
-	if (TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
+	if ( HasAuthority() && TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower time line end called %f"), TowerTimeLine->GetPlaybackPosition()));
 
 		RequiresReset = true;
@@ -79,33 +90,54 @@ void AFloorSpikeTrapTower::TowerTimeLineEnd() {
 
 void AFloorSpikeTrapTower::TowerDormant(float& DeltaTime) {
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("TowerRest timer %f"), CoolDownAfterReset));
-	if (StartedReset && !TowerTimeLine->IsReversing() && (CoolDownAfterReset -= DeltaTime) <= 0.0f) {
+	
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower fully reset")));
+	  if ( HasAuthority() && StartedReset && !TowerTimeLine->IsReversing() && (CoolDownAfterReset -= DeltaTime) <= 0.0f) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("TowerRest timer %f"), CoolDownAfterReset));
+
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower fully reset")));
 		CoolDownAfterReset = MaxCoolDownAfterReset;
-		TriggerRangeBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		Multicast_SetTriggerBoxCollision(ECollisionEnabled::QueryOnly);
 		StartedReset = false;
 
 
-	}
 
+
+		}
+	
 
 
 }
 void AFloorSpikeTrapTower::TowerActive(float& DeltaTime) {
 
+	/*if (HasAuthority()) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Server requires reset %d"), (int)RequiresReset));
 
-	if (!RequiresReset && !SpikesUp && !TowerTimeLine->IsReversing()) {
+		}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("client requires reset %d"), (int)RequiresReset));
 
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower begin swing ")));*/
-		TowerTimeLine->SetPlayRate(UpwardPlayBackSpeed);
+	}*/
+		if (HasAuthority() && !RequiresReset && !SpikesUp && !TowerTimeLine->IsReversing()) {
+			 
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower begin swing ")));
 
-		TowerTimeLine->PlayFromStart();
-		SpikesUp = true;
+			/*	TowerTimeLine->SetPlayRate(UpwardPlayBackSpeed);
+				TowerTimeLine->PlayFromStart();*/			
+			Multicast_PlayTowerTimeLine(UpwardPlayBackSpeed);
+			SpikesUp = true;
 
-	}
+			
+			
+				
+		
+			/*TowerTimeLine->SetPlayRate(UpwardPlayBackSpeed);
+			TowerTimeLine->PlayFromStart();*/
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Tower play back rate %f"), TowerTimeLine->GetPlayRate()));
 
+
+		}
+	
 
 
 
@@ -118,13 +150,21 @@ void AFloorSpikeTrapTower::TowerActive(float& DeltaTime) {
 
 void AFloorSpikeTrapTower::TowerReset()
 {
-	StartedReset = true;
-	TowerTimeLine->ReverseFromEnd();
-	TriggerRangeBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CurrentyActive = false;
-	TowerTimeLine->SetPlayRate(DownWardPlayBackSpeed);
+	
+		if (HasAuthority()) {
+			//Multicast_SetTriggerBoxCollision(ECollisionEnabled::NoCollision);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower starting reset ")));
+			/*	TowerTimeLine->SetPlayRate(DownWardPlayBackSpeed);
+				TowerTimeLine->ReverseFromEnd();*/
+			Multicast_ReverseTowerTimeLine(DownWardPlayBackSpeed);
+			StartedReset = true;
+			CurrentyActive = false;
+			Multicast_SetTriggerBoxCollision(ECollisionEnabled::NoCollision);
+		}
+		
+
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower starting reset ")));
 
 
 }

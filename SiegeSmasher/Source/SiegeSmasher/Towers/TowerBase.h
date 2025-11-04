@@ -6,7 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
 #include "../Enemies/EnemyBase.h" 
-#include "Components/TimelineComponent.h"
+#include "Components/TimelineComponent.h" 
+#include "Net/UnrealNetwork.h"
 #include "Math/MathFwd.h" 
 #include "Math/Vector.h" 
 #include "GenericTeamAgentInterface.h"
@@ -28,27 +29,7 @@
 
 
 
-// enum bit flags for chekcing if an enemy already has a status effect we can have each enum go up in a power of two as that will give 
-// us a binary number of 32 bits where only one bit is positive allowing us to easily combine bit field flags using bitwise operators
-// to check if an enemy already has a status effect applied to them(so we dont reapply status effects or add them when its not neccessary)
-UENUM()
-enum class TowerStatusEffect : int32
-{
-	PHYSCIALDOT = 1,
-	SLOW = 2,
 
-};
-
-static inline  TowerStatusEffect operator |  (TowerStatusEffect  other, TowerStatusEffect other1) {
-
-	return static_cast<TowerStatusEffect>(static_cast<int32>(other) | static_cast<int32>(other1));
-
-}
-static inline  int32 operator &  (TowerStatusEffect  other, TowerStatusEffect other1) {
-
-	return (static_cast<int32>(other) & static_cast<int32>(other1));
-
-}
 
 UCLASS()
 class SIEGESMASHER_API ATowerBase : public AActor, public IGenericTeamAgentInterface
@@ -74,18 +55,30 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementCollider");
 	UBoxComponent* BoxColliderForObjectPlacement;
 	FOnTimelineEvent TowerEndAction;  
-	FOnTimelineFloat TowerTimeLineInterpEvent;
+	FOnTimelineFloat TowerTimeLineInterpEvent; 
 	bool RequiresReset = false; 
-	
+	bool StartedReset = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerWaitTimeToReset");
 	float MaxWaitTimeToReset;
-
 	float WaitTimeToReset = 0.0f;
+	
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_PlayTowerTimeLine(float PlayBackSpeed);
+	void Multicast_PlayTowerTimeLine_Implementation(float PlayBackSpeed);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ReverseTowerTimeLine(float PlayBackSpeed);
+	void Multicast_ReverseTowerTimeLine_Implementation(float PlayBackSpeed); 
+
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_SetTriggerBoxCollision(ECollisionEnabled::Type ColType); 
+	void Multicast_SetTriggerBoxCollision_Implementation(ECollisionEnabled::Type ColType);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerHitBox");  
 	UBoxComponent* TowerHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CoolDownAfterReset");
-	float MaxCoolDownAfterReset = 0.0f;
+	float MaxCoolDownAfterReset = 0.0f; 
+	UPROPERTY(Replicated);
 	float CoolDownAfterReset = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerCost"); 
 	float TowerCost = 0.0f;
@@ -115,7 +108,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerDamage");
 	float TowerDamage = 0.0f;
-
+	
 	UFUNCTION() 
 	virtual void TowerTimeLineInterp(float value); 
 
@@ -144,6 +137,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Stats")
 	float Health = 100.0f;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -156,7 +151,6 @@ public:
 	float getHealth();
 
 private: 
-
 	FVector FacingDirSum;
 
 

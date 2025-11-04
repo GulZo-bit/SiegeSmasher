@@ -100,6 +100,7 @@ void AMCArrow::FireInDirection(const FVector& ShootDirection, float Charge)
 
 float AMCArrow::getDamage()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, FString::Printf(TEXT("Arrow Damage: %f"), ArrowDamage));
 	return ArrowDamage;
 }
 

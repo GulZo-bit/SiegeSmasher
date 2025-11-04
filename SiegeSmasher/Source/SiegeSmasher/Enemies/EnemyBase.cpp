@@ -24,6 +24,9 @@ void AEnemyBase::BeginPlay()
 		GLog->Log("Found capsule for enemy base");
 	}
 	CurrentHealth = MaxHealth;
+
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("CURRENT HEALTH BEGIN PLAY %f"), CurrentHealth));
 }
 
 int AEnemyBase::EnemyTest()
@@ -33,7 +36,10 @@ int AEnemyBase::EnemyTest()
 
 void AEnemyBase::DamageEnemy(float Damage)
 {
-	CurrentHealth -= Damage;
+	if (HasAuthority()) {
+		CurrentHealth -= Damage;
+	}
+
 	GLog->Log(FString::Printf(TEXT("Current Health: %f"), CurrentHealth));
 }
 
@@ -124,13 +130,16 @@ void AEnemyBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActo
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Overlap Begun with: %s"), *OtherActor->GetName());
 	}*/
-	if (Cast<AMCArrow>(OtherActor))
-	{
-		AMCArrow* TempArrow = Cast<AMCArrow>(OtherActor);
-		//GLog->Log(FString::Printf(TEXT("Arrow Damage: %f"), TempArrow->getDamage()));
-		this->SetHealth(GetHealth() - TempArrow->getDamage());
-		OtherActor->Destroy();
+	if (HasAuthority()) {
+		if (Cast<AMCArrow>(OtherActor))
+		{
+			AMCArrow* TempArrow = Cast<AMCArrow>(OtherActor);
+			//GLog->Log(FString::Printf(TEXT("Arrow Damage: %f"), TempArrow->getDamage()));
+			this->SetHealth(GetHealth() - TempArrow->getDamage());
+			OtherActor->Destroy();
+		}
 	}
+	
 }
 
 void AEnemyBase::SetEnemyAliveCountref(int* WaveEnemyAliveCount)
@@ -153,3 +162,27 @@ void AEnemyBase::DecrementWaveEnemyAliveCount()
 
 	}
 }
+
+void AEnemyBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AEnemyBase, CurrentHealth);
+	DOREPLIFETIME(AEnemyBase, CurrentStatusEffects);
+
+
+
+
+}
+
+int32 AEnemyBase::CheckHasStatusEffect(EnemyStatusEffect StatusEffect)
+{
+	return (CurrentStatusEffects & StatusEffect)  ;
+}
+
+void AEnemyBase::ApplyStatusEffect(EnemyStatusEffect StatusEffect) {
+	if (HasAuthority()) {
+		CurrentStatusEffects = CurrentStatusEffects | StatusEffect;
+
+	}
+}
+
