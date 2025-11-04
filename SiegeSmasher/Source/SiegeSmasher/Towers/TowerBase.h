@@ -80,8 +80,7 @@ protected:
 	float MaxCoolDownAfterReset = 0.0f; 
 	UPROPERTY(Replicated);
 	float CoolDownAfterReset = 0.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerCost"); 
-	float TowerCost = 0.0f;
+	
 	UFUNCTION()
 	virtual void TowerTimeLineEnd();
 	virtual void TowerDormant(float& DeltaTime);
@@ -138,6 +137,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Stats")
 	float Health = 100.0f;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerMainStatusEffect")
+	EnemyStatusEffect TowerMainStatusEffect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerMainStatusEffect"); 
+	float MainStatusEffectDuration = 0.0f; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerMainStatusEffect", meta = (ClampMin = "0.1", ClampMax = "1.0"));
+	float MainStatusEffectIncreaseScalar = 0.0f;
 
 public:
 	// Called every frame

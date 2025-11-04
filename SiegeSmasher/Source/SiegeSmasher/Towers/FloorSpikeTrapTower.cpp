@@ -46,6 +46,24 @@ void AFloorSpikeTrapTower::Tick(float DeltaTime)
 
 }
 
+void AFloorSpikeTrapTower::ApplyBleedToEnemy(AEnemyBase* Enemy)
+{
+	Enemy->SetBleedBaseDamage(BleedBaseDamage);
+	if (Enemy->CheckHasStatusEffect(TowerMainStatusEffect)) {
+		
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Enemy aleady had status effect increasing duration")));
+
+		Enemy->IncreaseStatusEffectDuration(TowerMainStatusEffect,
+			MainStatusEffectDuration * MainStatusEffectIncreaseScalar);
+		
+		return;
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Enemy did not have status effect")));
+	Enemy->ApplyStatusEffect(TowerMainStatusEffect); 
+	Enemy->SetUpStatusEffectDuration(TowerMainStatusEffect, MainStatusEffectDuration);
+
+}
+
 
 void AFloorSpikeTrapTower::TowerSetUp() {
 
@@ -93,9 +111,7 @@ void AFloorSpikeTrapTower::TowerDormant(float& DeltaTime) {
 	
 
 	  if ( HasAuthority() && StartedReset && !TowerTimeLine->IsReversing() && (CoolDownAfterReset -= DeltaTime) <= 0.0f) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("TowerRest timer %f"), CoolDownAfterReset));
 
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower fully reset")));
 		CoolDownAfterReset = MaxCoolDownAfterReset;
 		Multicast_SetTriggerBoxCollision(ECollisionEnabled::QueryOnly);
 		StartedReset = false;
@@ -103,38 +119,20 @@ void AFloorSpikeTrapTower::TowerDormant(float& DeltaTime) {
 
 
 
-		}
+	  }
 	
 
 
 }
 void AFloorSpikeTrapTower::TowerActive(float& DeltaTime) {
 
-	/*if (HasAuthority()) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Server requires reset %d"), (int)RequiresReset));
-
-		}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("client requires reset %d"), (int)RequiresReset));
-
-	}*/
+	
 		if (HasAuthority() && !RequiresReset && !SpikesUp && !TowerTimeLine->IsReversing()) {
 			 
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower begin swing ")));
+			Multicast_PlayTowerTimeLine(UpwardPlayBackSpeed); 
 
-			/*	TowerTimeLine->SetPlayRate(UpwardPlayBackSpeed);
-				TowerTimeLine->PlayFromStart();*/			
-			Multicast_PlayTowerTimeLine(UpwardPlayBackSpeed);
+
 			SpikesUp = true;
-
-			
-			
-				
-		
-			/*TowerTimeLine->SetPlayRate(UpwardPlayBackSpeed);
-			TowerTimeLine->PlayFromStart();*/
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Tower play back rate %f"), TowerTimeLine->GetPlayRate()));
-
 
 		}
 	
@@ -152,20 +150,13 @@ void AFloorSpikeTrapTower::TowerReset()
 {
 	
 		if (HasAuthority()) {
-			//Multicast_SetTriggerBoxCollision(ECollisionEnabled::NoCollision);
-
-			/*	TowerTimeLine->SetPlayRate(DownWardPlayBackSpeed);
-				TowerTimeLine->ReverseFromEnd();*/
+			
 			Multicast_ReverseTowerTimeLine(DownWardPlayBackSpeed);
 			StartedReset = true;
 			CurrentyActive = false;
 			Multicast_SetTriggerBoxCollision(ECollisionEnabled::NoCollision);
 		}
 		
-
-
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower starting reset ")));
-
 
 }
 
@@ -177,6 +168,13 @@ void AFloorSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT(" Spike Trap Damaging enemy")));
 		Enemy->DamageEnemy(TowerDamage);
+		if (HasAuthority()) {
+			ApplyBleedToEnemy(Enemy);
+		}
+		
+
+
+
 
 	}
 }
