@@ -87,12 +87,13 @@ void AAICharTest::Tick(float DeltaTime)
 
 				if (MontageTimeStore >= 2.5f)
 				{
-					this->ResetEnemyOnDeath();
-					Sword->ResetSwordOnDeath();
+					DecrementWaveEnemyAliveCount();
 					CubeStore->SetActorHiddenInGame(false);
 					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
 					Count = StartTime;
-					bCanActorMove = true;
+					this->ResetEnemyOnDeath();
+					Sword->ResetSwordOnDeath();
+					bCanActorMove = false;
 				}
 			}
 		}
@@ -120,6 +121,8 @@ void AAICharTest::Tick(float DeltaTime)
 
 			Count += 1.0f * DeltaTime;
 		}
+
+		bCanActorMove = true;
 	}
 	
 	

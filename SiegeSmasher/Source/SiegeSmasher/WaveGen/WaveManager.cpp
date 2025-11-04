@@ -144,10 +144,10 @@ void AWaveManager::EnemySetUp()
 	// reset values associated with spawning enemies
 	CurrentAvailableEnemyIndex = 0;
 	TotalEnemiesSpawned = 0;
-
+	WaveEnemyCount = 0  ;
 	for (int i = 0; i < EnemiesToSpawn.Num(); i++) {
 		EnemyTypes EnemyType = EnemiesToSpawn[i]->GetEnemyWaveType();
-		if (EnemiesToSpawn[i]->GetStartingWave() <= WaveNumber) {
+		if ( !(EnemyAvailablePoolIndicies.Find(EnemiesToSpawn[i]->GetEnemyWaveType())) &&  EnemiesToSpawn[i]->GetStartingWave() <= WaveNumber) {
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 			//	FString::Printf(TEXT(" new enemy added to available enemies %d wave number was %d"), (int)EnemyType, WaveNumber));
@@ -160,11 +160,7 @@ void AWaveManager::EnemySetUp()
 			continue;
 		}
 
-	/*	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-			FString::Printf(TEXT(" enemy excluded from this wave, wave number was %d enemy types was %d enemy starting wave"), WaveNumber, (int)EnemyType, EnemiesToSpawn[i]->GetStartingWave()));*/
-		//GLog->Log(FString::Printf(TEXT(" enemy excluded from this wave, wave number was %d enemy types was %d enemy starting wave"), WaveNumber, (int)EnemyType, EnemiesToSpawn[i]->GetStartingWave()));
-
-
+	
 	}
 	//GLog->Log(FString::Printf(TEXT("number of available enemies %d"), (int)AvailableEnemies.Num()));
 
@@ -175,9 +171,9 @@ void AWaveManager::EnemySetUp()
 		WaveEnemyCount += NewEnemyWaveContrib;
 		EnemyAvailablePoolIndicies[EnemyType] = 0;
 		EnemyWaveContribution[EnemyType] = NewEnemyWaveContrib;
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-			FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));*/
-		//GLog->Log(FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+	//		FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));
+	//	GLog->Log(FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));
 	}
 
 	AliveEnemyCount = WaveEnemyCount;
@@ -221,7 +217,8 @@ void AWaveManager::EvaluateEnemySpawning()
 			//For multiplayer. This makes it so that only the server can spawn enemies in. This way we only have the right amount of enemies spawning.
 			if (HasAuthority())
 			{
-				PotentialEnemyInstance = CurrentSpawnPoint->SpawnEnemy(CurrentEnemyToSpawn);
+				PotentialEnemyInstance = CurrentSpawnPoint->SpawnEnemy(CurrentEnemyToSpawn); 
+				PotentialEnemyInstance->SetEnemyAliveCountref(&AliveEnemyCount);
 				EnemyPools[CurrentEnemyToSpawn->GetEnemyWaveType()].Add(PotentialEnemyInstance);
 			}
 			
@@ -249,18 +246,29 @@ void AWaveManager::EvaluateEnemySpawning()
 
 
 
+
 AEnemyBase* AWaveManager::GetExistingInstance(EnemyTypes EnemyType)
 {
 
-	int& availableIndex = EnemyAvailablePoolIndicies[EnemyType];
-	if (availableIndex != EnemyPools[EnemyType].Num() && !EnemyPools[EnemyType][availableIndex]->IsActorTickEnabled()) {
+	int availableIndex = EnemyAvailablePoolIndicies[EnemyType];
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("REUSING ENEMY INDEX %d "), availableIndex)); 
+	/*if (EnemyPools[EnemyType].Num() >0 && EnemyPools[EnemyType][EnemyAvailablePoolIndicies[EnemyType]] != nullptr) {
 
-		availableIndex++;
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("REUSING ENEMY INDEX WAS DISABLED  %d "), (int)EnemyPools[EnemyType][EnemyAvailablePoolIndicies[EnemyType]]->GetIsDisabled()));
+	}*/
+
+	if (availableIndex != EnemyPools[EnemyType].Num() && EnemyPools[EnemyType][availableIndex]->GetIsDisabled()) {
+
+		EnemyAvailablePoolIndicies[EnemyType] = (availableIndex + 1); 
+
+		int EnemyToUse = EnemyAvailablePoolIndicies[EnemyType] - 1;
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("ENEMY INDEX USED NEW INDEX %d "), (int)EnemyAvailablePoolIndicies[EnemyType]));
+
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 			FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));*/
 		//GLog->Log(FString::Printf(TEXT(" found existing available instance new available index is %d previous index %d"), EnemyAvailablePoolIndicies[EnemyType], EnemyAvailablePoolIndicies[EnemyType] - 1));
-
-		return CurrentSpawnPoint->SpawnAndResetExistingEnemyInstance(EnemyPools[EnemyType][availableIndex - 1]);
+		
+		return CurrentSpawnPoint->SpawnAndResetExistingEnemyInstance(EnemyPools[EnemyType][EnemyToUse]);
 
 	}
 	return nullptr;

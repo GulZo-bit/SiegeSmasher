@@ -3,12 +3,15 @@
 
 #include "EnemyBase.h"
 #include "AI/BoolAnimInstance.h"
+#include "../StatusEffects/BleedStatusEffect.h" 
 
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	StatusEffectTest = CreateDefaultSubobject<UStatusEffectBase>("StatusEffectTest");
+	BleedStatusEffect = CreateDefaultSubobject<UBleedStatusEffect>("BleedStatusEffect");
 }
 
 // Called when the game starts or when spawned
@@ -24,9 +27,10 @@ void AEnemyBase::BeginPlay()
 		GLog->Log("Found capsule for enemy base");
 	}
 	CurrentHealth = MaxHealth;
+	
+	InitialiseBleedStatusEffect();
 
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("CURRENT HEALTH BEGIN PLAY %f"), CurrentHealth));
 }
 
 int AEnemyBase::EnemyTest()
@@ -38,9 +42,10 @@ void AEnemyBase::DamageEnemy(float Damage)
 {
 	if (HasAuthority()) {
 		CurrentHealth -= Damage;
+		GEngine->AddOnScreenDebugMessage (-1,3.0f,FColor::Orange,FString::Printf(TEXT("Current Health for enemy: %f"), CurrentHealth));
+
 	}
 
-	GLog->Log(FString::Printf(TEXT("Current Health: %f"), CurrentHealth));
 }
 
 void AEnemyBase::SetHealth(float Health)
@@ -62,15 +67,20 @@ void AEnemyBase::ResetEnemyOnDeath()
 {
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
-	SetActorTickEnabled(false);
+	SetActorTickEnabled(false); 
+	Disabled = true;
 
-
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("enemy reset on death disabled %d"), (int)Disabled));
 }
 
 // Called every frame
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	/*GLog->Log(FString::Printf(TEXT("Current health for enemy %f"), CurrentHealth));
+	GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("Current health for enemy %f"),CurrentHealth));*/
+
 
 }
 
@@ -88,6 +98,11 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 }
 
+bool AEnemyBase::GetIsDisabled()
+{
+	return Disabled;
+}
+
 
 
 
@@ -95,7 +110,8 @@ void AEnemyBase::ResetOnSpawn()
 {
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
-	SetActorTickEnabled(true);
+	SetActorTickEnabled(true); 
+	Disabled = false;
 	CurrentHealth = MaxHealth;
 	UBoolAnimInstance* Temp = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
 	Temp->setIsDeadBool(false);
@@ -130,15 +146,17 @@ void AEnemyBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActo
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Overlap Begun with: %s"), *OtherActor->GetName());
 	}*/
-	if (HasAuthority()) {
+	
 		if (Cast<AMCArrow>(OtherActor))
 		{
 			AMCArrow* TempArrow = Cast<AMCArrow>(OtherActor);
 			//GLog->Log(FString::Printf(TEXT("Arrow Damage: %f"), TempArrow->getDamage()));
-			this->SetHealth(GetHealth() - TempArrow->getDamage());
+			if (HasAuthority()) {
+				this->SetHealth(GetHealth() - TempArrow->getDamage());
+			}
 			OtherActor->Destroy();
 		}
-	}
+	
 	
 }
 
@@ -151,17 +169,22 @@ void AEnemyBase::SetEnemyAliveCountref(int* WaveEnemyAliveCount)
 void AEnemyBase::DecrementWaveEnemyAliveCount()
 {
 
-	if (WaveEnemyAliveCountRef != nullptr) {
 
-		(*WaveEnemyAliveCountRef)--;
-		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Orange, FString::Printf(TEXT("Enemy alive count decremented by enemy new count %d"), (*WaveEnemyAliveCountRef)));
+	if (HasAuthority()) {
+		if (WaveEnemyAliveCountRef != nullptr) {
+
+			(*WaveEnemyAliveCountRef)--;
+			GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Orange, FString::Printf(TEXT("Enemy alive count decremented by enemy new count %d"), (*WaveEnemyAliveCountRef)));
+		}
+		else {
+			GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("WAVE ENEMY ALIVE COUNT ON ENEMY WAS NULL")));
+
+
+		}
 	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("WAVE ENEMY ALIVE COUNT ON ENEMY WAS NULL")));
-
-
-	}
+	
 }
+
 
 void AEnemyBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 
@@ -181,8 +204,50 @@ int32 AEnemyBase::CheckHasStatusEffect(EnemyStatusEffect StatusEffect)
 
 void AEnemyBase::ApplyStatusEffect(EnemyStatusEffect StatusEffect) {
 	if (HasAuthority()) {
+		AvailableStatusEffects[StatusEffect]->SetComponentTickEnabled(true);
 		CurrentStatusEffects = CurrentStatusEffects | StatusEffect;
 
 	}
 }
+
+void AEnemyBase::RemoveStatusEffect(EnemyStatusEffect StatusEffect)
+{
+	if (HasAuthority()) {
+
+		CurrentStatusEffects = AndNotBitwise(CurrentStatusEffects, StatusEffect);
+
+
+	}
+}
+
+
+
+
+
+void AEnemyBase::IncreaseStatusEffectDuration(EnemyStatusEffect Id, float Increment)
+{	
+		AvailableStatusEffects[Id]->IncreaseDuration(Increment);
+}
+
+void AEnemyBase::SetBleedBaseDamage(float BleedDamage)
+{	
+		BleedStatusEffect->SetBaseDamage(BleedDamage);
+
+}
+
+void AEnemyBase::SetUpStatusEffectDuration(EnemyStatusEffect Id, float MaxDuration)
+{
+	AvailableStatusEffects[Id]->SetCurrentDuration(MaxDuration);
+
+}
+
+
+void AEnemyBase::InitialiseBleedStatusEffect()
+{
+	AvailableStatusEffects.Add(EnemyStatusEffect::BLEED, BleedStatusEffect);
+	BleedStatusEffect->SetEnemyRef(this);
+
+}
+
+
 

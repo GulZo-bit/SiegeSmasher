@@ -41,10 +41,15 @@ protected:
 	bool SpikesUp = false;  
 	float CurrentDeltaTime = 0.0f; 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+	
 
 	FVector SpikesStartPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BleedDOTBaseDamage"); 
+	float BleedBaseDamage = 0.0f;
 public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override; 
+	void ApplyBleedToEnemy(AEnemyBase* Enemy);
 
 };

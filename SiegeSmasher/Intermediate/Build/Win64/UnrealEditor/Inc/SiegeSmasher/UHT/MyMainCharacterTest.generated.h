@@ -15,7 +15,7 @@ class AActor;
 #endif
 #define SIEGESMASHER_MyMainCharacterTest_generated_h
 
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_RPC_WRAPPERS_NO_PURE_DECLS \
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_RPC_WRAPPERS_NO_PURE_DECLS \
 	virtual void Multicast_SetPlayerId_Implementation(int32 Id); \
 	virtual void Server_SetPlayerId_Implementation(int32 Id); \
 	virtual void Multicast_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn); \
@@ -44,8 +44,8 @@ class AActor;
 	DECLARE_FUNCTION(execGetArrowDrawn);
 
 
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_CALLBACK_WRAPPERS
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_INCLASS_NO_PURE_DECLS \
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_CALLBACK_WRAPPERS
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesAMainCharacterTest(); \
 	friend struct Z_Construct_UClass_AMainCharacterTest_Statics; \
@@ -71,7 +71,7 @@ public: \
 	NO_API virtual void ValidateGeneratedRepEnums(const TArray<struct FRepRecord>& ClassReps) const override;
 
 
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_ENHANCED_CONSTRUCTORS \
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	AMainCharacterTest(AMainCharacterTest&&); \
@@ -83,14 +83,14 @@ public: \
 	NO_API virtual ~AMainCharacterTest();
 
 
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_23_PROLOG
-#define FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_GENERATED_BODY \
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_23_PROLOG
+#define FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_RPC_WRAPPERS_NO_PURE_DECLS \
-	FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_CALLBACK_WRAPPERS \
-	FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_INCLASS_NO_PURE_DECLS \
-	FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_ENHANCED_CONSTRUCTORS \
+	FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_CALLBACK_WRAPPERS \
+	FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_INCLASS_NO_PURE_DECLS \
+	FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h_26_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -98,7 +98,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> SIEGESMASHER_API UClass* StaticClass<class AMainCharacterTest>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_Unreal_Projects_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h
+#define CURRENT_FILE_ID FID_Github_SiegeSmasher_SiegeSmasher_Source_SiegeSmasher_MyMainCharacterTest_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

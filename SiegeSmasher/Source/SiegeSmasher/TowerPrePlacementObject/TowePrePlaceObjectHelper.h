@@ -26,7 +26,8 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementBox");
 	UBoxComponent* BoxColliderForObjectPlacement;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerCost");
+	int TowerCost = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementSize");
 	float PlacementSize = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AllowedPlacementDirectionsCanBeNegative"); 
@@ -41,13 +42,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerSurfaceAlignmentAxis");
 	FVector AlignmentAxis = FVector::ZeroVector;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlayerRotationEulerAxis"); 
+	FVector TowerPlayerRotationAxis; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlayerRotationIncrement");
+	float TowerPlayerRotationIncrement = 0.0f;
+
 public:	
 	// Called every frame
 	bool ResolvePlacement(FVector& SurfaceBoxExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir, FVector& CamPos, FTransform& surfaceTransform);
 	FVector GetPlacementColliderHalfExtents();
 	void DisableTick();
 	virtual void Tick(float DeltaTime) override;
-
+	int GetTowerCost();
 	bool GetCanPlaceTower();
 
 private: 

@@ -416,22 +416,11 @@ void ATowerBase::Tick(float DeltaTime)
 	 
 
 		TowerActive(DeltaTime); 
-		/*if (HasAuthority()) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Server wait time to reset %f"), WaitTimeToReset));
-		}
-		else {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("client wait time to reset %f"), WaitTimeToReset));
-
-		}*/
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("waitimeToReset is %f requires reset is %d"), WaitTimeToReset,(int)RequiresReset));
-		if (HasAuthority()) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("wait time to reset %f"), WaitTimeToReset));
-
-		}
+		
 		
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("wait time to reset %f"), WaitTimeToReset));
 		if (HasAuthority() && RequiresReset && (WaitTimeToReset -= DeltaTime) <= 0.0f) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("reset called  wait time to reset %f"), WaitTimeToReset));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("reset called  wait time to reset %f"), WaitTimeToReset));
 
 			RequiresReset = false;
 			WaitTimeToReset = MaxWaitTimeToReset;

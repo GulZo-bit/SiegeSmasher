@@ -826,7 +826,11 @@ void AMainCharacterTest::SpawnSelected()
 {
 
 	if (HasAuthority() && IsLocallyControlled()) {
-		if (TogglePlacingTowers && IsPlacingTower && Selected->GetCanPlaceTower()) {
+		if (TogglePlacingTowers 
+			&& IsPlacingTower 
+			&& Selected->GetCanPlaceTower() 
+			&& PlayerPoints >= Selected->GetTowerCost()) 
+		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("local host Placing tower")));
 			ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
 			if (TowerRef) {
@@ -912,7 +916,10 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,b
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower selected get can place tower %d"), (int)IsPlacingTower));
 	
-	if (ToggleTower && IsPlacingTower && Selected->GetCanPlaceTower()) {
+	if (ToggleTower && IsPlacingTower && 
+		Selected->GetCanPlaceTower() && 
+		PlayerPoints >= Selected->GetTowerCost()) 
+	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower")));
 		ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
 	}
@@ -924,7 +931,6 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,b
 void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex, bool ToggleTower)
 {
 	 
-
 	if (Selected != nullptr) {
 		HideSelected();
 	}
@@ -933,14 +939,7 @@ void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex,
 	if (ToggleTower) {
 		DisplaySelected();
 	}
-
-    
-
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("updating selected index on client %d "),SelectedTowerIndex));
-
-
-	
-
 
 }
 
@@ -970,6 +969,22 @@ void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
 
 
 }
+void AMainCharacterTest::IncrementPlayerScore(int Increment)
+{
+	if (HasAuthority()) {
+		PlayerPoints += Increment;
+	}
 
+
+}
+
+void AMainCharacterTest::IncrementPlayerKills(int Increment)
+{
+
+	if (HasAuthority()) {
+		PlayerKills += Increment;
+	}
+
+}
 
 

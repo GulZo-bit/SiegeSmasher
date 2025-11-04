@@ -155,7 +155,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Placement distances");
 	FVector PlayerPlacementDistances;
-
+	
+	UPROPERTY(Replicated);
+	int PlayerKills = 0;
+	UPROPERTY(Replicated);
+	int PlayerPoints = 0;
 
 
 	//getters and seeters for the bools for the animation blueprint
@@ -303,7 +307,8 @@ public:
 		void DisplaySelected();
 		void HideSelected();
 		void ClientSwitchTower(); 
-
+		void IncrementPlayerScore(int Increment);
+		void IncrementPlayerKills(int Increment);
 		void HandleTowerPlacement();
 		void InitialiseTowers(); 
 
