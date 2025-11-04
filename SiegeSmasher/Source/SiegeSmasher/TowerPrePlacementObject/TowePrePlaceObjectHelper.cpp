@@ -38,6 +38,11 @@ void ATowePrePlaceObjectHelper::Tick(float DeltaTime)
 
 }
 
+int ATowePrePlaceObjectHelper::GetTowerCost()
+{
+	return TowerCost;
+}
+
 bool ATowePrePlaceObjectHelper::GetCanPlaceTower()
 {
 	TArray<UPrimitiveComponent*> OverlappedTowers = {};
@@ -53,13 +58,8 @@ FVector ATowePrePlaceObjectHelper::GetPlacementColliderHalfExtents()
 }
 
 
-
-
-
 bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir, FVector& CamPos, FTransform& surfaceTransform)
 {
-
-
 
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorUpVector() * FVector(700.0f, 700.0f, 700.0f), FColor::Green);
 	FVector ActorRight = GetActorRightVector();
@@ -200,7 +200,8 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 	FVector pitchCross = TransformedNormal.Cross(FVector::UpVector) * axisOfRotation.GetAbs();
 	float anglePitchCross = pitchCross.X + pitchCross.Y + pitchCross.Z;
 
-
+	FVector VPlayerRot = FVector::OneVector * TowerPlayerRotationAxis * TowerPlayerRotationIncrement;
+	FRotator PlayerRot = FRotator(VPlayerRot.Y, VPlayerRot.Z, VPlayerRot.X);
 	if (AlignmentVector != FVector::ZeroVector && AlignmentAngle != 0.0f) {
 
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Alignment angle not equal to zero "), AlignmentAngle)); 
@@ -214,7 +215,9 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("pitch angle for alignmen :%f"), PitchAngleForAlingment));
 
 		FQuat PicthRotationForAlignment = FQuat(AlignmentAxisCros, abs(PitchAngleForAlingment));
-		SetActorRotation(AligmentRotation.Rotator() + PicthRotationForAlignment.Rotator());
+		
+
+		SetActorRotation(AligmentRotation.Rotator() + PicthRotationForAlignment.Rotator() + PlayerRot );
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Is correct surface %d"), (int)IsCorrectSurfaceDir));
 			
@@ -252,10 +255,8 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 
 	if (CheckOppositeRotation && CeilingCheck) {
 		CollisionResNormal = trueAxisOfRotation;
-
 		trueAxisOfRotation = currentAxisUp;
 		currentAxisUp = FVector::UpVector;
-
 
 	}
 
@@ -291,7 +292,8 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("final rot  %f %f %f"), finalRot.X, finalRot.Y, finalRot.Z));
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + TransformedNormal * FVector(700.0f, 700.0f, 700.0f), FColor::Blue);
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + AlignedAlignmentVector * FVector(700.0f, 700.0f, 700.0f), FColor::Green);
-	SetActorRotation(RotatorPitch + YawRot.Rotator());
+
+	SetActorRotation(RotatorPitch + YawRot.Rotator() + PlayerRot );
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Is correct surface %d"), (int)IsCorrectSurfaceDir));
 	return true;
 } 

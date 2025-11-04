@@ -11,6 +11,7 @@
  #define MAX_ENEMY_NUM 150
 #endif // !MAX_ENEMY_NUM
 
+
 UENUM(BlueprintType)
 enum class EnemyTypes : uint8
 {
@@ -27,22 +28,29 @@ enum class EnemyTypes : uint8
 UENUM()
 enum class EnemyStatusEffect : int32
 {
-	PHYSCIALDOT = 1,
+	NONE = 0 UMETA(DisplayName = "NONE"),
+	BLEED = 1 UMETA(DisplayName = "BLEED"),
 	
 
 };
 
-static inline  EnemyStatusEffect operator |  (EnemyStatusEffect  other, EnemyStatusEffect other1) {
+static inline  EnemyStatusEffect operator |  (EnemyStatusEffect  Lhs, EnemyStatusEffect Rhs) {
 
-	return static_cast<EnemyStatusEffect>(static_cast<int32>(other) | static_cast<int32>(other1));
-
-}
-static inline  int32 operator &  (EnemyStatusEffect  other, EnemyStatusEffect other1) {
-
-	return (static_cast<int32>(other) & static_cast<int32>(other1));
+	return static_cast<EnemyStatusEffect>(static_cast<int32>(Lhs) | static_cast<int32>(Rhs));
 
 }
+static inline  int32 operator &  (EnemyStatusEffect  Lhs, EnemyStatusEffect Rhs) {
 
+	return (static_cast<int32>(Lhs) & static_cast<int32>(Rhs));
+
+}
+static inline  EnemyStatusEffect AndNotBitwise (EnemyStatusEffect  Lhs, EnemyStatusEffect Rhs) {
+
+	return StaticCast<EnemyStatusEffect>((int)Lhs & (~(int)Rhs));
+}
+
+class UStatusEffectBase;
+class UBleedStatusEffect;
 UCLASS()
 class SIEGESMASHER_API AEnemyBase : public ACharacter
 {
@@ -63,7 +71,14 @@ protected:
 	float WavePolynomialConstantOne = 0.7f;
 	float WavePolynomialConstantTwo = 0.2f;
 	int CurrentWaveContribution = 0;
-	
+	UPROPERTY(); 
+	UStatusEffectBase* StatusEffectTest;
+
+	UPROPERTY();
+	UBleedStatusEffect* BleedStatusEffect;
+
+	TMap<EnemyStatusEffect, UStatusEffectBase*> AvailableStatusEffects;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyVariables")
 	EnemyTypes EnemyType = EnemyTypes::BASE;
 	UPROPERTY(Replicated)
@@ -76,13 +91,16 @@ protected:
 	float MaxHealth = 100.0f;
 
 	int StartingWave = 0; // wave 0 = 1(starts counting from 0) 
-	int32 CheckHasStatusEffect(EnemyStatusEffect StatusEffect); 
-	void ApplyStatusEffect(EnemyStatusEffect  StatusEffect);
-
+	
 	
 
 public:
-
+	int32 CheckHasStatusEffect(EnemyStatusEffect StatusEffect);
+	void ApplyStatusEffect(EnemyStatusEffect  StatusEffect); 
+	void RemoveStatusEffect(EnemyStatusEffect StatusEffect);
+	void IncreaseStatusEffectDuration(EnemyStatusEffect Id,float Increment);
+	void SetBleedBaseDamage(float BleedDamage);
+	void SetUpStatusEffectDuration(EnemyStatusEffect Id, float MaxDuration);
 	virtual void Tick(float DeltaTime) override;
 	virtual int CalculateWaveContribution(float FractionalWaveNumber);
 	// Called to bind functionality to input
@@ -100,7 +118,10 @@ public:
 	void AddToHealth(float Increase);
 	void ResetEnemyOnDeath();
 	EnemyTypes GetEnemyWaveType();
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PointIncrementOnHit"); 
+	int PointIncrementOnHit = 0; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PointIncrementOnKill"); 
+	int PointIncrementOnKill = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "default")
 	UCapsuleComponent* CapsuleStore;
 
@@ -110,11 +131,11 @@ public:
 	EnemyStatusEffect CurrentStatusEffects;
 
 private:
-		int* WaveEnemyAliveCountRef;
+	int* WaveEnemyAliveCountRef;
 
-		void SetEnemyAliveCountref(int* WaveEnemyAliveCount); 
-		void DecrementWaveEnemyAliveCount();
-
+	void SetEnemyAliveCountref(int* WaveEnemyAliveCount); 
+	void DecrementWaveEnemyAliveCount();
+	void InitialiseBleedStatusEffect();
 	
 
 
