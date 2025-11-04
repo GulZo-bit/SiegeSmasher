@@ -92,7 +92,8 @@ protected:
 
 	int StartingWave = 0; // wave 0 = 1(starts counting from 0) 
 	
-	
+	void DecrementWaveEnemyAliveCount();
+	bool Disabled = false;
 
 public:
 	int32 CheckHasStatusEffect(EnemyStatusEffect StatusEffect);
@@ -104,7 +105,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual int CalculateWaveContribution(float FractionalWaveNumber);
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override; 
+
+	bool GetIsDisabled();
 	// method used for objects pooling can be overidden by defining it in a child class 
 	// but i suggest calling the AEnemyBase class method 
 	// by doing AEnemyBase::ResetOnSpawn() inside your overidden method
@@ -129,12 +132,13 @@ public:
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UPROPERTY(Replicated);
 	EnemyStatusEffect CurrentStatusEffects;
+	void SetEnemyAliveCountref(int* WaveEnemyAliveCount);
 
 private:
 	int* WaveEnemyAliveCountRef;
 
-	void SetEnemyAliveCountref(int* WaveEnemyAliveCount); 
-	void DecrementWaveEnemyAliveCount();
+	
+	
 	void InitialiseBleedStatusEffect();
 	
 

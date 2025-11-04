@@ -51,7 +51,7 @@ void UStatusEffectBase::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 void UStatusEffectBase::IncreaseDuration(float Increment)
 {
 	CurrentDuration += Increment;
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, FString::Printf(TEXT("Status effect duration increased to %f by %f"), CurrentDuration, Increment));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, FString::Printf(TEXT("Status effect duration increased to %f by %f"), CurrentDuration, Increment));
 
 }
 

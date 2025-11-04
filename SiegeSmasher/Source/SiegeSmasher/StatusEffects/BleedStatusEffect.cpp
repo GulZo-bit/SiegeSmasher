@@ -23,7 +23,7 @@ UBleedStatusEffect::UBleedStatusEffect()
 void UBleedStatusEffect::BeginPlay()
 {
 	Super::BeginPlay();
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("BLEED STATUS EFFECT BEGIN PLAY")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("BLEED STATUS EFFECT BEGIN PLAY")));
 	// ...
 	
 }

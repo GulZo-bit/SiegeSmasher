@@ -31,7 +31,6 @@ void AEnemyBase::BeginPlay()
 	InitialiseBleedStatusEffect();
 
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("CURRENT HEALTH BEGIN PLAY %f"), CurrentHealth));
 }
 
 int AEnemyBase::EnemyTest()
@@ -68,9 +67,10 @@ void AEnemyBase::ResetEnemyOnDeath()
 {
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
-	SetActorTickEnabled(false);
+	SetActorTickEnabled(false); 
+	Disabled = true;
 
-
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("enemy reset on death disabled %d"), (int)Disabled));
 }
 
 // Called every frame
@@ -98,6 +98,11 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 }
 
+bool AEnemyBase::GetIsDisabled()
+{
+	return Disabled;
+}
+
 
 
 
@@ -105,7 +110,8 @@ void AEnemyBase::ResetOnSpawn()
 {
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
-	SetActorTickEnabled(true);
+	SetActorTickEnabled(true); 
+	Disabled = false;
 	CurrentHealth = MaxHealth;
 	UBoolAnimInstance* Temp = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
 	Temp->setIsDeadBool(false);
@@ -163,16 +169,20 @@ void AEnemyBase::SetEnemyAliveCountref(int* WaveEnemyAliveCount)
 void AEnemyBase::DecrementWaveEnemyAliveCount()
 {
 
-	if (WaveEnemyAliveCountRef != nullptr) {
 
-		(*WaveEnemyAliveCountRef)--;
-		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Orange, FString::Printf(TEXT("Enemy alive count decremented by enemy new count %d"), (*WaveEnemyAliveCountRef)));
+	if (HasAuthority()) {
+		if (WaveEnemyAliveCountRef != nullptr) {
+
+			(*WaveEnemyAliveCountRef)--;
+			GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Orange, FString::Printf(TEXT("Enemy alive count decremented by enemy new count %d"), (*WaveEnemyAliveCountRef)));
+		}
+		else {
+			GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("WAVE ENEMY ALIVE COUNT ON ENEMY WAS NULL")));
+
+
+		}
 	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("WAVE ENEMY ALIVE COUNT ON ENEMY WAS NULL")));
-
-
-	}
+	
 }
 
 
