@@ -121,7 +121,6 @@ void AAICharTest::Tick(float DeltaTime)
 
 			Count += 1.0f * DeltaTime;
 		}
-
 		bCanActorMove = true;
 	}
 	
