@@ -10,6 +10,8 @@
 #include "Net/UnrealNetwork.h"
 #include "MCArrow.generated.h"
 
+class AMainCharacterTest;
+
 UCLASS()
 class SIEGESMASHER_API AMCArrow : public AActor
 {
@@ -22,11 +24,12 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	AMainCharacterTest* PlayerRef;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
@@ -48,8 +51,16 @@ public:
 	//function that initialises the arrow in the shoot direction
 	void FireInDirection(const FVector& ShootDirection, float Charge);
 	
+	void IncrementPlayerPointsRef(int ScoreIncrement);
+	void IncrementPlayerKillsRef();
+
+	void SetPlayerRef(AMainCharacterTest* PlayerPtr);
+
+	
 
 	float ArrowDamage = 20.0f;
 
-	float getDamage();
+	float getDamage(); 
+
+
 };

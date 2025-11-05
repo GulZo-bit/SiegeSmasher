@@ -8,6 +8,8 @@
 #include "StatusEffectBase.generated.h"
 
 
+
+class AMainCharacterTest;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SIEGESMASHER_API UStatusEffectBase : public UActorComponent
 {
@@ -24,15 +26,17 @@ protected:
 	float CurrentDuration = 0.0f; 
 	AEnemyBase* EnemyRef = nullptr;
 	EnemyStatusEffect StatusEffectId;
-	float CurrentDeltaTime = 0.0f;
+	float CurrentDeltaTime = 0.0f; 
+    AMainCharacterTest* PlayerRef= nullptr;
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void IncreaseDuration(float Increment);
 	void SetCurrentDuration(float Duration); 
-	void SetEnemyRef(AEnemyBase* Enemy);
+	void SetEnemyRef(AEnemyBase* Enemy); 
+	void SetPlayerRef(AMainCharacterTest* PlayerScorePtr);
 	 
-
+	void IncrementAssignedPlayerScore(int Increment);
 
 		
 };

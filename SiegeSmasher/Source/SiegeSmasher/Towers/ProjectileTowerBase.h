@@ -52,9 +52,11 @@ protected:
 
 	TMap<AActor*, FVector> DirectionsToRegainLos;
 	TArray<AActor*> EnemiesToTrackForLOS;
-	AActor* EnemySingleTarget = nullptr;
+	UPROPERTY(Replicated);
+	AEnemyBase* EnemySingleTarget = nullptr;
 	TMap<AActor*, int> IndicesForEnemiesInRange; 
-	TSet<FVector> DirectionsLOSWasLostAt;
+	TSet<FVector> DirectionsLOSWasLostAt; 
+	UPROPERTY(Replicated);
 	bool CurrentEnemyOutOfRange = true;  
 	FBox TriggerBoxAABB;
 	float HalfTriggerBoxDimLength = 0.0f; 
@@ -68,12 +70,16 @@ protected:
 	void ShootProjectile(FVector Position, FRotator Rotation); 
 	virtual bool HasLineOfSite(FVector To);  
 	void TrackEnemies(FVector Location);
+	UPROPERTY(Replicated);
 	bool NoTargetsInRange = true; 
 	TArray<AEnemyBase*> CurrentEnemiesInRange;
 	bool CanLoseLOS = false;
 	int MaxEnemiesInRangeIndex = 0;
 	virtual void SortedClosestEnemiesInRange();
 	// Called every frame
-	virtual void Tick(float DeltaTime) override; 
+	virtual void Tick(float DeltaTime) override;   
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+
 
 };

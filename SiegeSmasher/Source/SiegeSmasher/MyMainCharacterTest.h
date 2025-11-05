@@ -124,6 +124,9 @@ public:
 
 	void SetPlayerId(int Id);
 
+	void IncrementPlayerScore(int Increment);
+	void DecrementPlayerScore(int Increment);
+	void IncrementPlayerKills();
 	//input for triggering the shooting action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* ShootAction;
@@ -156,10 +159,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Placement distances");
 	FVector PlayerPlacementDistances;
 	
-	UPROPERTY(Replicated);
-	int PlayerKills = 0;
-	UPROPERTY(Replicated);
-	int PlayerPoints = 0;
+	
 
 
 	//getters and seeters for the bools for the animation blueprint
@@ -282,9 +282,16 @@ public:
 	void CallCreateLobby();
 
 	UFUNCTION(BlueprintCallable)
-	void CallClientTravel(const FString& Address);
-
-	private:
+	void CallClientTravel(const FString& Address); 
+protected:
+	UFUNCTION()
+	void UpdatePointsUi();
+	UPROPERTY(Replicated)
+    int PlayerKills = 0;
+	UPROPERTY(ReplicatedUsing = UpdatePointsUi);
+	int PlayerPoints = 0; 
+	
+private:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 
 		
@@ -307,12 +314,9 @@ public:
 		void DisplaySelected();
 		void HideSelected();
 		void ClientSwitchTower(); 
-		void IncrementPlayerScore(int Increment);
-		void IncrementPlayerKills(int Increment);
+		
 		void HandleTowerPlacement();
 		void InitialiseTowers(); 
-
-
 
 		void ClientTowerPlacment();
 };

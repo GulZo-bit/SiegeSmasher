@@ -8,6 +8,8 @@
 #include "Net/UnrealNetwork.h"
 #include "TowerProjectileBase.generated.h"
 
+class AMainCharacterTest;
+
 UCLASS()
 class SIEGESMASHER_API ATowerProjectileBase : public AActor
 {
@@ -51,7 +53,10 @@ public:
 	virtual void MoveToTarget(float DeltaTime); 
 	void SetInitialPitch(float Pitch); 
 	
+	void SetPlayerRef(AMainCharacterTest* PlayerPtr);
+	void IncrementPlayerScore(int Increment);
 private:
 	FVector TargetPosition = FVector::ZeroVector;
-	UWorld* World = nullptr;
+	UWorld* World = nullptr; 
+	AMainCharacterTest* PlayerRef;
 };

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "MCArrow.h"
 #include "Components/CapsuleComponent.h"
 #include "EnemyBase.generated.h"
 #ifndef MAX_ENEMY_NUM
@@ -50,7 +49,8 @@ static inline  EnemyStatusEffect AndNotBitwise (EnemyStatusEffect  Lhs, EnemySta
 }
 
 class UStatusEffectBase;
-class UBleedStatusEffect;
+class UBleedStatusEffect; 
+class AMainCharacterTest;
 UCLASS()
 class SIEGESMASHER_API AEnemyBase : public ACharacter
 {
@@ -96,12 +96,12 @@ protected:
 	bool Disabled = false;
 
 public:
-	int32 CheckHasStatusEffect(EnemyStatusEffect StatusEffect);
-	void ApplyStatusEffect(EnemyStatusEffect  StatusEffect); 
-	void RemoveStatusEffect(EnemyStatusEffect StatusEffect);
-	void IncreaseStatusEffectDuration(EnemyStatusEffect Id,float Increment);
+	int32 CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect);
+	void ApplyTowerStatusEffect(EnemyStatusEffect  StatusEffect); 
+	void RemoveTowerStatusEffect(EnemyStatusEffect StatusEffect);
+	void IncreaseTowerStatusEffectDuration(EnemyStatusEffect Id,float Increment,AMainCharacterTest* EffectPlayerRef);
 	void SetBleedBaseDamage(float BleedDamage);
-	void SetUpStatusEffectDuration(EnemyStatusEffect Id, float MaxDuration);
+	void SetUpTowerStatusEffectDuration(EnemyStatusEffect Id, float MaxDuration,AMainCharacterTest* EffectPlayerRef);
 	virtual void Tick(float DeltaTime) override;
 	virtual int CalculateWaveContribution(float FractionalWaveNumber);
 	// Called to bind functionality to input
@@ -122,9 +122,9 @@ public:
 	void ResetEnemyOnDeath();
 	EnemyTypes GetEnemyWaveType();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PointIncrementOnHit"); 
-	int PointIncrementOnHit = 0; 
+	int ScoreIncrementOnHit = 0; 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PointIncrementOnKill"); 
-	int PointIncrementOnKill = 0;
+	int ScoreIncrementOnKill = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "default")
 	UCapsuleComponent* CapsuleStore;
 
@@ -132,7 +132,11 @@ public:
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UPROPERTY(Replicated);
 	EnemyStatusEffect CurrentStatusEffects;
-	void SetEnemyAliveCountref(int* WaveEnemyAliveCount);
+	void SetEnemyAliveCountref(int* WaveEnemyAliveCount); 
+
+
+	int GetScoreIncOnKill(); 
+	int GetScoreIncOnHit();
 
 private:
 	int* WaveEnemyAliveCountRef;

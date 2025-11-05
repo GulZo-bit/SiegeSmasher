@@ -2,7 +2,7 @@
 
 
 #include "MCArrow.h"
-
+#include "../MyMainCharacterTest.h"
 // Sets default values
 AMCArrow::AMCArrow()
 {
@@ -14,7 +14,8 @@ AMCArrow::AMCArrow()
 	//creates the default scene root component if it doesn't exist already
 	if (!RootComponent)
 	{
-		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSceneComponent"));
+		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSceneComponent")); 
+		PlayerRef = nullptr;
 	}
 
 	if (!ArrowCollision)
@@ -67,6 +68,7 @@ AMCArrow::AMCArrow()
 		ArrowMesh->SetRelativeScale3D(FVector(3.0f, 2.0f, 2.0f));
 		ArrowMesh->SetRelativeRotation(FQuat(FVector(0.0f, 0.0f, 1.0f), FMath::DegreesToRadians(90.0f)));
 	}
+
 }
 
 // Called when the game starts or when spawned
@@ -96,6 +98,35 @@ void AMCArrow::FireInDirection(const FVector& ShootDirection, float Charge)
 	//UE_LOG(LogTemp, Warning, TEXT("ArrowSpeed: %f"), ArrowSpeed);
 	//UE_LOG(LogTemp, Warning, TEXT("Arrow Function FireInDirection called"));
 	ArrowMovement->Velocity = ShootDirection * ArrowSpeed;
+}
+
+
+
+void AMCArrow::IncrementPlayerPointsRef(int ScoreIncrement)
+{
+	if (PlayerRef != nullptr) {
+
+		PlayerRef->IncrementPlayerScore(ScoreIncrement);
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ARROW WAS NULL WHEN INCREASING POINTS")));
+	}
+}
+void AMCArrow::IncrementPlayerKillsRef()
+{
+	if (PlayerRef != nullptr) {
+
+		PlayerRef->IncrementPlayerKills();
+
+
+	}
+
+}
+
+void AMCArrow::SetPlayerRef(AMainCharacterTest* PlayerPtr)
+{
+	PlayerRef = PlayerPtr;
+
 }
 
 float AMCArrow::getDamage()

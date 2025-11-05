@@ -49,18 +49,18 @@ void AFloorSpikeTrapTower::Tick(float DeltaTime)
 void AFloorSpikeTrapTower::ApplyBleedToEnemy(AEnemyBase* Enemy)
 {
 	Enemy->SetBleedBaseDamage(BleedBaseDamage);
-	if (Enemy->CheckHasStatusEffect(TowerMainStatusEffect)) {
+	if (Enemy->CheckHasTowerStatusEffect(TowerMainStatusEffect)) {
 		
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Enemy aleady had status effect increasing duration")));
 
-		Enemy->IncreaseStatusEffectDuration(TowerMainStatusEffect,
-			MainStatusEffectDuration * MainStatusEffectIncreaseScalar);
+		Enemy->IncreaseTowerStatusEffectDuration(TowerMainStatusEffect,
+			MainStatusEffectDuration * MainStatusEffectIncreaseScalar,PlayerRef);
 		
 		return;
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Enemy did not have status effect")));
-	Enemy->ApplyStatusEffect(TowerMainStatusEffect); 
-	Enemy->SetUpStatusEffectDuration(TowerMainStatusEffect, MainStatusEffectDuration);
+	Enemy->ApplyTowerStatusEffect(TowerMainStatusEffect); 
+	Enemy->SetUpTowerStatusEffectDuration(TowerMainStatusEffect, MainStatusEffectDuration,PlayerRef);
 
 }
 
@@ -168,7 +168,9 @@ void AFloorSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT(" Spike Trap Damaging enemy")));
 		Enemy->DamageEnemy(TowerDamage);
+		
 		if (HasAuthority()) {
+			IncrementAssignedPlayersScore(Enemy->GetScoreIncOnHit() * (Enemy->GetHealth() > 0.0f));
 			ApplyBleedToEnemy(Enemy);
 		}
 		

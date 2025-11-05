@@ -112,8 +112,9 @@ void AMainCharacterTest::Tick(float DeltaTime)
 	ChargeShot(DeltaTime);
 	//if Charge widget is not empty, update the charge amount in the widget
 	if (ChargeWidget != nullptr) 
-	{
-		ChargeWidget->SetChargeAmount(CurrentCharge);
+	{ 
+		ChargeWidget->SetChargeAmount(CurrentCharge); 
+
 	}
 	TowerPlacementHandle();
 
@@ -232,9 +233,12 @@ void AMainCharacterTest::Shoot()
 				SpawnParams.Instigator = GetInstigator();
 				//creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
 				AMCArrow* Arrow = World->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
+				
+				
 				//if arrow has been succesfully created
 				if (Arrow)
 				{
+					Arrow->SetPlayerRef(this);
 					//changes the Bow rotation to be changed into a vector so that it shows a direction
 					FVector LaunchDirection = BowRotation.Vector();
 					//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
@@ -265,7 +269,10 @@ void AMainCharacterTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	//DOREPLIFETIME(AMainCharacterTest, CurrentCharge);
 	DOREPLIFETIME(AMainCharacterTest, isCharging);
 	DOREPLIFETIME(AMainCharacterTest, ArrowClass);
-	DOREPLIFETIME(AMainCharacterTest, ChargeFinal); 
+	DOREPLIFETIME(AMainCharacterTest, ChargeFinal);  
+
+	DOREPLIFETIME(AMainCharacterTest, PlayerPoints); 
+	DOREPLIFETIME(AMainCharacterTest, PlayerKills);
 	
 }
 
@@ -305,6 +312,8 @@ void AMainCharacterTest::Server_SpawnProjectile_Implementation(FRotator CamRotat
 	//if arrow has been succesfully created
 	if (Arrow)
 	{
+
+		Arrow->SetPlayerRef(this);
 		//changes the Bow rotation to be changed into a vector so that it shows a direction
 		FVector LaunchDirection = BowRot.Vector();
 		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
@@ -347,6 +356,8 @@ void AMainCharacterTest::Multi_SpawnProjectile_Implementation(FRotator CamRotati
 	//if arrow has been succesfully created
 	if (Arrow)
 	{
+		Arrow->SetPlayerRef(this);
+
 		//changes the Bow rotation to be changed into a vector so that it shows a direction
 		FVector LaunchDirection = BowRot.Vector();
 		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
@@ -685,6 +696,17 @@ void AMainCharacterTest::CallClientTravel(const FString& Address)
 	}
 }
 
+
+
+void AMainCharacterTest::UpdatePointsUi()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Update charge ui called")));
+	if (ChargeWidget != nullptr) {
+		ChargeWidget->SetPoints(PlayerPoints);
+	}
+	
+}
+
 void AMainCharacterTest::setHealth(float HealthStore)
 {
 	Health = HealthStore;
@@ -835,7 +857,11 @@ void AMainCharacterTest::SpawnSelected()
 			ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
 			if (TowerRef) {
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Local Host Set Owner")));
-				TowerRef->SetOwner(Controller);
+				TowerRef->SetOwner(Controller); 
+				TowerRef->SetPlayerRef(this);
+				DecrementPlayerScore(Selected->GetTowerCost());
+				//TowerRef->SetPlayerRef(this);
+
 			}
 		}
 	}
@@ -918,10 +944,15 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,b
 	
 	if (ToggleTower && IsPlacingTower && 
 		Selected->GetCanPlaceTower() && 
-		PlayerPoints >= Selected->GetTowerCost()) 
+		PlayerPoints >= Selected->GetTowerCost() ) 
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower")));
 		ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
+		if (TowerRef) {
+			TowerRef->SetPlayerRef(this);
+			DecrementPlayerScore(Selected->GetTowerCost());
+
+		}
 	}
 	
 }
@@ -971,18 +1002,51 @@ void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
 }
 void AMainCharacterTest::IncrementPlayerScore(int Increment)
 {
-	if (HasAuthority()) {
-		PlayerPoints += Increment;
+	
+	if (HasAuthority()) { 
+
+
+		PlayerPoints += Increment;  
+		if (IsLocallyControlled()) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score server %d "), PlayerPoints));
+
+			UpdatePointsUi();
+		}
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score %d "), PlayerPoints));
 	}
 
 
 }
 
-void AMainCharacterTest::IncrementPlayerKills(int Increment)
+
+
+void AMainCharacterTest::DecrementPlayerScore(int Increment)
 {
 
 	if (HasAuthority()) {
-		PlayerKills += Increment;
+
+
+		PlayerPoints -= Increment;
+		if (IsLocallyControlled()) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score server %d "), PlayerPoints));
+
+			UpdatePointsUi();
+		}
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score %d "), PlayerPoints));
+	}
+
+
+}
+
+
+void AMainCharacterTest::IncrementPlayerKills()
+{
+
+	
+	if (HasAuthority()) {
+		PlayerKills++; 
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incrementing Player kills %d"), PlayerKills));
 	}
 
 }
