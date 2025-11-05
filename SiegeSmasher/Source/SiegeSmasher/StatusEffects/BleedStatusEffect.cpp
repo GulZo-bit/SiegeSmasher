@@ -2,7 +2,6 @@
 
 
 #include "BleedStatusEffect.h"
-
 // Sets default values for this component's properties
 UBleedStatusEffect::UBleedStatusEffect()
 {
@@ -34,7 +33,20 @@ void UBleedStatusEffect::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+
+	if (EnemyRef->GetHealth() <= 0.0f) {
+
+
+		EnemyRef->RemoveTowerStatusEffect(StatusEffectId);
+		IncrementAssignedPlayerScore(EnemyRef->GetScoreIncOnKill());
+		SetComponentTickEnabled(false);
+		return;
+
+
+	}
 	EnemyRef->DamageEnemy((BaseDamage * DeltaTime) );
+
+	
 
 
 }

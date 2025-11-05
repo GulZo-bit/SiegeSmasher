@@ -146,7 +146,16 @@ void AWallSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
 
 		  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Wall Spike Trap Damaging enemy")));
 		  Enemy->DamageEnemy(TowerDamage);
+		  if (HasAuthority()) {
 
+			  
+			  IncrementAssignedPlayersScore(Enemy->GetScoreIncOnHit() * (int)(Enemy->GetHealth() > 0.0f));
+                
+			  IncrementAssignedPlayersScore(Enemy->GetScoreIncOnKill() * (int)(Enemy->GetHealth() <= 0.0f)); 
+
+			  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Incremeting score wall spike trap score ")));
+
+		  }
 	}
 }
 

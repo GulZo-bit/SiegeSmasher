@@ -30,7 +30,7 @@
 
 
 
-
+class AMainCharacterTest;
 UCLASS()
 class SIEGESMASHER_API ATowerBase : public AActor, public IGenericTeamAgentInterface
 {
@@ -45,11 +45,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
   	bool ResolvePlacement(FVector& SurfaceHalfExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos, FTransform& surfaceTransform);
 
+	//void SetPlayerRef(AMainCharacterTest* PlayerPtr);
+
+	void IncrementAssignedPlayersScore(int increment);
+
 	UBoxComponent* GetPlacmentBox();
 protected:
 	// Called when the game starts or when spawned
 
 	virtual void BeginPlay() override;
+	UPROPERTY(Replicated);
 	bool CurrentyActive = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementCollider");
@@ -78,7 +83,7 @@ protected:
 	UBoxComponent* TowerHitBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CoolDownAfterReset");
 	float MaxCoolDownAfterReset = 0.0f; 
-	UPROPERTY(Replicated);
+
 	float CoolDownAfterReset = 0.0f;
 	
 	UFUNCTION()
@@ -112,8 +117,6 @@ protected:
 	virtual void TowerTimeLineInterp(float value); 
 
 	void SetHitBoxActive(bool HitBoxActive);
-
-	
 protected:
 
 	
@@ -143,7 +146,7 @@ protected:
 	float MainStatusEffectDuration = 0.0f; 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerMainStatusEffect", meta = (ClampMin = "0.1", ClampMax = "1.0"));
 	float MainStatusEffectIncreaseScalar = 0.0f;
-
+	AMainCharacterTest* PlayerRef;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -151,13 +154,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UAIPerceptionStimuliSourceComponent* StimuliSourceComponent;
-
+	void SetPlayerRef(AMainCharacterTest* PlayerPtr);
 	void setHealth(float HealthStore);
 	float getHealth();
-
 private: 
 	FVector FacingDirSum;
-
-
+	
 
 };

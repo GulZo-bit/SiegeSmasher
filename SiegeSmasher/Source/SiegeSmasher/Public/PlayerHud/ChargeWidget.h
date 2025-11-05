@@ -20,7 +20,10 @@ public:
 	float Charge;
 
 	UPROPERTY(BlueprintReadOnly)
-	float Health;
+	float Health; 
+
+	UPROPERTY(BlueprintReadOnly) 
+	int PlayerPoints;
 
 	UFUNCTION()
 	void SetChargeAmount(float ChargeAmount);
@@ -35,5 +38,13 @@ public:
 	float GetHealthAmount();
 
 	UFUNCTION(BlueprintCallable)
-	float GetHealthPercent();
+	float GetHealthPercent(); 
+
+	
+	void SetPoints(int NewPoints);
+
+	UFUNCTION(BlueprintCallable)
+	int GetPoints();
+	
+
 };

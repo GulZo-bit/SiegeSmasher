@@ -2,7 +2,7 @@
 
 
 #include "StatusEffectBase.h"
-
+#include "../MyMainCharacterTest.h"
 // Sets default values for this component's properties
 UStatusEffectBase::UStatusEffectBase()
 {
@@ -22,6 +22,8 @@ void UStatusEffectBase::BeginPlay()
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Status effect base begin play called")));
 	// ...
 	SetComponentTickEnabled(false);
+
+	
 }
 
 
@@ -35,16 +37,12 @@ void UStatusEffectBase::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	if (CurrentDuration <= 0.0f) {
 		SetComponentTickEnabled(false); 
 
-		EnemyRef->RemoveStatusEffect(StatusEffectId);
+		EnemyRef->RemoveTowerStatusEffect(StatusEffectId);
 
 
 	}
 	
 
-
-
-
-    
 	 
 }
 
@@ -64,5 +62,21 @@ void UStatusEffectBase::SetCurrentDuration(float Duration)
 void UStatusEffectBase::SetEnemyRef(AEnemyBase* Enemy)
 {
 	EnemyRef = Enemy;
+}
+
+void UStatusEffectBase::SetPlayerRef(AMainCharacterTest* PlayerScorePtr)
+{
+	PlayerRef = PlayerScorePtr;
+}
+
+void UStatusEffectBase::IncrementAssignedPlayerScore(int Increment)
+{
+
+	if (PlayerRef != nullptr && PlayerRef->HasAuthority()) {
+		PlayerRef->IncrementPlayerScore(Increment);
+	}
+
+
+
 }
 
