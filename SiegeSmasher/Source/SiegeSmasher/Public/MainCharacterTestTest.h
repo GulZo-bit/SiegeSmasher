@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Public/MCArrow.h"
+#include "MCArrow.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
@@ -15,19 +15,19 @@
 #include "Blueprint/UserWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "../TowerPrePlacementObject/TowePrePlaceObjectHelper.h"
-#include "Towers/TowerBase.h" 
+#include "SiegeSmasher/Towers/TowerBase.h" 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h" 
-#include "MyMainCharacterTest.generated.h"
+#include "MainCharacterTestTest.generated.h"
 
 UCLASS()
-class SIEGESMASHER_API AMainCharacterTest : public ACharacter
+class SIEGESMASHER_API AMainCharacterTestTest : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AMainCharacterTest();
+	AMainCharacterTestTest();
 	void SetPlayerOwnerShip(AActor* ActorToOwn);
 
 protected:
@@ -52,7 +52,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Input", Replicated);
 	bool ArrowFired;
-	
+
 	//flaot and bool for the Charging mechanic 
 	UPROPERTY(Replicated);
 	float MaxCharge;
@@ -124,9 +124,6 @@ public:
 
 	void SetPlayerId(int Id);
 
-	void IncrementPlayerScore(int Increment);
-	void DecrementPlayerScore(int Increment);
-	void IncrementPlayerKills();
 	//input for triggering the shooting action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* ShootAction;
@@ -138,7 +135,7 @@ public:
 	class UInputAction* StopAimAction;
 
 	//Projectile class to spawn.
-	UPROPERTY(EditDefaultsOnly, Replicated,  Category = "Projectile")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "Projectile")
 	TSubclassOf<class AMCArrow> ArrowClass;
 	//Static mesh that serves as a spawning point for the arrows
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay");
@@ -158,8 +155,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Placement distances");
 	FVector PlayerPlacementDistances;
-	
-	
+
 
 
 	//getters and seeters for the bools for the animation blueprint
@@ -188,9 +184,9 @@ public:
 	bool Server_ChargeShot_Validate(float DeltaTime);
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void Multi_SpawnProjectile(FRotator CamRotation, FRotator BowRot);
-	void Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot);
-	bool Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot);
+	void Multi_PlaySound(USoundBase* Sound);
+	void Multi_PlaySound_Implementation(USoundBase* Sound);
+	bool Multi_PlaySound_Validate(USoundBase* Sound);
 
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
@@ -229,11 +225,11 @@ public:
 
 	void TowerPlacementHandle();
 
-	UFUNCTION(Server,Reliable)
-	void Server_HandleTowerPlacement(FVector CamForward,FVector CamPosition); 
+	UFUNCTION(Server, Reliable)
+	void Server_HandleTowerPlacement(FVector CamForward, FVector CamPosition);
 
 	void Server_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
-	
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_HandleTowerPlacement(FVector CamForward, FVector CamPosition);
 
@@ -241,18 +237,18 @@ public:
 
 
 
-	UFUNCTION(Server,Reliable) 
-	void Server_SetPlaceTower(bool PlaceTower); 
+	UFUNCTION(Server, Reliable)
+	void Server_SetPlaceTower(bool PlaceTower);
 	void Server_SetPlaceTower_Implementation(bool PlaceTower);
 	UFUNCTION(Server, Reliable)
 	void Server_LogPlaceTower();
 	void Server_LogPlaceTower_Implementation();
 
-	UFUNCTION(Server, Unreliable) 
-	void Server_PushSelected(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
-	void Server_PushSelected_Implementation(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
+	UFUNCTION(Server, Unreliable)
+	void Server_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
+	void Server_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 
-	UFUNCTION(NetMulticast,Unreliable) 
+	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 	void Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 
@@ -261,20 +257,20 @@ public:
 	void Server_SpawnSelected(bool PlacingTower, bool ToggleTower);
 	void Server_SpawnSelected_Implementation(bool PlacingTower, bool ToggleTower);
 
-	UFUNCTION(Server,Reliable) 
-	void Server_SwitchTower(int SelectedIndex, bool ToggleTower); 
-	
-	void Server_SwitchTower_Implementation(int SelectedIndex,bool ToggleTower);
-	
-	UFUNCTION(Server,Reliable) 
-	void Server_HideSelected(); 
+	UFUNCTION(Server, Reliable)
+	void Server_SwitchTower(int SelectedIndex, bool ToggleTower);
+
+	void Server_SwitchTower_Implementation(int SelectedIndex, bool ToggleTower);
+
+	UFUNCTION(Server, Reliable)
+	void Server_HideSelected();
 	void Server_HideSelected_Implementation();
 
 	UFUNCTION(Server, Reliable)
 	void Server_DisplaySelected();
 	void Server_DisplaySelected_Implementation();
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server, Reliable)
 	void Server_ToggleTowers(bool ToggleTower);
 	void Server_ToggleTowers_Implementation(bool ToggleTower);
 	//Online Lobby 
@@ -282,41 +278,42 @@ public:
 	void CallCreateLobby();
 
 	UFUNCTION(BlueprintCallable)
-	void CallClientTravel(const FString& Address); 
-protected:
-	UFUNCTION()
-	void UpdatePointsUi();
-	UPROPERTY(Replicated)
-    int PlayerKills = 0;
-	UPROPERTY(ReplicatedUsing = UpdatePointsUi);
-	int PlayerPoints = 0; 
-	
+	void CallClientTravel(const FString& Address);
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* FiringSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* DrawingSound;
+
 private:
-		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
-		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 
-		
-		ATowePrePlaceObjectHelper* Selected = nullptr; 
+	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
+	TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects;
 
-		UWorld* World = nullptr;
-		APlayerController* AssignedPlayerController = nullptr;
-		FActorSpawnParameters TowerSpawnParameters;
-		int PlayerId = 0;
-		UPROPERTY(Replicated);
-		int SelectedTowerIndex = -1;
+	ATowePrePlaceObjectHelper* Selected = nullptr;
 
-		float Health = 100.0f;
-		UPROPERTY(Replicated);
-		bool IsPlacingTower = false;
+	UWorld* World = nullptr;
+	APlayerController* AssignedPlayerController = nullptr;
+	FActorSpawnParameters TowerSpawnParameters;
+	int PlayerId = 0;
+	UPROPERTY(Replicated);
+	int SelectedTowerIndex = -1;
 
-		bool TogglePlacingTowers = false;
+	float Health = 100.0f;
+	UPROPERTY(Replicated);
+	bool IsPlacingTower = false;
 
-		FCollisionQueryParams TraceParams;
-		void DisplaySelected();
-		void HideSelected();
-		void ClientSwitchTower(); 
-		
-		void HandleTowerPlacement();
-		void InitialiseTowers(); 
+	bool TogglePlacingTowers = false;
 
-		void ClientTowerPlacment();
+	FCollisionQueryParams TraceParams;
+	void DisplaySelected();
+	void HideSelected();
+	void ClientSwitchTower();
+
+	void HandleTowerPlacement();
+	void InitialiseTowers();
+
+
+
+	void ClientTowerPlacment();
 };

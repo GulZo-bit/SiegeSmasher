@@ -1,14 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MyMainCharacterTest.h"
+#include "MainCharacterTestTest.h"
 
+// Sets default values
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
 
 // Sets default values
-AMainCharacterTest::AMainCharacterTest()
+AMainCharacterTestTest::AMainCharacterTestTest()
 {
 	TowerSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -30,7 +31,7 @@ AMainCharacterTest::AMainCharacterTest()
 
 	//Creates the static mesh and assigns it to the socket 
 	BowPosition = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BowPosition"));
-	BowPosition->SetupAttachment(AMainCharacterTest::GetMesh(), TEXT("BowPosition"));
+	BowPosition->SetupAttachment(AMainCharacterTestTest::GetMesh(), TEXT("BowPosition"));
 	//Default values for the charge mechanic
 	isCharging = false;
 	MaxCharge = 100.0f;
@@ -39,7 +40,7 @@ AMainCharacterTest::AMainCharacterTest()
 }
 
 // Called when the game starts or when spawned
-void AMainCharacterTest::BeginPlay()
+void AMainCharacterTestTest::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -68,7 +69,7 @@ void AMainCharacterTest::BeginPlay()
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Bgeing play called for character ")));
 		InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(AssignedPlayerController->GetLocalPlayer());
-		
+
 
 		if (InputSubsystem)
 		{
@@ -79,10 +80,10 @@ void AMainCharacterTest::BeginPlay()
 		}
 	}
 	//checks if the reference to the player hud is not empty
-	if (PlayerHUD != nullptr) 
+	if (PlayerHUD != nullptr)
 	{
 
-		if (IsLocallyControlled()) 
+		if (IsLocallyControlled())
 		{
 			//creates the widget of the ChargeWidget class in the current world
 			ChargeWidget = CreateWidget<UChargeWidget>(GetWorld(), PlayerHUD);
@@ -101,31 +102,30 @@ void AMainCharacterTest::BeginPlay()
 	TraceParams.AddIgnoredActor(this);
 	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(TPSCameraComponent == nullptr)));
 
-	
+
 
 }
 
 // Called every frame
-void AMainCharacterTest::Tick(float DeltaTime)
+void AMainCharacterTestTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	ChargeShot(DeltaTime);
 	//if Charge widget is not empty, update the charge amount in the widget
-	if (ChargeWidget != nullptr) 
-	{ 
-		ChargeWidget->SetChargeAmount(CurrentCharge); 
-
+	if (ChargeWidget != nullptr)
+	{
+		ChargeWidget->SetChargeAmount(CurrentCharge);
 	}
 	TowerPlacementHandle();
 
-	
-	
+
+
 
 
 }
 
 // Called to bind functionality to input
-void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AMainCharacterTestTest::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -136,30 +136,30 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::Jumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMainCharacterTestTest::Jumping);
 
 		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacterTestTest::Move);
 
 		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::Look);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacterTestTest::Look);
 
-		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::Shoot);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AMainCharacterTestTest::Shoot);
 
-		EnhancedInputComponent->BindAction(DrawAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::DrawBow);
+		EnhancedInputComponent->BindAction(DrawAction, ETriggerEvent::Triggered, this, &AMainCharacterTestTest::DrawBow);
 
-		EnhancedInputComponent->BindAction(StopAimAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::StopAim);
+		EnhancedInputComponent->BindAction(StopAimAction, ETriggerEvent::Triggered, this, &AMainCharacterTestTest::StopAim);
 
-		EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Started, this, &AMainCharacterTest::PlaceTower);
+		EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Started, this, &AMainCharacterTestTest::PlaceTower);
 
-		EnhancedInputComponent->BindAction(SwitchTowerAction, ETriggerEvent::Started, this, &AMainCharacterTest::SwitchTowers);
-		
-		EnhancedInputComponent->BindAction(ToggleTowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleTowerPlacement);
+		EnhancedInputComponent->BindAction(SwitchTowerAction, ETriggerEvent::Started, this, &AMainCharacterTestTest::SwitchTowers);
+
+		EnhancedInputComponent->BindAction(ToggleTowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacterTestTest::ToggleTowerPlacement);
 
 	}
 }
 
-void AMainCharacterTest::Move(const FInputActionValue& Value)
+void AMainCharacterTestTest::Move(const FInputActionValue& Value)
 {
 	//Input is a Vector2d
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -183,7 +183,7 @@ void AMainCharacterTest::Move(const FInputActionValue& Value)
 	}
 }
 
-void AMainCharacterTest::Look(const FInputActionValue& Value)
+void AMainCharacterTestTest::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
@@ -195,14 +195,14 @@ void AMainCharacterTest::Look(const FInputActionValue& Value)
 	}
 }
 
-void AMainCharacterTest::Jumping()
+void AMainCharacterTestTest::Jumping()
 {
 
 	Server_SetPlaceTower(!IsPlacingTower);
 	Jump();
 }
 
-void AMainCharacterTest::Shoot()
+void AMainCharacterTestTest::Shoot()
 {
 	//Attempt to shoot a projectile.
 	if (ArrowClass)
@@ -227,18 +227,19 @@ void AMainCharacterTest::Shoot()
 
 			else
 			{
+				if (FiringSound != nullptr)
+				{
+					UGameplayStatics::PlaySoundAtLocation(this, FiringSound, GetActorLocation());
+				}
 				//on Server
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
 				SpawnParams.Instigator = GetInstigator();
 				//creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
 				AMCArrow* Arrow = World->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
-				
-				
 				//if arrow has been succesfully created
 				if (Arrow)
 				{
-					Arrow->SetPlayerRef(this);
 					//changes the Bow rotation to be changed into a vector so that it shows a direction
 					FVector LaunchDirection = BowRotation.Vector();
 					//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
@@ -256,55 +257,52 @@ void AMainCharacterTest::Shoot()
 	}
 }
 
-void AMainCharacterTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AMainCharacterTestTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AMainCharacterTest, ArrowDrawn);
-	DOREPLIFETIME(AMainCharacterTest, ArrowFired);
-	DOREPLIFETIME(AMainCharacterTest, MaxCharge);
-	DOREPLIFETIME(AMainCharacterTest, ChargeRate);
+	DOREPLIFETIME(AMainCharacterTestTest, ArrowDrawn);
+	DOREPLIFETIME(AMainCharacterTestTest, ArrowFired);
+	DOREPLIFETIME(AMainCharacterTestTest, MaxCharge);
+	DOREPLIFETIME(AMainCharacterTestTest, ChargeRate);
 
-	DOREPLIFETIME(AMainCharacterTest, SelectedTowerIndex);
-	DOREPLIFETIME(AMainCharacterTest, IsPlacingTower);
-	//DOREPLIFETIME(AMainCharacterTest, CurrentCharge);
-	DOREPLIFETIME(AMainCharacterTest, isCharging);
-	DOREPLIFETIME(AMainCharacterTest, ArrowClass);
-	DOREPLIFETIME(AMainCharacterTest, ChargeFinal);  
+	DOREPLIFETIME(AMainCharacterTestTest, SelectedTowerIndex);
+	DOREPLIFETIME(AMainCharacterTestTest, IsPlacingTower);
+	//DOREPLIFETIME(AMainCharacterTestTest, CurrentCharge);
+	DOREPLIFETIME(AMainCharacterTestTest, isCharging);
+	DOREPLIFETIME(AMainCharacterTestTest, ArrowClass);
+	DOREPLIFETIME(AMainCharacterTestTest, ChargeFinal);
 
-	DOREPLIFETIME(AMainCharacterTest, PlayerPoints); 
-	DOREPLIFETIME(AMainCharacterTest, PlayerKills);
-	
 }
 
-bool AMainCharacterTest::GetArrowDrawn()
+bool AMainCharacterTestTest::GetArrowDrawn()
 {
 	return ArrowDrawn;
 }
 
-void AMainCharacterTest::SetArrowDrawn(bool isArrowDrawn)
+void AMainCharacterTestTest::SetArrowDrawn(bool isArrowDrawn)
 {
 	ArrowDrawn = isArrowDrawn;
 }
 
-bool AMainCharacterTest::GetArrowFired()
+bool AMainCharacterTestTest::GetArrowFired()
 {
 	return ArrowFired;
 }
 
-void AMainCharacterTest::SetArrowFired(bool wasArrowShot)
+void AMainCharacterTestTest::SetArrowFired(bool wasArrowShot)
 {
 	ArrowFired = wasArrowShot;
 }
 
-float AMainCharacterTest::GetCurrentCharge()
+float AMainCharacterTestTest::GetCurrentCharge()
 {
 	return CurrentCharge;
 }
 
-void AMainCharacterTest::Server_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot)
+void AMainCharacterTestTest::Server_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot)
 {
 
-	
+	Multi_PlaySound(FiringSound);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
@@ -312,8 +310,6 @@ void AMainCharacterTest::Server_SpawnProjectile_Implementation(FRotator CamRotat
 	//if arrow has been succesfully created
 	if (Arrow)
 	{
-
-		Arrow->SetPlayerRef(this);
 		//changes the Bow rotation to be changed into a vector so that it shows a direction
 		FVector LaunchDirection = BowRot.Vector();
 		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
@@ -327,12 +323,12 @@ void AMainCharacterTest::Server_SpawnProjectile_Implementation(FRotator CamRotat
 	}
 }
 
-bool AMainCharacterTest::Server_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot)
+bool AMainCharacterTestTest::Server_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot)
 {
 	return true;
 }
 
-void AMainCharacterTest::Server_ChargeShot_Implementation(float DeltaTime)
+void AMainCharacterTestTest::Server_ChargeShot_Implementation(float DeltaTime)
 {
 	if (isCharging == true)
 	{
@@ -341,87 +337,71 @@ void AMainCharacterTest::Server_ChargeShot_Implementation(float DeltaTime)
 	}
 }
 
-bool AMainCharacterTest::Server_ChargeShot_Validate(float DeltaTime)
+bool AMainCharacterTestTest::Server_ChargeShot_Validate(float DeltaTime)
 {
 	return true;
 }
 
-void AMainCharacterTest::Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot)
+void AMainCharacterTestTest::Multi_PlaySound_Implementation(USoundBase* Sound)
 {
-	Multi_UpdateCharge();
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
-	AMCArrow* Arrow = GetWorld()->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CamRotation, SpawnParams);
-	//if arrow has been succesfully created
-	if (Arrow)
+	if (Sound != nullptr)
 	{
-		Arrow->SetPlayerRef(this);
-
-		//changes the Bow rotation to be changed into a vector so that it shows a direction
-		FVector LaunchDirection = BowRot.Vector();
-		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
-		Arrow->FireInDirection(LaunchDirection, ChargeFinal);
-		//sets the bools for animations and turns off charging and resets the charge
-		SetArrowDrawn(false);
-		SetArrowFired(true);
-		isCharging = false;
-		//UE_LOG(LogTemp, Warning, TEXT("Multi Charge: %f Percent"), ChargeFinal);
-		CurrentCharge = 0;
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, GetActorLocation());
 	}
 }
 
-bool AMainCharacterTest::Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot)
+bool AMainCharacterTestTest::Multi_PlaySound_Validate(USoundBase* Sound)
 {
 	return true;
 }
 
-void AMainCharacterTest::Multi_UpdateCharge_Implementation()
+void AMainCharacterTestTest::Multi_UpdateCharge_Implementation()
 {
 	ChargeFinal = CurrentCharge;
 }
 
-bool AMainCharacterTest::Multi_UpdateCharge_Validate()
+bool AMainCharacterTestTest::Multi_UpdateCharge_Validate()
 {
 	return true;
 }
 
-void AMainCharacterTest::Server_UpdateCharge_Implementation(float ClientCharge)
+void AMainCharacterTestTest::Server_UpdateCharge_Implementation(float ClientCharge)
 {
 	ChargeFinal = ClientCharge;
 	//UE_LOG(LogTemp, Warning, TEXT("Server Charge: %f Percent"), ChargeFinal);
 }
 
-bool AMainCharacterTest::Server_UpdateCharge_Validate(float ClientCharge)
+bool AMainCharacterTestTest::Server_UpdateCharge_Validate(float ClientCharge)
 {
 	return true;
 }
 
-void AMainCharacterTest::Server_DrawBow_Implementation()
+void AMainCharacterTestTest::Server_DrawBow_Implementation()
 {
+	Multi_PlaySound(DrawingSound);
 	SetArrowFired(false);
 	SetArrowDrawn(true);
 	isCharging = true;
 }
 
-bool AMainCharacterTest::Server_DrawBow_Validate()
+bool AMainCharacterTestTest::Server_DrawBow_Validate()
 {
 	return true;
 }
 
-void AMainCharacterTest::Server_StopAim_Implementation()
+void AMainCharacterTestTest::Server_StopAim_Implementation()
 {
 	SetArrowDrawn(false);
 	SetArrowFired(true);
 	isCharging = false;
 }
 
-bool AMainCharacterTest::Server_StopAim_Validate()
+bool AMainCharacterTestTest::Server_StopAim_Validate()
 {
 	return true;
 }
 
-void AMainCharacterTest::DrawBow()
+void AMainCharacterTestTest::DrawBow()
 {
 	if (!HasAuthority())
 	{
@@ -431,6 +411,11 @@ void AMainCharacterTest::DrawBow()
 	}
 	else
 	{
+		if (DrawingSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, DrawingSound, GetActorLocation());
+
+		}
 		//Server
 		SetArrowFired(false);
 		SetArrowDrawn(true);
@@ -438,15 +423,15 @@ void AMainCharacterTest::DrawBow()
 	}
 }
 
-void AMainCharacterTest::StopAim()
+void AMainCharacterTestTest::StopAim()
 {
-	if (!HasAuthority()) 
+	if (!HasAuthority())
 	{
 		//Client
 		Server_StopAim();
 	}
 
-	else 
+	else
 	{
 		//Server
 		SetArrowDrawn(false);
@@ -455,9 +440,9 @@ void AMainCharacterTest::StopAim()
 	}
 }
 
-void AMainCharacterTest::ChargeShot(float DeltaTime)
+void AMainCharacterTestTest::ChargeShot(float DeltaTime)
 {
-	if (isCharging == true) 
+	if (isCharging == true)
 	{
 		CurrentCharge += ChargeRate * DeltaTime;
 		CurrentCharge = FMath::Clamp(CurrentCharge, 0.0f, MaxCharge);
@@ -467,22 +452,22 @@ void AMainCharacterTest::ChargeShot(float DeltaTime)
 
 //Abandon hope all who go past this line
 
-void AMainCharacterTest::Server_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
+void AMainCharacterTestTest::Server_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("server ownership of actor changed to player character")));
 	Multicast_SetPlayerOwnerShip(ActorToOwn);
 }
 
-void AMainCharacterTest::SetPlayerOwnerShip(AActor* ActorToOwn)
+void AMainCharacterTestTest::SetPlayerOwnerShip(AActor* ActorToOwn)
 {
 
-	if (!HasAuthority()) 
+	if (!HasAuthority())
 	{
 		//Client
 		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on server for client")));
 		Server_SetPlayerOwnerShip(ActorToOwn);
 	}
-	else 
+	else
 	{
 		//Server
 		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on local")));
@@ -491,13 +476,13 @@ void AMainCharacterTest::SetPlayerOwnerShip(AActor* ActorToOwn)
 
 }
 
-void AMainCharacterTest::Multicast_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
+void AMainCharacterTestTest::Multicast_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
 {
 	ActorToOwn->SetOwner(Controller);
 }
 
 
-void AMainCharacterTest::PlaceTower()
+void AMainCharacterTestTest::PlaceTower()
 {
 
 	Server_LogPlaceTower();
@@ -506,31 +491,31 @@ void AMainCharacterTest::PlaceTower()
 	SpawnSelected();
 }
 
-void AMainCharacterTest::ToggleTowerPlacement()
+void AMainCharacterTestTest::ToggleTowerPlacement()
 {
 	TogglePlacingTowers = !TogglePlacingTowers;
-	
+
 	if (!HasAuthority()) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Toggle place tower client %d"), (int)TogglePlacingTowers));
 
 		Server_ToggleTowers(TogglePlacingTowers);
 
 	}
-	else { 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Toggle place tower local hosts %d"),(int)TogglePlacingTowers));
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Toggle place tower local hosts %d"), (int)TogglePlacingTowers));
 		if (Selected != nullptr && !TogglePlacingTowers) {
 			HideSelected();
 		}
 	}
 
 }
-	
 
 
 
 
 
-void AMainCharacterTest::DisplaySelected()
+
+void AMainCharacterTestTest::DisplaySelected()
 {
 	if (HasAuthority()) {
 		Selected->SetActorHiddenInGame(false);
@@ -539,15 +524,15 @@ void AMainCharacterTest::DisplaySelected()
 
 }
 
-void AMainCharacterTest::HideSelected()
+void AMainCharacterTestTest::HideSelected()
 {
-	
+
 	Selected->SetActorHiddenInGame(true);
 	Selected->SetActorEnableCollision(false);
 	Selected->SetActorTickEnabled(false);
 }
 
-void AMainCharacterTest::ClientSwitchTower()
+void AMainCharacterTestTest::ClientSwitchTower()
 {
 
 	int index = 0;
@@ -566,13 +551,13 @@ void AMainCharacterTest::ClientSwitchTower()
 
 
 
-	Server_SwitchTower(index,TogglePlacingTowers);
+	Server_SwitchTower(index, TogglePlacingTowers);
 
 
 
 }
 
-void AMainCharacterTest::HandleTowerPlacement()
+void AMainCharacterTestTest::HandleTowerPlacement()
 {
 
 	if (TogglePlacingTowers && Selected != nullptr) {
@@ -587,7 +572,7 @@ void AMainCharacterTest::HandleTowerPlacement()
 		IsPlacingTower = false;
 
 		if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
-		{ 
+		{
 			DrawDebugLine(World, start, end, FColor::Blue);
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("line trace hit")));
 			DisplaySelected();
@@ -605,13 +590,13 @@ void AMainCharacterTest::HandleTowerPlacement()
 			//Selected->SetActorHiddenInGame(IsPlacingTower);
 
 			return;
-		} 
+		}
 
 		HideSelected();
 	}
 }
 
-void AMainCharacterTest::InitialiseTowers()
+void AMainCharacterTestTest::InitialiseTowers()
 {
 
 	ATowePrePlaceObjectHelper* currentInstance = nullptr;
@@ -640,7 +625,7 @@ void AMainCharacterTest::InitialiseTowers()
 	}*/
 }
 
-void AMainCharacterTest::ClientTowerPlacment()
+void AMainCharacterTestTest::ClientTowerPlacment()
 {
 
 	if (TogglePlacingTowers && Selected != nullptr) {
@@ -652,7 +637,7 @@ void AMainCharacterTest::ClientTowerPlacment()
 		FVector start = TPSCameraComponent->GetComponentLocation() + PlayerCamForward;
 
 		FVector end = start + PlayerCamForward * PlayerPlacementDistances;
-		
+
 
 
 		if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
@@ -662,8 +647,8 @@ void AMainCharacterTest::ClientTowerPlacment()
 			//DrawDebugLine(World, start, end, FColor::Blue);
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("line trace hit cleint")));
 
-			
-			Server_PushSelected(Selected->GetActorTransform(),start,end,PlayerCamForward);
+
+			Server_PushSelected(Selected->GetActorTransform(), start, end, PlayerCamForward);
 
 
 			//Selected->SetActorHiddenInGame(IsPlacingTower);
@@ -678,7 +663,7 @@ void AMainCharacterTest::ClientTowerPlacment()
 
 }
 
-void AMainCharacterTest::CallCreateLobby()
+void AMainCharacterTestTest::CallCreateLobby()
 {
 	UWorld* MultiWorld = GetWorld();
 	{
@@ -687,7 +672,7 @@ void AMainCharacterTest::CallCreateLobby()
 	}
 }
 
-void AMainCharacterTest::CallClientTravel(const FString& Address)
+void AMainCharacterTestTest::CallClientTravel(const FString& Address)
 {
 	APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
 	if (PlayerController)
@@ -696,28 +681,17 @@ void AMainCharacterTest::CallClientTravel(const FString& Address)
 	}
 }
 
-
-
-void AMainCharacterTest::UpdatePointsUi()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Update charge ui called")));
-	if (ChargeWidget != nullptr) {
-		ChargeWidget->SetPoints(PlayerPoints);
-	}
-	
-}
-
-void AMainCharacterTest::setHealth(float HealthStore)
+void AMainCharacterTestTest::setHealth(float HealthStore)
 {
 	Health = HealthStore;
 }
 
-float AMainCharacterTest::getHealth()
+float AMainCharacterTestTest::getHealth()
 {
 	return Health;
 }
 
-void AMainCharacterTest::SwitchTowers()
+void AMainCharacterTestTest::SwitchTowers()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Switch  called")));
 
@@ -737,29 +711,29 @@ void AMainCharacterTest::SwitchTowers()
 			if (TogglePlacingTowers) {
 				DisplaySelected();
 			}
-		
-			
-			
+
+
+
 			break;
 
 		}
-		}
-	
-	if(!HasAuthority()) { 
+	}
+
+	if (!HasAuthority()) {
 		ClientSwitchTower();
 	}
-	
+
 }
 
-void AMainCharacterTest::Server_SetPlayerId_Implementation(int Id)
+void AMainCharacterTestTest::Server_SetPlayerId_Implementation(int Id)
 {
 	Multicast_SetPlayerId(Id);
 }
-void AMainCharacterTest::Multicast_SetPlayerId_Implementation(int Id)
+void AMainCharacterTestTest::Multicast_SetPlayerId_Implementation(int Id)
 {
 	PlayerId = Id;
 }
-void AMainCharacterTest::SetPlayerId(int Id)
+void AMainCharacterTestTest::SetPlayerId(int Id)
 {
 	if (GetLocalRole() < ROLE_Authority) {
 		Server_SetPlayerId(Id);
@@ -774,13 +748,13 @@ void AMainCharacterTest::SetPlayerId(int Id)
 
 
 
-void AMainCharacterTest::TowerPlacementHandle()
+void AMainCharacterTestTest::TowerPlacementHandle()
 {
-	if (!HasAuthority() ) {
-		
+	if (!HasAuthority()) {
+
 		ClientTowerPlacment();
 	}
-	else if(IsLocallyControlled()) {
+	else if (IsLocallyControlled()) {
 
 		HandleTowerPlacement();
 
@@ -790,12 +764,12 @@ void AMainCharacterTest::TowerPlacementHandle()
 
 }
 
-void AMainCharacterTest::Server_HandleTowerPlacement_Implementation(FVector CamFoward, FVector CamPosition)
+void AMainCharacterTestTest::Server_HandleTowerPlacement_Implementation(FVector CamFoward, FVector CamPosition)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Tower placement server called")));
 	if (Selected != nullptr) {
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("PlayerPlacingTower")));
-		
+
 		FVector PlayerCamForward = CamFoward;
 
 		FHitResult PlacementSurfaceResult = FHitResult();
@@ -817,7 +791,7 @@ void AMainCharacterTest::Server_HandleTowerPlacement_Implementation(FVector CamF
 			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
 			DrawDebugLine(World, start, end, FColor::Blue);
 			DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
-		    Server_SetPlaceTower(  Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCamForward, CamPosition, SurfaceTransform));
+			Server_SetPlaceTower(Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCamForward, CamPosition, SurfaceTransform));
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("is placing tower is %d"), (int)IsPlacingTower));
 			//Selected->SetActorHiddenInGame(IsPlacingTower);
 
@@ -829,59 +803,51 @@ void AMainCharacterTest::Server_HandleTowerPlacement_Implementation(FVector CamF
 
 }
 
-void AMainCharacterTest::Multicast_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition)
+void AMainCharacterTestTest::Multicast_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition)
 {
-	
+
 
 
 
 }
 
-void AMainCharacterTest::Server_SetPlaceTower_Implementation(bool PlaceTower)
+void AMainCharacterTestTest::Server_SetPlaceTower_Implementation(bool PlaceTower)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Silver, FString::Printf(TEXT("Set place tower called %d "), PlaceTower));
 	IsPlacingTower = PlaceTower;
 }
 
 
-void AMainCharacterTest::SpawnSelected()
+void AMainCharacterTestTest::SpawnSelected()
 {
 
 	if (HasAuthority() && IsLocallyControlled()) {
-		if (TogglePlacingTowers 
-			&& IsPlacingTower 
-			&& Selected->GetCanPlaceTower() 
-			&& PlayerPoints >= Selected->GetTowerCost()) 
-		{
+		if (TogglePlacingTowers && IsPlacingTower && Selected->GetCanPlaceTower()) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("local host Placing tower")));
 			ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
 			if (TowerRef) {
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Local Host Set Owner")));
-				TowerRef->SetOwner(Controller); 
-				TowerRef->SetPlayerRef(this);
-				DecrementPlayerScore(Selected->GetTowerCost());
-				//TowerRef->SetPlayerRef(this);
-
+				TowerRef->SetOwner(Controller);
 			}
 		}
 	}
 	else {
 		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client  tower")));
-		
-		Server_SpawnSelected(IsPlacingTower,TogglePlacingTowers);
+
+		Server_SpawnSelected(IsPlacingTower, TogglePlacingTowers);
 	}
 
 }
-void AMainCharacterTest::Server_LogPlaceTower_Implementation()
+void AMainCharacterTestTest::Server_LogPlaceTower_Implementation()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("is placing tower %d"), (int)IsPlacingTower));
 }
-void AMainCharacterTest::Server_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd,FVector SelectedRayDir)
+void AMainCharacterTestTest::Server_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir)
 {
 
 	if (Selected != nullptr) {
-		FHitResult result = FHitResult(); 
-		
+		FHitResult result = FHitResult();
+
 		if (World->LineTraceSingleByChannel(result, SelectRayStart, SelectRayEnd, PlacingSurface)) {
 
 			DrawDebugLine(World, SelectRayStart, SelectRayEnd, FColor::Magenta);
@@ -898,9 +864,9 @@ void AMainCharacterTest::Server_PushSelected_Implementation(FTransform ClientSel
 
 			return;
 		}
-		
+
 		HideSelected();
-		
+
 
 
 	}
@@ -909,10 +875,10 @@ void AMainCharacterTest::Server_PushSelected_Implementation(FTransform ClientSel
 
 
 }
-void AMainCharacterTest::Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir)
+void AMainCharacterTestTest::Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("multi cast push selected")));
-	
+
 	if (Selected != nullptr) {
 		FHitResult result = FHitResult();
 		if (World->LineTraceSingleByChannel(result, SelectRayStart, SelectRayEnd, PlacingSurface)) {
@@ -938,30 +904,23 @@ void AMainCharacterTest::Multicast_PushSelected_Implementation(FTransform Client
 
 
 }
-void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,bool ToggleTower)
+void AMainCharacterTestTest::Server_SpawnSelected_Implementation(bool PlacingTower, bool ToggleTower)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower selected get can place tower %d"), (int)IsPlacingTower));
-	
-	if (ToggleTower && IsPlacingTower && 
-		Selected->GetCanPlaceTower() && 
-		PlayerPoints >= Selected->GetTowerCost() ) 
-	{
+
+	if (ToggleTower && IsPlacingTower && Selected->GetCanPlaceTower()) {
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower")));
 		ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
-		if (TowerRef) {
-			TowerRef->SetPlayerRef(this);
-			DecrementPlayerScore(Selected->GetTowerCost());
-
-		}
 	}
-	
+
 }
 
 
 
-void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex, bool ToggleTower)
+void AMainCharacterTestTest::Server_SwitchTower_Implementation(int NewSelectedIndex, bool ToggleTower)
 {
-	 
+
+
 	if (Selected != nullptr) {
 		HideSelected();
 	}
@@ -970,11 +929,18 @@ void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex,
 	if (ToggleTower) {
 		DisplaySelected();
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("updating selected index on client %d "),SelectedTowerIndex));
+
+
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("updating selected index on client %d "), SelectedTowerIndex));
+
+
+
+
 
 }
 
-void AMainCharacterTest::Server_HideSelected_Implementation()
+void AMainCharacterTestTest::Server_HideSelected_Implementation()
 {
 
 	HideSelected();
@@ -983,14 +949,14 @@ void AMainCharacterTest::Server_HideSelected_Implementation()
 
 }
 
-void AMainCharacterTest::Server_DisplaySelected_Implementation()
+void AMainCharacterTestTest::Server_DisplaySelected_Implementation()
 {
 	DisplaySelected();
 
 
 }
 
-void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
+void AMainCharacterTestTest::Server_ToggleTowers_Implementation(bool ToggleTower)
 {
 	if (Selected != nullptr && !ToggleTower) {
 
@@ -998,56 +964,6 @@ void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
 
 	}
 
-
-}
-void AMainCharacterTest::IncrementPlayerScore(int Increment)
-{
-	
-	if (HasAuthority()) { 
-
-
-		PlayerPoints += Increment;  
-		if (IsLocallyControlled()) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score server %d "), PlayerPoints));
-
-			UpdatePointsUi();
-		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score %d "), PlayerPoints));
-	}
-
-
-}
-
-
-
-void AMainCharacterTest::DecrementPlayerScore(int Increment)
-{
-
-	if (HasAuthority()) {
-
-
-		PlayerPoints -= Increment;
-		if (IsLocallyControlled()) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score server %d "), PlayerPoints));
-
-			UpdatePointsUi();
-		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score %d "), PlayerPoints));
-	}
-
-
-}
-
-
-void AMainCharacterTest::IncrementPlayerKills()
-{
-
-	
-	if (HasAuthority()) {
-		PlayerKills++; 
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incrementing Player kills %d"), PlayerKills));
-	}
 
 }
 
