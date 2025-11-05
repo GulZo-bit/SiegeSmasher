@@ -3,8 +3,9 @@
 
 #include "EnemyBase.h"
 #include "AI/BoolAnimInstance.h"
-#include "../StatusEffects/BleedStatusEffect.h" 
-
+#include "../StatusEffects/BleedStatusEffect.h"  
+#include "../MyMainCharacterTest.h"
+#include "MCArrow.h"
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
@@ -133,6 +134,8 @@ int AEnemyBase::GetStartingWave()
 	return StartingWave;
 }
 
+
+
 EnemyTypes AEnemyBase::GetEnemyWaveType()
 {
 	return EnemyType;
@@ -153,7 +156,18 @@ void AEnemyBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActo
 			//GLog->Log(FString::Printf(TEXT("Arrow Damage: %f"), TempArrow->getDamage()));
 			if (HasAuthority()) {
 				this->SetHealth(GetHealth() - TempArrow->getDamage());
-			}
+				if (CurrentHealth <= 0.0f) {
+					TempArrow->IncrementPlayerKillsRef();
+					TempArrow->IncrementPlayerPointsRef(ScoreIncrementOnKill);
+
+				}
+				else {
+					TempArrow->IncrementPlayerPointsRef(ScoreIncrementOnHit);
+
+				}
+			
+			} 
+
 			OtherActor->Destroy();
 		}
 	
@@ -164,6 +178,16 @@ void AEnemyBase::SetEnemyAliveCountref(int* WaveEnemyAliveCount)
 {
 	WaveEnemyAliveCountRef = WaveEnemyAliveCount;
 
+}
+
+int AEnemyBase::GetScoreIncOnKill()
+{
+	return ScoreIncrementOnKill;
+}
+
+int AEnemyBase::GetScoreIncOnHit()
+{
+	return ScoreIncrementOnHit;
 }
 
 void AEnemyBase::DecrementWaveEnemyAliveCount()
@@ -197,12 +221,12 @@ void AEnemyBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 }
 
-int32 AEnemyBase::CheckHasStatusEffect(EnemyStatusEffect StatusEffect)
+int32 AEnemyBase::CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect)
 {
 	return (CurrentStatusEffects & StatusEffect)  ;
 }
 
-void AEnemyBase::ApplyStatusEffect(EnemyStatusEffect StatusEffect) {
+void AEnemyBase::ApplyTowerStatusEffect(EnemyStatusEffect StatusEffect) {
 	if (HasAuthority()) {
 		AvailableStatusEffects[StatusEffect]->SetComponentTickEnabled(true);
 		CurrentStatusEffects = CurrentStatusEffects | StatusEffect;
@@ -210,7 +234,7 @@ void AEnemyBase::ApplyStatusEffect(EnemyStatusEffect StatusEffect) {
 	}
 }
 
-void AEnemyBase::RemoveStatusEffect(EnemyStatusEffect StatusEffect)
+void AEnemyBase::RemoveTowerStatusEffect(EnemyStatusEffect StatusEffect)
 {
 	if (HasAuthority()) {
 
@@ -224,9 +248,10 @@ void AEnemyBase::RemoveStatusEffect(EnemyStatusEffect StatusEffect)
 
 
 
-void AEnemyBase::IncreaseStatusEffectDuration(EnemyStatusEffect Id, float Increment)
+void AEnemyBase::IncreaseTowerStatusEffectDuration(EnemyStatusEffect Id, float Increment,AMainCharacterTest* EffectPlayerRef)
 {	
 		AvailableStatusEffects[Id]->IncreaseDuration(Increment);
+		AvailableStatusEffects[Id]->SetPlayerRef(EffectPlayerRef);
 }
 
 void AEnemyBase::SetBleedBaseDamage(float BleedDamage)
@@ -235,9 +260,11 @@ void AEnemyBase::SetBleedBaseDamage(float BleedDamage)
 
 }
 
-void AEnemyBase::SetUpStatusEffectDuration(EnemyStatusEffect Id, float MaxDuration)
+void AEnemyBase::SetUpTowerStatusEffectDuration(EnemyStatusEffect Id, float MaxDuration, AMainCharacterTest* EffectPlayerRef)
 {
 	AvailableStatusEffects[Id]->SetCurrentDuration(MaxDuration);
+	AvailableStatusEffects[Id]->SetPlayerRef(EffectPlayerRef);
+
 
 }
 

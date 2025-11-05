@@ -2,7 +2,7 @@
 
 
 #include "TowerProjectileBase.h"
-
+#include "../MyMainCharacterTest.h"
 // Sets default values
 ATowerProjectileBase::ATowerProjectileBase()
 {
@@ -14,7 +14,7 @@ ATowerProjectileBase::ATowerProjectileBase()
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("Projectile Mesh"); 
 	ProjectileMesh->SetCollisionProfileName(FName("TowerProjectile"));
 	RootComponent = ProjectileMesh;
-
+	PlayerRef = nullptr;
 
 	//ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 
@@ -47,6 +47,10 @@ void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 
 
 			Enemy->DamageEnemy(Damage);
+			
+			IncrementPlayerScore(Enemy->GetScoreIncOnKill() * (Enemy->GetHealth() <= 0.0f)); 
+			IncrementPlayerScore(Enemy->GetScoreIncOnHit() * (Enemy->GetHealth() > 0.0f));
+
 
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Tower projectile hitting enemy")));
 
@@ -113,6 +117,22 @@ void ATowerProjectileBase::MoveToTarget(float DeltaTime)
 
 
 }
+
+void ATowerProjectileBase::SetPlayerRef(AMainCharacterTest* PlayerPtr) {
+	PlayerRef = PlayerPtr;
+}
+
+void ATowerProjectileBase::IncrementPlayerScore(int Increment) {
+
+	if (PlayerRef != nullptr && HasAuthority()) {
+
+		PlayerRef->IncrementPlayerScore(Increment);
+
+	}
+
+
+}
+
 
 void ATowerProjectileBase::SetInitialPitch(float Pitch)
 {

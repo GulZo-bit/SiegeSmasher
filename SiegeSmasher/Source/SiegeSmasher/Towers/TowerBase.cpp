@@ -2,6 +2,7 @@
 
 
 #include "TowerBase.h"
+#include "../MyMainCharacterTest.h"
 
 // Sets default values
 ATowerBase::ATowerBase()
@@ -31,6 +32,8 @@ ATowerBase::ATowerBase()
 	StimuliSourceComponent->RegisterForSense(UAISense_Sight::StaticClass()); 
 	TowerTimeLine->SetIsReplicated(true);
 	TeamID = FGenericTeamId(1);
+
+	/*PlayerRef = nullptr;*/
 }
 
 void ATowerBase::DisableTick()
@@ -42,7 +45,8 @@ void ATowerBase::DisableTick()
 void ATowerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const {
 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
+	DOREPLIFETIME(ATowerBase, CurrentyActive);
+
 }
 
 
@@ -314,9 +318,10 @@ UBoxComponent* ATowerBase::GetPlacmentBox()
 
 void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor* OverlapedActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool SweepBool ,const FHitResult& HitResult) {
 	
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
 	if (HasAuthority() ) {
-		if (AEnemyBase* EnemyTOHandle = Cast<AEnemyBase>(OverlapedActor)) {
+		AEnemyBase* EnemyToHandle = Cast<AEnemyBase>(OverlapedActor);
+		if (EnemyToHandle != nullptr && EnemyToHandle->GetHealth() >0.0f) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin hit ")));
 
 			CurrentyActive = true;
@@ -458,4 +463,17 @@ void ATowerBase::setHealth(float HealthStore)
 float ATowerBase::getHealth()
 {
 	return Health;
+}
+
+void ATowerBase::SetPlayerRef(AMainCharacterTest* PlayerPtr) {
+	PlayerRef = PlayerPtr;
+}
+
+void ATowerBase::IncrementAssignedPlayersScore(int increment)
+{
+
+	if (HasAuthority()) {
+		PlayerRef->IncrementPlayerScore(increment);
+	}
+
 }

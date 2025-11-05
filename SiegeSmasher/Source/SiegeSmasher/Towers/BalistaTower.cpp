@@ -21,13 +21,14 @@ ABalistaTower::ABalistaTower()
 	BallistaArrow->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BallistaTurret->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+
+
 }
 
 
 void ABalistaTower::BeginPlay() {
   
 	Super::BeginPlay(); 
-	EstablishLineOfSightRays();
 
 
 
@@ -45,7 +46,7 @@ void ABalistaTower::Multicast_SetArrowHidden_Implementation(bool HideBallistaArr
 void ABalistaTower::HideArrow(bool ShouldHideArrow)
 {
 
-	if (BallistaArrow->bHiddenInGame != ShouldHideArrow) {
+	if (HasAuthority() && BallistaArrow->bHiddenInGame != ShouldHideArrow) {
 
 		Multicast_SetArrowHidden(ShouldHideArrow);
 
@@ -69,7 +70,7 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 	bool LostLOs = World->LineTraceSingleByChannel(LOSResult, BallistaTurretLocation,
 		           BallistaTurretLocation + TargetDir * ToTarget.Length(), TowerNoLOSChannel);
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("distance to target %f"), ToTarget.SquaredLength()));
-	if (!LostLOs && !CurrentEnemyOutOfRange) {
+	if (!LostLOs && !CurrentEnemyOutOfRange && EnemySingleTarget->GetHealth() > 0.0f) {
 
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Ballista currently active")));
 		float Alignment = TargetDir.Dot(BallistaTurret->GetForwardVector());
@@ -93,6 +94,7 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 
 		}
 		if (WaitTimeToReset <= MaxWaitTimeToReset * ProjectileReappearPercent) {
+			
 			HideArrow(false);
 
 		}
@@ -102,9 +104,12 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 
 	
 	 //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Ballista could not find targets waiting for next overlap")));
-	 CurrentyActive = false; 
-	
-	 NoTargetsInRange = true;
+	if (HasAuthority()) {
+		CurrentyActive = false;
+
+		NoTargetsInRange = true;
+	 }
+
 	
 
 	

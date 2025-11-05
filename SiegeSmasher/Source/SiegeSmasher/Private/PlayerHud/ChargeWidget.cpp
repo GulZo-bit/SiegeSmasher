@@ -27,3 +27,16 @@ float UChargeWidget::GetHealthPercent()
 {
 	return Health/100;
 }
+
+void UChargeWidget::SetPoints(int NewPoints)
+{
+	PlayerPoints = NewPoints;
+
+
+
+}
+
+int UChargeWidget::GetPoints()
+{
+	return PlayerPoints;
+}
