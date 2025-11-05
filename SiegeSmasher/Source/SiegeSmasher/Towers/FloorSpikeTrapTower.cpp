@@ -164,7 +164,7 @@ void AFloorSpikeTrapTower::TowerReset()
 
 
 void AFloorSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
-	if (( RequiresReset || SpikesUp )) {
+	if ( SpikesUp || RequiresReset ) {
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT(" Spike Trap Damaging enemy")));
 		Enemy->DamageEnemy(TowerDamage);

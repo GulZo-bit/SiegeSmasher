@@ -320,7 +320,8 @@ void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor*
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
 	if (HasAuthority() ) {
-		if (AEnemyBase* EnemyTOHandle = Cast<AEnemyBase>(OverlapedActor)) {
+		AEnemyBase* EnemyToHandle = Cast<AEnemyBase>(OverlapedActor);
+		if (EnemyToHandle != nullptr && EnemyToHandle->GetHealth() >0.0f) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin hit ")));
 
 			CurrentyActive = true;
