@@ -116,10 +116,6 @@ public:
 
 	void ToggleTowerPlacement();
 
-	void setHealth(float HealthStore);
-
-	float getHealth();
-
 	void SwitchTowers();
 
 	void SetPlayerId(int Id);
@@ -174,6 +170,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetArrowFired(bool isArrowDrawn);
+
+	void setHealth(float HealthStore);
+
+	float getHealth();
 
 	UFUNCTION()
 	float GetCurrentCharge();
@@ -277,6 +277,18 @@ public:
 	UFUNCTION(Server,Reliable)
 	void Server_ToggleTowers(bool ToggleTower);
 	void Server_ToggleTowers_Implementation(bool ToggleTower);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetHealth(float HealthStore);
+
+	void Server_SetHealth_Implementation(float HealthStore);
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void Multi_PlaySound(USoundBase* Sound);
+	void Multi_PlaySound_Implementation(USoundBase* Sound);
+	bool Multi_PlaySound_Validate(USoundBase* Sound);
+
+
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)
 	void CallCreateLobby();
@@ -290,6 +302,20 @@ protected:
     int PlayerKills = 0;
 	UPROPERTY(ReplicatedUsing = UpdatePointsUi);
 	int PlayerPoints = 0; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputAction* SelfDamage;
+
+	void DamageYourself();
+
+	UFUNCTION()
+	void UpdateHealthWidget();
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* FiringSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* DrawingSound;
 	
 private:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
@@ -304,6 +330,7 @@ private:
 		UPROPERTY(Replicated);
 		int SelectedTowerIndex = -1;
 
+		UPROPERTY(ReplicatedUsing = UpdateHealthWidget)
 		float Health = 100.0f;
 		UPROPERTY(Replicated);
 		bool IsPlacingTower = false;

@@ -101,10 +101,13 @@ void AMCArrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPri
 
 void AMCArrow::ArrowOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (WhooshingSound != nullptr)
+	if (!HasAuthority()) 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, FString::Printf(TEXT("Arrow Overlapped Player")));
-		UGameplayStatics::PlaySoundAtLocation(this, WhooshingSound, GetActorLocation());
+		if (WhooshingSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, FString::Printf(TEXT("Arrow Overlapped Player")));
+			UGameplayStatics::PlaySoundAtLocation(this, WhooshingSound, GetActorLocation());
+		}
 	}
 }
 

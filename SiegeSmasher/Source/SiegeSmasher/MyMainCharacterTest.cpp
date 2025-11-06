@@ -90,6 +90,7 @@ void AMainCharacterTest::BeginPlay()
 			if (ChargeWidget != nullptr)
 			{
 				ChargeWidget->AddToViewport();
+				ChargeWidget->SetHealthAmount(Health);
 			}
 		}
 	}
@@ -101,8 +102,7 @@ void AMainCharacterTest::BeginPlay()
 	TraceParams.AddIgnoredActor(this);
 	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(TPSCameraComponent == nullptr)));
 
-	
-
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Health: %f"), Health));
 }
 
 // Called every frame
@@ -156,6 +156,8 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		
 		EnhancedInputComponent->BindAction(ToggleTowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleTowerPlacement);
 
+
+		EnhancedInputComponent->BindAction(SelfDamage, ETriggerEvent::Triggered, this, &AMainCharacterTest::DamageYourself);
 	}
 }
 
@@ -227,6 +229,10 @@ void AMainCharacterTest::Shoot()
 
 			else
 			{
+				if (FiringSound != nullptr)
+				{
+					UGameplayStatics::PlaySoundAtLocation(this, FiringSound, GetActorLocation());
+				}
 				//on Server
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
@@ -273,6 +279,8 @@ void AMainCharacterTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 	DOREPLIFETIME(AMainCharacterTest, PlayerPoints); 
 	DOREPLIFETIME(AMainCharacterTest, PlayerKills);
+
+	DOREPLIFETIME(AMainCharacterTest, Health);
 	
 }
 
@@ -304,7 +312,7 @@ float AMainCharacterTest::GetCurrentCharge()
 void AMainCharacterTest::Server_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot)
 {
 
-	
+	Multi_PlaySound(FiringSound);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
@@ -399,6 +407,7 @@ bool AMainCharacterTest::Server_UpdateCharge_Validate(float ClientCharge)
 
 void AMainCharacterTest::Server_DrawBow_Implementation()
 {
+	Multi_PlaySound(DrawingSound);
 	SetArrowFired(false);
 	SetArrowDrawn(true);
 	isCharging = true;
@@ -431,6 +440,11 @@ void AMainCharacterTest::DrawBow()
 	}
 	else
 	{
+		if (DrawingSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, DrawingSound, GetActorLocation());
+
+		}
 		//Server
 		SetArrowFired(false);
 		SetArrowDrawn(true);
@@ -462,6 +476,19 @@ void AMainCharacterTest::ChargeShot(float DeltaTime)
 		CurrentCharge += ChargeRate * DeltaTime;
 		CurrentCharge = FMath::Clamp(CurrentCharge, 0.0f, MaxCharge);
 	}
+}
+
+void AMainCharacterTest::Multi_PlaySound_Implementation(USoundBase* Sound)
+{
+	if (Sound != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, GetActorLocation());
+	}
+}
+
+bool AMainCharacterTest::Multi_PlaySound_Validate(USoundBase* Sound)
+{
+	return true;
 }
 
 
@@ -678,6 +705,7 @@ void AMainCharacterTest::ClientTowerPlacment()
 
 }
 
+
 void AMainCharacterTest::CallCreateLobby()
 {
 	UWorld* MultiWorld = GetWorld();
@@ -707,9 +735,39 @@ void AMainCharacterTest::UpdatePointsUi()
 	
 }
 
+void AMainCharacterTest::DamageYourself()
+{
+	setHealth(10);
+}
+
+void AMainCharacterTest::UpdateHealthWidget()
+{
+	if (ChargeWidget != nullptr) 
+	{
+
+		ChargeWidget->SetHealthAmount(Health);
+	}
+}
+
 void AMainCharacterTest::setHealth(float HealthStore)
 {
-	Health = HealthStore;
+	if (HasAuthority()) 
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Damaged")));
+		Health -= HealthStore;
+		ChargeWidget->SetHealthAmount(Health);
+	}
+	else 
+	{
+		Server_SetHealth(HealthStore);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Health: %f"), Health));
+	}
+}
+
+void AMainCharacterTest::Server_SetHealth_Implementation(float HealthStore)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Player Damaged Called On Server")));
+	Health -= HealthStore;
 }
 
 float AMainCharacterTest::getHealth()
