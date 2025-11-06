@@ -213,8 +213,10 @@ void AAIWitch::Multicast_PlayDeathMontage_Implementation()
 	{
 		if (AnimInstance != nullptr)
 		{
-			UBoolAnimInstance* BoolAnimInstance = Cast<UBoolAnimInstance>(AnimInstance);
-			if (BoolAnimInstance != nullptr) { BoolAnimInstance->setIsDeadBool(true); }
+			if (HasAuthority())
+			{
+				Multicast_AnimIsDead(true);
+			}
 
 			AnimInstance->Montage_Play(DeathMontage);
 			bCanActorMove = false;

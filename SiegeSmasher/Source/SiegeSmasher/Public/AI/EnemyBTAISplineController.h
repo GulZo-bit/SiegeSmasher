@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "SplineMovementActor.h"
 #include "../MainCharacter.h"
+#include "../MyMainCharacterTest.h"
 #include "AICharTest.h"
 #include "EnemyBTAISplineController.generated.h"
 

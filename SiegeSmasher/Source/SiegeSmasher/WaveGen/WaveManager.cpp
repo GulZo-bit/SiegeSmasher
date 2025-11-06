@@ -19,6 +19,12 @@ void AWaveManager::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Display, TEXT("Wave Manager Begin play called"));
+	for (int i = 0; i < EnemiesToSpawn.Num(); i++)
+	{
+		EnemiesToSpawn[i]->SetActorTickEnabled(false);
+		EnemiesToSpawn[i]->SetActorEnableCollision(false);
+		EnemiesToSpawn[i]->SetActorHiddenInGame(true);
+	}
 	BeginWave();
 
 
@@ -202,7 +208,7 @@ void AWaveManager::UpdateSpawning(float DeltaTime)
 
 void AWaveManager::EvaluateEnemySpawning()
 {
-	if (CurrentSpawnPoint->IsAvailable()) {
+	if (HasAuthority() && CurrentSpawnPoint->IsAvailable()) {
 
 
 		int randomAvailableEnemyIndex = random.RandRange(CurrentAvailableEnemyIndex, AvailableEnemies.Num() - 1);

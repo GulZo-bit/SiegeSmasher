@@ -41,7 +41,7 @@ void AWitch_Projectile::Tick(float DeltaTime)
 	
 	if (bMove == true)
 	{
-		FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 1500.0f);
+		FVector Target = FMath::VInterpConstantTo(GetActorLocation(), PlayerPawn->GetActorLocation(), DeltaTime, 1000.0f);
 		SetActorLocation(Target);
 	}
 	
@@ -60,9 +60,9 @@ void AWitch_Projectile::Tick(float DeltaTime)
 void AWitch_Projectile::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
-	if (Cast<AMainCharacter>(OtherActor))
+	if (Cast<AMainCharacterTest>(OtherActor))
 	{
-		AMainCharacter* MainChar = Cast<AMainCharacter>(OtherActor);
+		AMainCharacterTest* MainChar = Cast<AMainCharacterTest>(OtherActor);
 		MainChar->setHealth(MainChar->getHealth() - Damage);
 		GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
 		//this->Destroy();

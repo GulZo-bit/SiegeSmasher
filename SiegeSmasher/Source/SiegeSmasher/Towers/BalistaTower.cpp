@@ -21,7 +21,7 @@ ABalistaTower::ABalistaTower()
 	BallistaArrow->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BallistaTurret->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-
+	StimuliSourceComponent->UnregisterFromPerceptionSystem();
 
 }
 
