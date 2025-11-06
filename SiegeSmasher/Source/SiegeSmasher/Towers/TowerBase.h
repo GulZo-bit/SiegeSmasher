@@ -26,6 +26,11 @@
 #ifndef TowerPlacementBox
  #define TowerPlacementBox ECC_GameTraceChannel9
 #endif // !TowerPlacementBox
+#ifndef EnemyObjects
+ #define EnemyObjects ECC_GameTraceChannel3
+#endif // !TowerPlacementBox
+
+
 
 
 
@@ -63,6 +68,9 @@ protected:
 	FOnTimelineFloat TowerTimeLineInterpEvent; 
 	bool RequiresReset = false; 
 	bool StartedReset = false;
+	
+	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerWaitTimeToReset");
 	float MaxWaitTimeToReset;
 	float WaitTimeToReset = 0.0f;
@@ -126,6 +134,8 @@ protected:
 
 	UFUNCTION() 
 	virtual void OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	virtual void OnHitBoxHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 
 	virtual void HandleNewEnemy(AEnemyBase* EnemyBase); 
@@ -146,7 +156,14 @@ protected:
 	float MainStatusEffectDuration = 0.0f; 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerMainStatusEffect", meta = (ClampMin = "0.1", ClampMax = "1.0"));
 	float MainStatusEffectIncreaseScalar = 0.0f;
-	AMainCharacterTest* PlayerRef;
+	AMainCharacterTest* PlayerRef; 
+	UFUNCTION(NetMulticast, Reliable) 
+	void Multicast_SetTowerHitBoxCollisionResponse(ECollisionChannel Channel, ECollisionResponse CollisionResponse); 
+	void Multicast_SetTowerHitBoxCollisionResponse_Implementation(ECollisionChannel Channel, ECollisionResponse CollisionResponse);
+	UFUNCTION(NetMulticast,Reliable)
+	void MultiCast_SetTowerHitBoxEnabled(ECollisionEnabled::Type CollisionEnabled); 
+	void MultiCast_SetTowerHitBoxEnabled_Implementation(ECollisionEnabled::Type CollisionEnabled);
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
