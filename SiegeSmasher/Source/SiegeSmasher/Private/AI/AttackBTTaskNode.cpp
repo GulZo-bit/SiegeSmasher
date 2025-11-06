@@ -3,7 +3,6 @@
 
 #include "AI/AttackBTTaskNode.h"
 #include "AIController.h"
-#include "SiegeSmasher/MainCharacter.h"
 #include "AI/Sword.h"
 #include "AI/AICharTest.h"
 #include "Kismet/GameplayStatics.h"

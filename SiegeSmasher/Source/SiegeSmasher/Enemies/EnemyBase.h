@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
+#include "AI/BoolAnimInstance.h"
 #include "EnemyBase.generated.h"
 #ifndef MAX_ENEMY_NUM
  #define MAX_ENEMY_NUM 150
@@ -95,6 +96,11 @@ protected:
 	void DecrementWaveEnemyAliveCount();
 	bool Disabled = false;
 
+	UBoolAnimInstance* AnimIsDead;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AnimIsDead(bool bStore);
+	void Multicast_AnimIsDead_Implementation(bool bStore);
 public:
 	int32 CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect);
 	void ApplyTowerStatusEffect(EnemyStatusEffect  StatusEffect); 

@@ -2,7 +2,6 @@
 
 
 #include "EnemyBase.h"
-#include "AI/BoolAnimInstance.h"
 #include "../StatusEffects/BleedStatusEffect.h"  
 #include "../MyMainCharacterTest.h"
 #include "MCArrow.h"
@@ -31,6 +30,7 @@ void AEnemyBase::BeginPlay()
 	
 	InitialiseBleedStatusEffect();
 
+	AnimIsDead = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
 
 }
 
@@ -114,8 +114,15 @@ void AEnemyBase::ResetOnSpawn()
 	SetActorTickEnabled(true); 
 	Disabled = false;
 	CurrentHealth = MaxHealth;
-	UBoolAnimInstance* Temp = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
-	Temp->setIsDeadBool(false);
+
+	if (HasAuthority())
+	{
+		//UBoolAnimInstance* Temp = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
+		//Temp->setIsDeadBool(false);
+
+		Multicast_AnimIsDead(false);
+	}
+	
 
 }
 
@@ -219,6 +226,15 @@ void AEnemyBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 
 
+}
+
+void AEnemyBase::Multicast_AnimIsDead_Implementation(bool bStore)
+{
+	if (AnimIsDead != nullptr)
+	{
+		GLog->Log("Anim Instance is not null");
+		AnimIsDead->setIsDeadBool(bStore);
+	}
 }
 
 int32 AEnemyBase::CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect)

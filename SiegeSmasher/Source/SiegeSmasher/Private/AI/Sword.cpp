@@ -43,14 +43,14 @@ void ASword::Tick(float DeltaTime)
 //void ASword::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 //{
 //	
-//	if (Cast<AMainCharacter>(OtherActor))
+//	if (Cast<AMainCharacterTest>(OtherActor))
 //	{
 //		GetWorldTimerManager().ClearTimer(TimerHandle);
 //		GetWorldTimerManager().SetTimer(TimerHandle, this, &ASword::ResetHit, 1.0f, false, 0.1f);
 //
 //		//if (bHitDetected == false)
 //		//{
-//			AMainCharacter* MainChar = Cast<AMainCharacter>(OtherActor);
+//			AMainCharacterTest* MainChar = Cast<AMainCharacterTest>(OtherActor);
 //			MainChar->setHealth(MainChar->getHealth() - Damage);
 //			GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
 //			//GLog->Log(FString::SanitizeFloat(MainChar->GetVelocity().Length()));
@@ -66,13 +66,13 @@ void ASword::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Overlap detected with: %s"), *OtherActor->GetName());
 	}*/
-	if (Cast<AMainCharacter>(OtherActor) )
+	if (Cast<AMainCharacterTest>(OtherActor) )
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle);
 		GetWorldTimerManager().SetTimer(TimerHandle, this, &ASword::ResetHit, 1.0f, false, 1.5f);
 		if (bHit == false)
 		{
-			AMainCharacter* MainChar = Cast<AMainCharacter>(OtherActor);
+			AMainCharacterTest* MainChar = Cast<AMainCharacterTest>(OtherActor);
 			MainChar->setHealth(MainChar->getHealth() - Damage);
 			bHit = true;
 			GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));

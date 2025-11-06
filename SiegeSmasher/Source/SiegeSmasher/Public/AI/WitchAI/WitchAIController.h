@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "AI/SplineMovementActor.h"
-#include "../MainCharacter.h"
+#include "../MyMainCharacterTest.h"
 #include "../AIWitch.h"
 #include "WitchAIController.generated.h"
 

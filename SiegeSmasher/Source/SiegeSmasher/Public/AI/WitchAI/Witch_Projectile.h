@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SiegeSmasher/MainCharacter.h"
+#include "../MyMainCharacterTest.h"
 #include "Witch_Projectile.generated.h"
 
 UCLASS()
@@ -26,7 +26,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "default")
 	UStaticMeshComponent* Mesh;
 
-	AMainCharacter* Player;
+	AMainCharacterTest* Player;
 	FVector StartLocation;
 
 	int32 PlayerIndex = 0;

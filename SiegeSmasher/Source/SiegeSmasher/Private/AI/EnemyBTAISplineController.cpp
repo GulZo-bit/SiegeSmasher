@@ -15,7 +15,7 @@ void AEnemyBTAISplineController::BeginPlay()
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Found Behaviour tree")));
 		RunBehaviorTree(AIBehavior);
 
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMainCharacter::StaticClass(), PlayerActorArray);
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMainCharacterTest::StaticClass(), PlayerActorArray);
 		/*for (int i = 0; i < PlayerActorArray.Num(); i++)
 		{
 			if (PlayerActorArray[i] != nullptr)

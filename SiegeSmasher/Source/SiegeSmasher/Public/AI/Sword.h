@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "SiegeSmasher/MainCharacter.h"
+#include "SiegeSmasher/MyMainCharacterTest.h"
 #include "Sword.generated.h"
 
 UCLASS()
