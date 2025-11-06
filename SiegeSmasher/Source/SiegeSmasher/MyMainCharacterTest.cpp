@@ -755,7 +755,7 @@ void AMainCharacterTest::setHealth(float HealthStore)
 	if (HasAuthority()) 
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Damaged")));
-		Health -= HealthStore;
+		Health = HealthStore;
 		ChargeWidget->SetHealthAmount(Health);
 	}
 	else 
@@ -768,7 +768,7 @@ void AMainCharacterTest::setHealth(float HealthStore)
 void AMainCharacterTest::Server_SetHealth_Implementation(float HealthStore)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Player Damaged Called On Server")));
-	Health -= HealthStore;
+	Health = HealthStore;
 }
 
 float AMainCharacterTest::getHealth()
