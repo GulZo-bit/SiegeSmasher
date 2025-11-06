@@ -24,7 +24,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SwingAngle")
 	float SwingRotationAngle = 90.0f;
 
-
 	
 	
 	
@@ -43,7 +42,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SwingPlayBackSpeed"); 
 	float SwingPlayBackSpeed = 0.0f;
 	UPROPERTY(Replicated); 
-	bool IsSwinging = false;
+	bool IsSwinging = false;  
+
 protected:
 	FVector EulerAnglesOfSpikesOnPlace;
 
@@ -53,12 +53,6 @@ public:
 
 
 private: 
-
-	
-	
-
-
-	void RotateOnTimeLine(float value);
 
 
 };

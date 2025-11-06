@@ -77,6 +77,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* JumpAction;
 
+
+
 	//Move input action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* MoveAction;
@@ -92,6 +94,8 @@ public:
 	class UInputAction* SwitchTowerAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* ToggleTowerPlacementAction;
+
+	int AssignedPlayerId = 0;
 
 
 	//Calling for movement input
@@ -122,7 +126,10 @@ public:
 
 	void IncrementPlayerScore(int Increment);
 	void DecrementPlayerScore(int Increment);
-	void IncrementPlayerKills();
+	void IncrementPlayerKills(); 
+
+	
+
 	//input for triggering the shooting action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* ShootAction;
@@ -219,14 +226,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetPlayerOwnerShip(AActor* ActorToOwn);
 
-	UFUNCTION(Server, Reliable)
-	void Server_SetPlayerId(int Id);
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SetPlayerId(int Id);
-
-
-
-
 	void TowerPlacementHandle();
 
 	UFUNCTION(Server,Reliable)
@@ -274,6 +273,14 @@ public:
 	void Server_DisplaySelected();
 	void Server_DisplaySelected_Implementation();
 
+	/*UFUNCTION(Server, Reliable); 
+	void Server_SetPlayerId(int );
+	void Server_SetPlayerId_Implementation(int PlayerId);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_IncrementLoggedPlayerCount();*/
+
+
 	UFUNCTION(Server,Reliable)
 	void Server_ToggleTowers(bool ToggleTower);
 	void Server_ToggleTowers_Implementation(bool ToggleTower);
@@ -317,6 +324,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* DrawingSound;
 	
+	UPROPERTY(Replicated);
+	int PlayerId = 0;
 private:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 
@@ -326,7 +335,7 @@ private:
 		UWorld* World = nullptr;
 		APlayerController* AssignedPlayerController = nullptr;
 		FActorSpawnParameters TowerSpawnParameters;
-		int PlayerId = 0;
+		
 		UPROPERTY(Replicated);
 		int SelectedTowerIndex = -1;
 

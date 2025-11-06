@@ -277,10 +277,11 @@ void AMainCharacterTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME(AMainCharacterTest, ArrowClass);
 	DOREPLIFETIME(AMainCharacterTest, ChargeFinal);  
 
-	DOREPLIFETIME(AMainCharacterTest, PlayerPoints); 
-	DOREPLIFETIME(AMainCharacterTest, PlayerKills);
-
 	DOREPLIFETIME(AMainCharacterTest, Health);
+
+	DOREPLIFETIME(AMainCharacterTest, PlayerPoints); 
+	DOREPLIFETIME(AMainCharacterTest, PlayerKills); 
+	DOREPLIFETIME(AMainCharacterTest, PlayerId);
 	
 }
 
@@ -809,26 +810,10 @@ void AMainCharacterTest::SwitchTowers()
 	
 }
 
-void AMainCharacterTest::Server_SetPlayerId_Implementation(int Id)
-{
-	Multicast_SetPlayerId(Id);
-}
-void AMainCharacterTest::Multicast_SetPlayerId_Implementation(int Id)
-{
-	PlayerId = Id;
-}
-void AMainCharacterTest::SetPlayerId(int Id)
-{
-	if (GetLocalRole() < ROLE_Authority) {
-		Server_SetPlayerId(Id);
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Setting PlayerId on Server for client new client id is %d "), PlayerId));
 
-		return;
-	}
-	Multicast_SetPlayerId(Id);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Setting player id local host machine and multi casting from server for clients new host id is %d "), PlayerId));
-}
+
+
 
 
 

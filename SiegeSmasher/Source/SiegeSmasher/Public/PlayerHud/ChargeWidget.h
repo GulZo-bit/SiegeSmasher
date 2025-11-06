@@ -3,19 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "Components/ProgressBar.h"
+#include "Blueprint/UserWidget.h" 
+#include "Components/TextBlock.h"
+#include "Blueprint/WidgetTree.h" 
+#include "Components/GridPanel.h"
+#include "Components/ProgressBar.h"  
+#include "Components/CanvasPanel.h" 
+#include  "Components/CanvasPanelSlot.h"  
+#include "Components/Border.h" 
+#include "Components/BorderSlot.h"
 #include "ChargeWidget.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SIEGESMASHER_API UChargeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
+
+	void NativeConstruct();
+	
+
 	UPROPERTY(BlueprintReadOnly)
 	float Charge;
 
@@ -40,11 +49,45 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetHealthPercent(); 
 
-	
+	void HideLeaderBoard(bool ShouldHide);
 	void SetPoints(int NewPoints);
 
 	UFUNCTION(BlueprintCallable)
 	int GetPoints();
 	
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaxPlayerNum", meta = (ClampMin = "1", ClampMax = "4"))
+	int MaxPlayerNum = 4; 
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardGridPanelName"); 
+	FString LeaderBoardGridPanelName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardGridPanelName");
+	FString LeaderBoardBorderName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardHeaderName");
+	FString LeaderBoardHeaderName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardVerticalPadding"); 
+	float LeaderboardTextPadding;  
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardVerticalPadding");
+	float LeaderboardTopPadding;
+    
+
+
+    
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardName");
+	FString LeaderBoardTagName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardFont"); 
+	FSlateFontInfo LeaderboardFont;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardTextColour");
+	FSlateColor LeaderboardTextColour;
+	void SetLoggedPlayerNum(int LoggedNum);
+private:
+	void GenerateLeaderBoard();
+	TArray<UTextBlock*> LeaderBoardItems; 
+	UBorder* LeaderboardBorder = nullptr; 
+	UBorder* LeaderboardHeader = nullptr;
+	UGridPanel* LeaderboardGrid = nullptr; 
+
+	int LoggedPlayerNumber = 0;
 
 };
