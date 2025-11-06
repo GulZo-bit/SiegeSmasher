@@ -49,6 +49,18 @@ void ATowerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 }
 
+void ATowerBase::Multicast_SetTowerHitBoxCollisionResponse_Implementation(ECollisionChannel Channel, ECollisionResponse CollisionResponse)
+{
+	TowerHitBox->SetCollisionResponseToChannel(Channel, CollisionResponse);
+
+}
+
+void ATowerBase::MultiCast_SetTowerHitBoxEnabled_Implementation(ECollisionEnabled::Type CollisionEnabled)
+{
+	TowerHitBox->SetCollisionEnabled(CollisionEnabled);
+
+}
+
 
 
 // Called when the game starts or when spawned
@@ -58,7 +70,10 @@ void ATowerBase::BeginPlay()
 	WaitTimeToReset = MaxWaitTimeToReset; 
 	CoolDownAfterReset = MaxCoolDownAfterReset;
 	TriggerRangeBox->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnOverLapBegin);
-	TowerHitBox->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnOverlapHitBox); 
+	TowerHitBox->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnOverlapHitBox);  
+
+	
+
 	TriggerBoxDim = TriggerRangeBox->GetCollisionShape().GetExtent(); 
 	/*TriggerRangeBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 	TowerHitBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);*/
@@ -318,9 +333,11 @@ UBoxComponent* ATowerBase::GetPlacmentBox()
 
 void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor* OverlapedActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool SweepBool ,const FHitResult& HitResult) {
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
 	if (HasAuthority() ) {
 		AEnemyBase* EnemyToHandle = Cast<AEnemyBase>(OverlapedActor);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
+
 		if (EnemyToHandle != nullptr && EnemyToHandle->GetHealth() >0.0f) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin hit ")));
 
@@ -337,13 +354,26 @@ void ATowerBase::OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, AActor* Ot
 {
 
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit enemy")));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit enemy")));
 
 		ApplyDamage(Enemy);
 
 	}
 
 
+
+}
+
+void ATowerBase::OnHitBoxHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit event enemy")));
+
+	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit event on  enemy")));
+
+		ApplyDamage(Enemy);
+
+	}
 
 }
 
@@ -409,6 +439,7 @@ FGenericTeamId ATowerBase::GetGenericTeamId() const
 {
 	return TeamID;
 }
+
 
 // Called every frame
 void ATowerBase::Tick(float DeltaTime)
