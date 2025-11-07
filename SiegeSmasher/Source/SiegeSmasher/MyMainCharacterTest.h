@@ -8,7 +8,8 @@
 #include "InputActionValue.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/CapsuleComponent.h" 
+#include "ServerObject/ServerObject.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerHud/ChargeWidget.h"
@@ -77,7 +78,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* JumpAction;
 
-
+	
 
 	//Move input action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
@@ -233,11 +234,7 @@ public:
 
 	void Server_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
 	
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_HandleTowerPlacement(FVector CamForward, FVector CamPosition);
-
-	void Multicast_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
-
+	
 
 
 	UFUNCTION(Server,Reliable) 
@@ -273,12 +270,22 @@ public:
 	void Server_DisplaySelected();
 	void Server_DisplaySelected_Implementation();
 
-	/*UFUNCTION(Server, Reliable); 
-	void Server_SetPlayerId(int );
-	void Server_SetPlayerId_Implementation(int PlayerId);
+	
 
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_IncrementLoggedPlayerCount();*/
+	UFUNCTION(Server,Reliable) 
+	void Server_AssignPlayerId(int Id);
+	void Server_AssignPlayerId_Implementation(int Id);
+
+	
+
+	UFUNCTION(Server, Reliable)
+	void Server_IncrementLoggedPlayerCount(); 
+	void Server_IncrementLoggedPlayerCount_Implementation();
+
+	
+	int GetScore(); 
+	int GetKills();
+
 
 
 	UFUNCTION(Server,Reliable)
@@ -301,13 +308,16 @@ public:
 	void CallCreateLobby();
 
 	UFUNCTION(BlueprintCallable)
-	void CallClientTravel(const FString& Address); 
+	void CallClientTravel(const FString& Address);  
+
+	void AdjustLeaderBoardValues(int LeaderboardPlayerPoints, int LeaderboardPlayerKils);
+
 protected:
 	UFUNCTION()
-	void UpdatePointsUi();
-	UPROPERTY(Replicated)
+	void UpdatePlayerInfoUi();
+	UPROPERTY(ReplicatedUsing = UpdatePlayerInfoUi)
     int PlayerKills = 0;
-	UPROPERTY(ReplicatedUsing = UpdatePointsUi);
+	UPROPERTY(ReplicatedUsing = UpdatePlayerInfoUi);
 	int PlayerPoints = 0; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
@@ -325,7 +335,17 @@ protected:
 	USoundBase* DrawingSound;
 	
 	UPROPERTY(Replicated);
-	int PlayerId = 0;
+	int PlayerId = 0; 
+
+	
+	AServerObject* ServerObjectRef = nullptr;
+
+	void SetUpPlayerId();
+
+	UFUNCTION(NetMulticast,Reliable) 
+	void Multicast_SetLeaderBoardTxt(int NewPlayerPoint, int NewPlayerKills, int LeaderBoardPlayerId); 
+	void Multicast_SetLeaderBoardTxt_Implementation(int NewPlayerPoints, int NewPlayerKills, int LeaderBoardPlayerId);
+
 private:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 
