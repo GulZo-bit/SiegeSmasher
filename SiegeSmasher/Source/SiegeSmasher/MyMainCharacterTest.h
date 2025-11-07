@@ -252,10 +252,23 @@ public:
 	void Multicast_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 	void Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 
+	
+
 	void SpawnSelected();
 	UFUNCTION(Server, Reliable)
 	void Server_SpawnSelected(bool PlacingTower, bool ToggleTower);
 	void Server_SpawnSelected_Implementation(bool PlacingTower, bool ToggleTower);
+
+
+	UFUNCTION(Server,Reliable)
+	void Server_RefreshLeaderboard();
+	void Server_RefreshLeaderboard_Implementation(); 
+
+	UFUNCTION(NetMulticast,Reliable) 
+	void Multicast_RefreshLeaderboard(); 
+	void Multicast_RefreshLeaderboard_Implementation();
+
+	void RefreshLeaderBoard();
 
 	UFUNCTION(Server,Reliable) 
 	void Server_SwitchTower(int SelectedIndex, bool ToggleTower); 
@@ -325,14 +338,21 @@ public:
 
 protected:
 	UFUNCTION()
-	void UpdatePlayerInfoUi();
-	UPROPERTY(ReplicatedUsing = UpdatePlayerInfoUi)
+	void UpdatePlayerScoreUi();
+	UPROPERTY(Replicated)
     int PlayerKills = 0;
-	UPROPERTY(ReplicatedUsing = UpdatePlayerInfoUi);
+	UPROPERTY(ReplicatedUsing = UpdatePlayerScoreUi);
 	int PlayerPoints = 0; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* SelfDamage;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCast_UpdateLeaderBoardInfo(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId); 
+
+	void MultiCast_UpdateLeaderBoardInfo_Implementation(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId);
+
+	void UpdateLeaderBoardInfo();
 
 	void DamageYourself();
 

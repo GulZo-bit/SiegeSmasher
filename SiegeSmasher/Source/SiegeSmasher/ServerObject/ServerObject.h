@@ -21,7 +21,6 @@ struct FPlayerLeaderBoardInfo: public FFastArraySerializerItem {
 	UPROPERTY();
 	int LeaderboardPlayerKills;
 
-	
 
 	FPlayerLeaderBoardInfo(): LeaderboardPlayerScore(0), LeaderboardPlayerKills(0) {};
     FPlayerLeaderBoardInfo(int _PlayerScore,int _PlayerKills):LeaderboardPlayerScore(_PlayerScore), LeaderboardPlayerKills(_PlayerKills){}
@@ -31,11 +30,9 @@ struct FPlayerLeaderBoardInfo: public FFastArraySerializerItem {
 	void PostReplicatedChange(const struct FLeaderboardItems& InArraySerializer);
 	
 
-	
-
-
-
 };
+
+
 
 
 USTRUCT()
@@ -53,9 +50,7 @@ struct FLeaderboardItems:public FFastArraySerializer
 		return FFastArraySerializer::FastArrayDeltaSerialize<FPlayerLeaderBoardInfo, FLeaderboardItems>(Items, DeltaParms, *this);
 	}
 
-	/*void AddPlayerIdMappedToRepId(int PlayerId, int32 ReplicationId) {
-		PlayerIdsToPlayerInfoIndex.Add({ PlayerId,ReplicationId });
-	};*/
+	
 
 
 };
@@ -72,7 +67,7 @@ inline void FPlayerLeaderBoardInfo::PostReplicatedAdd(const FLeaderboardItems& I
 {
 
 	int32 RepId = InArraySerializer.Items[InArraySerializer.Items.Num() - 1].ReplicationID;
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Replciated Tarray for leader board count for index for array %d "), InArraySerializer.Items.Num() - 1));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Replciated Tarray for leader board count for index for array %d "), InArraySerializer.Items.Num() - 1));
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, FString::Printf("Server client current player id %d"), InArraySerializer.ServerObjectRef->GetCurrentPlayerId());
 	
 
@@ -85,7 +80,7 @@ inline void FPlayerLeaderBoardInfo::PostReplicatedChange(const FLeaderboardItems
 
 
 
-
+class AMainCharacterTest;
 UCLASS()
 class SIEGESMASHER_API AServerObject : public AActor
 {
@@ -101,13 +96,15 @@ protected:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
 	
-
+	AMainCharacterTest* Host  = nullptr;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override; 
-	void IncrementPlayerCount();
+	void IncrementPlayerCount(); 
 	int GetPlayerCurrentCount();
-	int GetCurrentPlayerId();
+	int GetCurrentPlayerId();  
+	void SetHost(AMainCharacterTest* Character);
+	AMainCharacterTest* GetHost();
 	UFUNCTION()
 	void AddLeaderBoardInfoOnIdInc();
 	UPROPERTY(ReplicatedUsing  = AddLeaderBoardInfoOnIdInc);
@@ -116,13 +113,15 @@ public:
 	
 	void MappPlayerIdToReplicatedId(int32 ReplicatedId);
 	
-	
+	void UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKills, int PlayerId);
 	void AdjustLeaderBoardPlayerInfo(int PlayerPoints, int PlayerKills, int PlayerId);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_AdjustPlayerInfo(int PlayerPoints, int PlayerKills, int PlayerId);
 	void Multicast_AdjustPlayerInfo_Implementation(int PlayerPoints, int PlayerKills, int PlayerId);
 
 	bool HasPlayerInfo(int PlayerId);
+
+	FPlayerLeaderBoardInfo GetPlayerInfo(int PlayerId);
 
 	void LogMap();
 

@@ -14,7 +14,7 @@ void UChargeWidget::NativeConstruct() {
 	if (LeaderboardGrid && LeaderboardHeader && LeaderboardBorder) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Leaderboard border found")));
 		
-		//GenerateLeaderBoard();
+		GenerateLeaderBoard();
 	}
 		
 	else {
@@ -64,30 +64,18 @@ void UChargeWidget::GenerateLeaderBoard()
 			TextCanvasSlot->SetPosition(TextPosition);
 			LeaderBoardItems.Add(Text);
 
-			if(ServerobjectRef->HasPlayerInfo(i)){
-
-				//Text->SetText(FText::FromString(PlayerTag + ":" + " Current Points:" + FString::FromInt(Info->LeaderboardPlayerScore) + " Kills:" + FString::FromInt(Info->LeaderboardPlayerKills)));
-
-
-
-			
-		    }
-			LeaderBoardItems[i]->SetRenderOpacity(0.0f);
+		
+			//LeaderBoardItems[i]->SetRenderOpacity(0.0f);
 
 			
 		}
-
+		 //LeaderboardBorder->SetRenderOpacity(0.0f); 
+        //LeaderboardHeader->SetRenderOpacity(0.0f); 
+	   //LeaderboardGrid->SetRenderOpacity(0.0f);
 	}
 
 }
 	
-	//LeaderboardBorder->SetRenderOpacity(0.0f); 
-	//LeaderboardHeader->SetRenderOpacity(0.0f); 
-	//LeaderboardGrid->SetRenderOpacity(0.0f);
-	
-	
-
-
 
 void UChargeWidget::SetChargeAmount(float ChargeAmount)
 {
@@ -153,14 +141,40 @@ void UChargeWidget::SetServerObjectRef(AServerObject* ServerObjectPtr)
 
 void UChargeWidget::UpdatePlayerLeaderBoardInfo(int Points, int Kills, int PlayerId)
 {
-	FString LeaderboardTxt = LeaderBoardTagName + FString::FromInt( PlayerId + 1) +":" + " Current Points:" + FString::FromInt(Points) + " Kills:" + FString::FromInt(Kills);
-	//LeaderBoardItems[PlayerId]->SetText(FText::FromString(LeaderboardTxt));
-	//LeaderBoardItems[PlayerId]->SetOpacity(((float)LeaderboardBorder->GetRenderOpacity() > 0.0f ));
+	try {
+		FString LeaderboardTxt = LeaderBoardTagName + FString::FromInt(PlayerId + 1) + ":" + " Current Points:" + FString::FromInt(Points) + " Kills:" + FString::FromInt(Kills);
+
+		LeaderBoardItems[PlayerId]->SetText(FText::FromString(LeaderboardTxt));
+		LeaderBoardItems[PlayerId]->SetOpacity(((float)LeaderboardBorder->GetRenderOpacity() > 0.0f));
+	}
+	catch (...) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID WAS NULL WHEN TRYING TO UPDATE SLOT ON LEADERBOARD")));
+
+	}
 }
 
-void UChargeWidget::InitialisePlayerLeaderboardInfo()
+void UChargeWidget::RefreshPlayerLeaderboardInfo()
 {
 	
+
+	FPlayerLeaderBoardInfo info = FPlayerLeaderBoardInfo();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), ServerobjectRef->GetPlayerCurrentCount()));
+
+	for (int i = 0; i < ServerobjectRef->GetPlayerCurrentCount(); i++) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), i));
+		 info = ServerobjectRef->GetPlayerInfo(i);
+        
+
+		FString LeaderboardTxt = LeaderBoardTagName + FString::FromInt(i + 1) + ":" + " Current Points:" + FString::FromInt(info.LeaderboardPlayerScore) + " Kills:" + FString::FromInt(info.LeaderboardPlayerKills);
+
+		LeaderBoardItems[i]->SetText(FText::FromString(LeaderboardTxt));
+		LeaderBoardItems[i]->SetOpacity(LeaderboardBorder->GetRenderOpacity());
+
+	}
+
+
 
 
 
