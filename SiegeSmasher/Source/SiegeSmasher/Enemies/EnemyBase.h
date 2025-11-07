@@ -65,6 +65,7 @@ protected:
 
 	virtual void BeginPlay() override;
 	int EnemyTest();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyVariables")
 	int EnemyStartingCount = 8;
 	
 
