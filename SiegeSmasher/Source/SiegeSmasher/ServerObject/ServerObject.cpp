@@ -32,8 +32,19 @@ void AServerObject::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 void AServerObject::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay(); 
+
+	
+
+
 }
+AMainCharacterTest* AServerObject::GetHost() {
+
+	return Host;
+
+
+}
+
 
 void AServerObject::Tick(float DeltaTime)
 {
@@ -64,10 +75,20 @@ int AServerObject::GetPlayerCurrentCount()
 
 
 
+
+
 int AServerObject::GetCurrentPlayerId() {
 
 	return CurrentPlayerCount - 1;
 }
+
+void AServerObject::SetHost(AMainCharacterTest* LocalHost)
+{
+	Host = LocalHost;
+
+
+}
+
 
 
 
@@ -75,6 +96,24 @@ void AServerObject::MappPlayerIdToReplicatedId(int32 ReplicatedId)
 {
 
 	//PlayerIdsToPlayerInfoIndex.Add({ GetCurrentPlayerId(),ReplicatedId });
+
+}
+
+void AServerObject::UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKills, int PlayerId)
+{
+	try {
+
+		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints; 
+		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
+		LeaderBoardInfo.MarkItemDirty(LeaderBoardInfo.Items[PlayerId]);
+
+
+	}
+	catch (...) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID FOR LEADER BOARD INFO FOR SERVER OBJECT WAS NULL %d"),PlayerId));
+	}
+
 
 }
 
@@ -96,10 +135,45 @@ void AServerObject::Multicast_AdjustPlayerInfo_Implementation(int PlayerPoints, 
 
 }
 
+
+
+
+
 bool AServerObject::HasPlayerInfo(int PlayerId)
 {
-	return LeaderBoardPlayerInfo.Find(PlayerId) != nullptr;
+	try {
+
+		LeaderBoardInfo.Items[PlayerId]; 
+
+		return true;
+
+
+	}
+	catch (...) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Player id did not exists %d"), PlayerId));
+		return false;
+	}
 }
+
+FPlayerLeaderBoardInfo AServerObject::GetPlayerInfo(int PlayerId)
+{
+	if (HasPlayerInfo(PlayerId)) {
+
+		return LeaderBoardInfo.Items[PlayerId];
+
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("COULD NOT FIND PLAYER ID WHEN REFRESHING LEADERBOARD ID: %d"), PlayerId)); 
+	
+	return FPlayerLeaderBoardInfo();
+
+
+}
+
+
+
+
 
 void AServerObject::LogMap()
 {
@@ -115,6 +189,8 @@ void AServerObject::LogMap()
 
 
 
+
+
 void AServerObject::AddLeaderBoardInfoOnIdInc()
 {
 
@@ -127,5 +203,9 @@ void AServerObject::AddLeaderBoardInfoOnIdInc()
 
 
 }
+
+
+
+
 
 

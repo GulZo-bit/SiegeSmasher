@@ -59,7 +59,9 @@ public:
 	void SetServerObjectRef(AServerObject* ServerObjectPtr);
 	void UpdatePlayerLeaderBoardInfo(int Points, int Kills, int PlayerId); 
 	
-	void InitialisePlayerLeaderboardInfo();
+	void RefreshPlayerLeaderboardInfo();
+
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaxPlayerNum", meta = (ClampMin = "1", ClampMax = "4"))
