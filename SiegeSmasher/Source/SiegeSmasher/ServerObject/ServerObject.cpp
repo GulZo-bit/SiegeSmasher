@@ -1,164 +1,131 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-//#include "ServerObject.h"
-
+#include "ServerObject.h"
+#include "../MyMainCharacterTest.h"
 // Sets default values
-//AServerObject::AServerObject()
-//{
-// 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-//	PrimaryActorTick.bCanEverTick = true;
-//	bReplicates = true;
-//	CurrentPlayerId = 0;
-//	MaxPlayerIdCount = 4; 
-//
-//
-//	RootComponent = CreateDefaultSubobject<USceneComponent>("Root");
-//
-//}
-//
-//int AServerObject::GetPlayerCurrentId()
-//{
-//
-//	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Emerald, FString::Printf(TEXT("getting player id from assigned server object %d"), CurrentPlayerId));
-//
-//
-//	return CurrentPlayerId;
-//}
-//
-//// Called when the game starts or when spawned
-//void AServerObject::BeginPlay()
-//{
-//	Super::BeginPlay();
-//
-//	UWorld* World = GetWorld();
-//	if (World != nullptr) {
-//		//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("Found world")));
-//
-//
-//		if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController()) {
-//
-//
-//
-//			TArray<AActor*> MainChars = {};
-//			UGameplayStatics::GetAllActorsOfClass(World, AMainCharacter::StaticClass(), MainChars);
-//
-//			if (AMainCharacter* MainChar = Cast<AMainCharacter>(UGameplayStatics::GetActorOfClass(World, AMainCharacter::StaticClass())))
-//			{
-//
-//				GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT(" Found local character num %d"),MainChars.Num()));
-//				MainChar->SetPlayerOwnerShip(this);
-//				
-//				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Owner ship was set to SERVER OBJECT")));
-//				IncrementPlayerId();
-//				
-//
-//				//MultiCast_IncrementPlayerId();
-//
-//
-//
-//
-//			}
-//
-//
-//			//if (HasAuthority()) {
-//			//	//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("local host Found local player")));
-//
-//
-//			//}
-//			//else {
-//			//	//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("client Found local player")));
-//
-//			//}
-//
-//
-//
-//
-//
-//
-//
-//		}
-//	}
-//}
-//
-//
-//
-//	
-//
-//
-//
-//
-//
-//
-//void AServerObject::AssignOwner(APlayerController* Controller)
-//{
-//	
-//		Server_AssignOwner(Controller);
-//	
-//
-//
-//}
-//void AServerObject::Server_AssignOwner_Implementation(APlayerController* Controller)
-//{
-//	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Blue, FString::Printf(TEXT("assigning player controlle on server ")));
-//	SetOwner(Controller);
-//}
-//
-//
-//void AServerObject::MultiCast_IncrementPlayerId_Implementation()
-//{
-//	CurrentPlayerId = (CurrentPlayerId + 1) % MaxPlayerIdCount;
-//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incremeting player id new id is %d"),CurrentPlayerId));
-//
-//	if (HasAuthority()) {
-//
-//
-//		//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("Incremented player id on local host %d"), CurrentPlayerId));
-//		//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("max id %d"), MaxPlayerIdCount));
-//
-//	}
-//	else {
-//		/*GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("Incremented player id on client  %d"), CurrentPlayerId));
-//		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("max id %d"), MaxPlayerIdCount));*/
-//
-//	}
-//}
-//  
-//
-//
-//
-//void AServerObject::Server_IncrementPlayerId_Implementation()
-//{ 
-//	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Magenta, FString::Printf(TEXT("SERVER implmentation called")));
-//	MultiCast_IncrementPlayerId();
-//
-//}
-//
-//
-//
-//
-//// Called every frame
-//void AServerObject::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//
-//}
-//
-//void AServerObject::IncrementPlayerId()
-//{
-//	if (!HasAuthority()) {
-//		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Purple, FString::Printf(TEXT("CLIENT DETECTED INCREMENTING PLAYER ID ON SERVER")));
-//		Server_IncrementPlayerId();
-//
-//		return;
-//	}
-//
-//	MultiCast_IncrementPlayerId();
-//
-//
-//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incrementing current player id on local host and multicasting to clients new id: %d"), CurrentPlayerId));
-//
-//
-//
-//}
-//
+
+
+
+
+AServerObject::AServerObject()
+{
+	bReplicates = true;
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	
+	PrimaryActorTick.bCanEverTick = true;
+	
+	RootComponent = CreateDefaultSubobject<USceneComponent>("Root");
+
+
+
+}
+
+
+void AServerObject::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const {
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AServerObject, CurrentPlayerCount);
+	DOREPLIFETIME(AServerObject, LeaderBoardInfo);
+
+}
+
+void AServerObject::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AServerObject::Tick(float DeltaTime)
+{
+
+
+}
+
+void AServerObject::IncrementPlayerCount()
+{
+	
+	//LeaderBoardPlayerInfo.Add({ CurrentPlayerCount,PlayerRef});
+	
+   CurrentPlayerCount += 1;
+
+   int32 Index = LeaderBoardInfo.Items.Add(FPlayerLeaderBoardInfo());  
+   int32 RepId = LeaderBoardInfo.Items[LeaderBoardInfo.Items.Num() - 1].ReplicationID;
+   //LeaderBoardInfo.AddPlayerIdMappedToRepId(GetCurrentPlayerId(), RepId);
+   LeaderBoardInfo.MarkItemDirty(LeaderBoardInfo.Items[Index]);
+   GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, FString::Printf(TEXT("incremeting server obejct count %d"), CurrentPlayerCount));
+   GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Replciated Tarray for leader board count for index for array %d "), LeaderBoardInfo.Items.Num() - 1));
+ /*  GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, FString::Printf("Server  current player id %d"), LeaderBoardInfo.ServerObjectRef->GetCurrentPlayerId());*/
+}
+
+int AServerObject::GetPlayerCurrentCount()
+{
+	return CurrentPlayerCount;
+}
+
+
+
+int AServerObject::GetCurrentPlayerId() {
+
+	return CurrentPlayerCount - 1;
+}
+
+
+
+void AServerObject::MappPlayerIdToReplicatedId(int32 ReplicatedId)
+{
+
+	//PlayerIdsToPlayerInfoIndex.Add({ GetCurrentPlayerId(),ReplicatedId });
+
+}
+
+void AServerObject::AdjustLeaderBoardPlayerInfo(int PlayerPoints, int PlayerKills, int PlayerId)
+{
+	Multicast_AdjustPlayerInfo(PlayerPoints, PlayerKills, PlayerId);
+
+}
+
+
+
+void AServerObject::Multicast_AdjustPlayerInfo_Implementation(int PlayerPoints, int PlayerKills, int PlayerId)
+{
+
+	if (LeaderBoardPlayerInfo.Find(PlayerId)) {
+
+	}
+
+
+}
+
+bool AServerObject::HasPlayerInfo(int PlayerId)
+{
+	return LeaderBoardPlayerInfo.Find(PlayerId) != nullptr;
+}
+
+void AServerObject::LogMap()
+{
+
+
+	/*for(TTuple<int,AMainCharacterTest*> pair: LeaderBoardPlayerInfo) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Leaderboard map: p:%d k:%d id:%d"), pair.Value->GetScore(), pair.Value->GetKills(), pair.Key));
+
+	}*/
+
+}
+
+
+
+void AServerObject::AddLeaderBoardInfoOnIdInc()
+{
+
+
+	/*PlayerIdsToPlayerInfoIndex.Add(GetCurrentPlayerId(), LeaderBoardInfo.Items[LeaderBoardInfo.Items.Num() - 1].ReplicationID);
+
+	*/
+	
+
+
+
+}
+
+
