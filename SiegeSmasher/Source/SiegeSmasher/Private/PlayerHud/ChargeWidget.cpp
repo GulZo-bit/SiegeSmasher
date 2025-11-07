@@ -154,8 +154,8 @@ void UChargeWidget::SetServerObjectRef(AServerObject* ServerObjectPtr)
 void UChargeWidget::UpdatePlayerLeaderBoardInfo(int Points, int Kills, int PlayerId)
 {
 	FString LeaderboardTxt = LeaderBoardTagName + FString::FromInt( PlayerId + 1) +":" + " Current Points:" + FString::FromInt(Points) + " Kills:" + FString::FromInt(Kills);
-	LeaderBoardItems[PlayerId]->SetText(FText::FromString(LeaderboardTxt));
-	LeaderBoardItems[PlayerId]->SetOpacity(((float)LeaderboardBorder->GetRenderOpacity() > 0.0f ));
+	//LeaderBoardItems[PlayerId]->SetText(FText::FromString(LeaderboardTxt));
+	//LeaderBoardItems[PlayerId]->SetOpacity(((float)LeaderboardBorder->GetRenderOpacity() > 0.0f ));
 }
 
 void UChargeWidget::InitialisePlayerLeaderboardInfo()
