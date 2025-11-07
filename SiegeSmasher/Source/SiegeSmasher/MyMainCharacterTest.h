@@ -302,6 +302,17 @@ public:
 	void Multi_PlaySound_Implementation(USoundBase* Sound);
 	bool Multi_PlaySound_Validate(USoundBase* Sound);
 
+	UFUNCTION()
+	void PlayerDeath();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdateChargeBar();
+
+	void Multicast_UpdateChargeBar_Implementation();
+
+	UPROPERTY()
+	FVector PlayerRespawnPoint;
+
 
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)

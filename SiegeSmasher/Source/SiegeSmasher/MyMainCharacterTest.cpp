@@ -111,7 +111,7 @@ void AMainCharacterTest::BeginPlay()
 	TraceParams.AddIgnoredActor(this);
 	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(TPSCameraComponent == nullptr)));
 
-
+	PlayerRespawnPoint = GetActorLocation();
 
 
 	SetUpPlayerId();
@@ -413,6 +413,19 @@ bool AMainCharacterTest::Multi_UpdateCharge_Validate()
 	return true;
 }
 
+
+void AMainCharacterTest::Multicast_UpdateChargeBar_Implementation()
+{
+	if (ChargeWidget != nullptr)
+	{
+		CurrentCharge = 0.0f;
+		ChargeWidget->SetChargeAmount(CurrentCharge);
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("Current Charge: %f"), CurrentCharge));
+
+	}
+}
+
+
 void AMainCharacterTest::Server_UpdateCharge_Implementation(float ClientCharge)
 {
 	ChargeFinal = ClientCharge;
@@ -442,6 +455,16 @@ void AMainCharacterTest::Server_StopAim_Implementation()
 	SetArrowDrawn(false);
 	SetArrowFired(true);
 	isCharging = false;
+
+	CurrentCharge = 0.0f;
+	Multicast_UpdateChargeBar();
+
+	CurrentCharge = 0.0f;
+	if (ChargeWidget != nullptr)
+	{
+		ChargeWidget->SetChargeAmount(CurrentCharge);
+
+	}
 }
 
 bool AMainCharacterTest::Server_StopAim_Validate()
@@ -509,6 +532,19 @@ bool AMainCharacterTest::Multi_PlaySound_Validate(USoundBase* Sound)
 {
 	return true;
 }
+
+
+void AMainCharacterTest::PlayerDeath()
+{
+	SetActorLocation(PlayerRespawnPoint);
+	DecrementPlayerScore(100);
+	if (PlayerPoints < 0)
+	{
+		PlayerPoints = 0;
+	}
+	Health = 100.0f;
+}
+
 
 
 //Abandon hope all who go past this line
@@ -822,6 +858,13 @@ void AMainCharacterTest::setHealth(float HealthStore)
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Damaged")));
 		Health = HealthStore;
 		ChargeWidget->SetHealthAmount(Health);
+
+		if (Health <= 0)
+		{
+			PlayerDeath();
+
+		}
+
 	}
 	else 
 	{
@@ -834,6 +877,13 @@ void AMainCharacterTest::Server_SetHealth_Implementation(float HealthStore)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Player Damaged Called On Server")));
 	Health = HealthStore;
+
+	if (Health <= 0)
+	{
+		PlayerDeath();
+
+	}
+
 }
 
 float AMainCharacterTest::getHealth()
