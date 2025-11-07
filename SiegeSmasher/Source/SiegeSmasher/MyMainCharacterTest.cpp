@@ -102,12 +102,14 @@ void AMainCharacterTest::BeginPlay()
 				
 				
 				ChargeWidget->SetServerObjectRef(ServerObjectRef);
+				ServerObjectRef->SetPlayerStateToHandle(this);
 
+				if (HasAuthority()) {
+					ServerObjectRef->SetHost(this);
+				}
 			}
 
-			if (HasAuthority()) {
-				ServerObjectRef->SetHost(this);
-			}
+			
 		}
 	}
 	
@@ -124,7 +126,7 @@ void AMainCharacterTest::BeginPlay()
 	SetUpPlayerId();
 
 
-	RefreshLeaderBoard();
+	//RefreshLeaderBoard();
 	
 
 }
@@ -143,10 +145,7 @@ void AMainCharacterTest::Tick(float DeltaTime)
 
 
 	}
-	if (!HasAuthority()) {
-		ServerObjectRef->LogMap();
-
-	}
+	
 
 
 	TowerPlacementHandle();
@@ -869,9 +868,9 @@ void AMainCharacterTest::SetUpPlayerId()
 		PlayerId = ServerObjectRef->GetCurrentPlayerId();  
 
 	
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, FString::Printf(TEXT("PLAYER ID ON SERVER %d"), PlayerId));
+		/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, FString::Printf(TEXT("PLAYER ID ON SERVER %d"), PlayerId));
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("INCREMENTING PLAYER ID ON SERVER OBJECT AFTER INCREMENT %d"), ServerObjectRef->GetPlayerCurrentCount()));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("INCREMENTING PLAYER ID ON SERVER OBJECT AFTER INCREMENT %d"), ServerObjectRef->GetPlayerCurrentCount()));*/
 
 	}
 	
@@ -882,10 +881,10 @@ void AMainCharacterTest::SetUpPlayerId()
 
 void AMainCharacterTest::Multicast_SetLeaderBoardTxt_Implementation(int NewPlayerPoints, int NewPlayerKills, int LeaderboardPlayerId)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("multi cast to set leaderboard called")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("multi cast to set leaderboard called")));
 	if (ChargeWidget != nullptr) {
 
-		ChargeWidget->UpdatePlayerLeaderBoardInfo(NewPlayerPoints, NewPlayerKills, LeaderboardPlayerId);
+		//ChargeWidget->UpdatePlayerLeaderBoardInfo(NewPlayerPoints, NewPlayerKills, LeaderboardPlayerId);
 
 
 
@@ -1162,7 +1161,7 @@ void AMainCharacterTest::Multicast_RefreshLeaderboard_Implementation()
 
 	if (ChargeWidget != nullptr && ServerObjectRef != nullptr) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" multi cats called refreshing leaderboard for player with id %d"), PlayerId));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" multi cats called refreshing leaderboard for player with id %d"), PlayerId));
 		ChargeWidget->RefreshPlayerLeaderboardInfo();
 
 
@@ -1176,13 +1175,15 @@ void AMainCharacterTest::RefreshLeaderBoard()
 	
 	if (HasAuthority() ) {
 
-		GEngine->AddOnScreenDebugMessage(-1,25.0f,FColor::Magenta,FString::Printf(TEXT("SERVER OBJECT HOST WAS NULL %d"), (int)(ServerObjectRef->GetHost() == nullptr)));
-		if (ChargeWidget == nullptr) {
-			ServerObjectRef->GetHost()->RefreshLeaderBoard();
-			return;
-		}
+		//GEngine->AddOnScreenDebugMessage(-1,25.0f,FColor::Magenta,FString::Printf(TEXT("SERVER OBJECT HOST WAS NULL %d"), (int)(ServerObjectRef->GetHost() == nullptr)));
 		
 		Multicast_RefreshLeaderboard();
+		/*if (ChargeWidget == nullptr) {
+			ServerObjectRef->GetHost()->RefreshLeaderBoard();
+			return;
+		}*/
+		
+	
 		
 	}
 	else {
@@ -1330,6 +1331,11 @@ void AMainCharacterTest::IncrementPlayerKills()
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incrementing Player kills %d"), PlayerKills));
 	}
 
+}
+
+UChargeWidget* AMainCharacterTest::GetPlayerWidget()
+{
+	return ChargeWidget;
 }
 
 

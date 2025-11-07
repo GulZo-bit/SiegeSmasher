@@ -10,6 +10,7 @@
 #include "ServerObject.generated.h"
 
 
+class AMainCharacterTest;
 
 USTRUCT() 
 struct FPlayerLeaderBoardInfo: public FFastArraySerializerItem {
@@ -25,10 +26,12 @@ struct FPlayerLeaderBoardInfo: public FFastArraySerializerItem {
 	FPlayerLeaderBoardInfo(): LeaderboardPlayerScore(0), LeaderboardPlayerKills(0) {};
     FPlayerLeaderBoardInfo(int _PlayerScore,int _PlayerKills):LeaderboardPlayerScore(_PlayerScore), LeaderboardPlayerKills(_PlayerKills){}
 
-	void PreReplicatedRemove(const struct FLeaderboardItems& InArraySerializer);
-	void PostReplicatedAdd(const struct FLeaderboardItems& InArraySerializer);
-	void PostReplicatedChange(const struct FLeaderboardItems& InArraySerializer);
+	void PreReplicatedRemove(struct FLeaderboardItems& InArraySerializer);
+	void PostReplicatedAdd(struct FLeaderboardItems& InArraySerializer);
+	void PostReplicatedChange(struct FLeaderboardItems& InArraySerializer);
 	
+  
+  
 
 };
 
@@ -43,6 +46,7 @@ struct FLeaderboardItems:public FFastArraySerializer
 	UPROPERTY();
 	TArray<FPlayerLeaderBoardInfo> Items; 
 	
+	AMainCharacterTest* PlayerRef = nullptr;
 
 
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
@@ -51,6 +55,10 @@ struct FLeaderboardItems:public FFastArraySerializer
 	}
 
 	
+	void SetPlayerRef(AMainCharacterTest* PlayerPtr) 
+	{
+		PlayerRef = PlayerPtr;
+	};
 
 
 };
@@ -63,24 +71,25 @@ struct TStructOpsTypeTraits< FLeaderboardItems > : public TStructOpsTypeTraitsBa
 		WithNetDeltaSerializer = true,
 	};
 };
-inline void FPlayerLeaderBoardInfo::PostReplicatedAdd(const FLeaderboardItems& InArraySerializer)
+inline void FPlayerLeaderBoardInfo::PostReplicatedAdd(FLeaderboardItems& InArraySerializer)
 {
 
 	int32 RepId = InArraySerializer.Items[InArraySerializer.Items.Num() - 1].ReplicationID;
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Replciated Tarray for leader board count for index for array %d "), InArraySerializer.Items.Num() - 1));
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, FString::Printf("Server client current player id %d"), InArraySerializer.ServerObjectRef->GetCurrentPlayerId());
 	
+	
+
 
 
 
 };
-inline void FPlayerLeaderBoardInfo::PreReplicatedRemove(const FLeaderboardItems& InArraySerializer) {};
-inline void FPlayerLeaderBoardInfo::PostReplicatedChange(const FLeaderboardItems& InArraySerializer) {};
+inline void FPlayerLeaderBoardInfo::PreReplicatedRemove(FLeaderboardItems& InArraySerializer) {};
+inline void FPlayerLeaderBoardInfo::PostReplicatedChange(FLeaderboardItems& InArraySerializer) {};
 
 
 
 
-class AMainCharacterTest;
 UCLASS()
 class SIEGESMASHER_API AServerObject : public AActor
 {
@@ -105,12 +114,13 @@ public:
 	int GetCurrentPlayerId();  
 	void SetHost(AMainCharacterTest* Character);
 	AMainCharacterTest* GetHost();
-	UFUNCTION()
-	void AddLeaderBoardInfoOnIdInc();
-	UPROPERTY(ReplicatedUsing  = AddLeaderBoardInfoOnIdInc);
+	
+	UPROPERTY(Transient, Replicated);
 	int CurrentPlayerCount = 0;  
 
 	
+	void SetPlayerStateToHandle(AMainCharacterTest* PlayerPtr);
+
 	void MappPlayerIdToReplicatedId(int32 ReplicatedId);
 	
 	void UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKills, int PlayerId);
@@ -123,14 +133,20 @@ public:
 
 	FPlayerLeaderBoardInfo GetPlayerInfo(int PlayerId);
 
+
+
 	void LogMap();
+
+
 
 	//FPlayerLeaderBoardInfo* GetPlayerInfo(int PlayerId);
 protected:
-
-	UPROPERTY(Replicated); 
+	UFUNCTION()
+	void OnRep_LeaderBoardState(FLeaderboardItems Old);
+	UPROPERTY(Transient,ReplicatedUsing = OnRep_LeaderBoardState);
 	FLeaderboardItems LeaderBoardInfo;
 
+	AMainCharacterTest* PlayerRef;
 
 private: 
 

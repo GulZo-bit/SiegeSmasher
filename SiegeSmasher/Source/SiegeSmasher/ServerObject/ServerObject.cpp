@@ -17,7 +17,7 @@ AServerObject::AServerObject()
 	
 	RootComponent = CreateDefaultSubobject<USceneComponent>("Root");
 
-
+	
 
 }
 
@@ -61,8 +61,19 @@ void AServerObject::IncrementPlayerCount()
 
    int32 Index = LeaderBoardInfo.Items.Add(FPlayerLeaderBoardInfo());  
    int32 RepId = LeaderBoardInfo.Items[LeaderBoardInfo.Items.Num() - 1].ReplicationID;
+
+
+
    //LeaderBoardInfo.AddPlayerIdMappedToRepId(GetCurrentPlayerId(), RepId);
    LeaderBoardInfo.MarkItemDirty(LeaderBoardInfo.Items[Index]);
+
+   if (Host != nullptr) {
+
+	   GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing server leaderboard new player was added")));
+
+	   Host->GetPlayerWidget()->RefreshPlayerLeaderboardInfo();
+   }
+
    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, FString::Printf(TEXT("incremeting server obejct count %d"), CurrentPlayerCount));
    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Replciated Tarray for leader board count for index for array %d "), LeaderBoardInfo.Items.Num() - 1));
  /*  GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, FString::Printf("Server  current player id %d"), LeaderBoardInfo.ServerObjectRef->GetCurrentPlayerId());*/
@@ -91,6 +102,14 @@ void AServerObject::SetHost(AMainCharacterTest* LocalHost)
 
 
 
+
+void AServerObject::SetPlayerStateToHandle(AMainCharacterTest* PlayerPtr)
+{
+
+	PlayerRef = PlayerPtr;
+
+
+}
 
 void AServerObject::MappPlayerIdToReplicatedId(int32 ReplicatedId)
 {
@@ -151,7 +170,7 @@ bool AServerObject::HasPlayerInfo(int PlayerId)
 	}
 	catch (...) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Player id did not exists %d"), PlayerId));
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Player id did not exists %d"), PlayerId));
 		return false;
 	}
 }
@@ -187,22 +206,26 @@ void AServerObject::LogMap()
 
 }
 
-
-
-
-
-void AServerObject::AddLeaderBoardInfoOnIdInc()
+void AServerObject::OnRep_LeaderBoardState(FLeaderboardItems Old)
 {
 
+	if (Old.Items.Num() < LeaderBoardInfo.Items.Num() && PlayerRef->GetPlayerWidget()) {
 
-	/*PlayerIdsToPlayerInfoIndex.Add(GetCurrentPlayerId(), LeaderBoardInfo.Items[LeaderBoardInfo.Items.Num() - 1].ReplicationID);
+		GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing client leaderboard new player was added")));
 
-	*/
-	
+		PlayerRef->GetPlayerWidget()->RefreshPlayerLeaderboardInfo();
+
+	}
 
 
 
 }
+
+
+
+
+
+
 
 
 

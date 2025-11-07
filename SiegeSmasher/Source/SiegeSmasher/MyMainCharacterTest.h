@@ -129,7 +129,7 @@ public:
 	void DecrementPlayerScore(int Increment);
 	void IncrementPlayerKills(); 
 
-	
+	UChargeWidget* GetPlayerWidget();
 
 	//input for triggering the shooting action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")

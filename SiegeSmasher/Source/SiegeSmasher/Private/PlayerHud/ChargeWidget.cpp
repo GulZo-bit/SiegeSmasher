@@ -37,17 +37,17 @@ void UChargeWidget::NativeConstruct() {
 void UChargeWidget::GenerateLeaderBoard()
 {
 	LeaderBoardItems = {};
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Bound leader board grid pannel sucessfully")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Bound leader board grid pannel sucessfully")));
 
 
 	if (UCanvasPanelSlot* LeaderboardCanvasSlot = Cast<UCanvasPanelSlot>(LeaderboardGrid->Slot)) {
 
 		FVector2D LeaderboardTopLeft = LeaderboardCanvasSlot->GetPosition();
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT(" max player num %d"), MaxPlayerNum));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT(" max player num %d"), MaxPlayerNum));
 
 		for (int i = 0; i < MaxPlayerNum; i++) {
 
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Itertaing max player num")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Itertaing max player num")));
 			FVector2D TextPosition = FVector2D(LeaderboardTopLeft.X, (LeaderboardTopLeft.Y + LeaderboardTextPadding * i) + LeaderboardTopPadding);
 			FString PlayerTag = LeaderBoardTagName + FString::FromInt(i + 1);
 			UTextBlock* Text = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(PlayerTag));
@@ -59,7 +59,7 @@ void UChargeWidget::GenerateLeaderBoard()
 			UCanvasPanelSlot* TextCanvasSlot = Cast<UCanvasPanelSlot>(Text->Slot);
 			 
 
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("canvas text slot is null %d "), (int)(TextCanvasSlot == nullptr)));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("canvas text slot is null %d "), (int)(TextCanvasSlot == nullptr)));
 			TextCanvasSlot->SetAnchors(LeaderboardCanvasSlot->GetAnchors());
 			TextCanvasSlot->SetPosition(TextPosition);
 			LeaderBoardItems.Add(Text);
@@ -159,18 +159,18 @@ void UChargeWidget::RefreshPlayerLeaderboardInfo()
 	
 
 	FPlayerLeaderBoardInfo info = FPlayerLeaderBoardInfo();
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), ServerobjectRef->GetPlayerCurrentCount()));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), ServerobjectRef->GetPlayerCurrentCount()));
 
 	for (int i = 0; i < ServerobjectRef->GetPlayerCurrentCount(); i++) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), i));
-		 info = ServerobjectRef->GetPlayerInfo(i);
+		GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), i));
+		info = ServerobjectRef->GetPlayerInfo(i);
         
 
 		FString LeaderboardTxt = LeaderBoardTagName + FString::FromInt(i + 1) + ":" + " Current Points:" + FString::FromInt(info.LeaderboardPlayerScore) + " Kills:" + FString::FromInt(info.LeaderboardPlayerKills);
 
 		LeaderBoardItems[i]->SetText(FText::FromString(LeaderboardTxt));
-		LeaderBoardItems[i]->SetOpacity(LeaderboardBorder->GetRenderOpacity());
+		//LeaderBoardItems[i]->SetOpacity(LeaderboardBorder->GetRenderOpacity());
 
 	}
 
