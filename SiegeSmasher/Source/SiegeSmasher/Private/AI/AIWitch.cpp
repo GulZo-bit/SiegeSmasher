@@ -90,11 +90,6 @@ void AAIWitch::PlayAttack()
 	else
 	{
 		Multicast_PlayAttackMontage();
-		if (FireballSound != nullptr)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("Fireball Sound Played")));
-			UGameplayStatics::PlaySoundAtLocation(this, FireballSound, GetActorLocation());
-		}
 	}
 }
 
@@ -108,6 +103,12 @@ void AAIWitch::Multicast_PlayAttackMontage_Implementation()
 {
 	if (AttackSpellMontage != nullptr)
 	{
+
+		if (FireballSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("Fireball Sound Played")));
+			UGameplayStatics::PlaySoundAtLocation(this, FireballSound, GetActorLocation());
+		}
 
 
 		if (AnimInstance != nullptr)
@@ -169,6 +170,12 @@ void AAIWitch::PlayHealSpellMontage()
 {
 	if (GetLocalRole() < ROLE_Authority)
 	{
+
+		if (HealingSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
+			UGameplayStatics::PlaySoundAtLocation(this, HealingSound, GetActorLocation());
+		}
 		Server_PlayHealSpellMontage();
 	}
 
@@ -192,6 +199,12 @@ void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 
 		if (AnimInstance != nullptr)
 		{
+
+			if (HealingSound != nullptr)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
+				UGameplayStatics::PlaySoundAtLocation(this, HealingSound, GetActorLocation());
+			}
 			AnimInstance->Montage_Play(HealSpellMontage);
 			iHealCount = 0;
 		}
