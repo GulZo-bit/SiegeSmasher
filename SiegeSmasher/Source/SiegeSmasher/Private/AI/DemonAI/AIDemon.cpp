@@ -147,6 +147,11 @@ void AAIDemon::PlayAttack()
 {
 	if (GetLocalRole() < ROLE_Authority)
 	{
+		if (AttackSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
+			UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
+		}
 		Server_PlayAttackMontage();
 	}
 
@@ -166,6 +171,11 @@ void AAIDemon::Multicast_PlayAttackMontage_Implementation()
 {
 	if (AttackAnimation != nullptr)
 	{
+		if (AttackSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
+			UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
+		}
 		if (AnimInstance != nullptr)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Playing Animation")));

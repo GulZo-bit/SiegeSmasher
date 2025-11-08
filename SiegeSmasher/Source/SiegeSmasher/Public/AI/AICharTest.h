@@ -67,6 +67,9 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayDeathMontage();
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* AttackSound;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

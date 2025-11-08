@@ -141,6 +141,11 @@ void AAICharTest::PlayAttackMontage()
 	{
 		//If it is then we play the attack animation on the server.
 		//This is also here to validate the request by the client initiating the action, then it calls the multicast.
+		if (AttackSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
+			UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
+		}
 		Server_PlayAttackMontage();
 	}
 	else
@@ -160,6 +165,12 @@ void AAICharTest::Multicast_PlayAttackMontage_Implementation()
 {
 	if (AttackMontage != nullptr)
 	{
+		if (AttackSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
+			UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
+		}
+
 		if (AnimInstance != nullptr)
 		{
 			AnimInstance->Montage_Play(AttackMontage);
