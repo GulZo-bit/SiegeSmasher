@@ -12,19 +12,9 @@ void AWitchAIController::BeginPlay()
 
 	if (AIBehavior != nullptr)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Found Behaviour tree")));
 		RunBehaviorTree(AIBehavior);
 
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMainCharacterTest::StaticClass(), PlayerActorArray);
-		//GetBlackboardComponent()->SetValueAsObject(TEXT("Player"), PlayerPawn);
-		/*for (int i = 0; i < PlayerActorArray.Num(); i++)
-		{
-			if (PlayerActorArray[i] != nullptr)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Player Found")));
-			}
-		}*/
-
 	}
 }
 
@@ -51,7 +41,6 @@ void AWitchAIController::OnPossess(APawn* InPawn)
 	}
 
 	GetWorldTimerManager().SetTimer(Timer, this, &AWitchAIController::setHealBool, 12.0f, true, 10.0f);
-	
 }
 
 void AWitchAIController::Tick(float DeltaTime)
@@ -59,15 +48,14 @@ void AWitchAIController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	CheckDeath();
-
+	CheckDistanceAndDirectionToPlayer();
 	//Switch for checking line of sight to each player.
 	switch (PlayerActorArray.Num())
 	{
 	case(1):
-		if (LineOfSightTo(PlayerActorArray[0]))
+		if (LineOfSightTo(PlayerActorArray[0]) && (DistStoreArray[0] >= 0 && DistStoreArray[0] <= MaxEyeRange && DotProductArray[0] >= 0))
 		{
 			SetFocus(PlayerActorArray[0]);
-
 			if (Witch != nullptr)
 			{
 				if (Witch->getSpell() != nullptr)
@@ -91,7 +79,7 @@ void AWitchAIController::Tick(float DeltaTime)
 		break;
 
 	case(2):
-		if (LineOfSightTo(PlayerActorArray[0]))
+		if (LineOfSightTo(PlayerActorArray[0]) && (DistStoreArray[0] >= 0 && DistStoreArray[0] <= MaxEyeRange && DotProductArray[0] >= 0))
 		{
 			SetFocus(PlayerActorArray[0]);
 
@@ -107,7 +95,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			Witch->setbCanActorMove(false);
 		}
 
-		else if (LineOfSightTo(PlayerActorArray[1]))
+		else if (LineOfSightTo(PlayerActorArray[1]) && (DistStoreArray[1] >= 0 && DistStoreArray[1] <= MaxEyeRange && DotProductArray[1] >= 0))
 		{
 			SetFocus(PlayerActorArray[1]);
 			if (Witch != nullptr)
@@ -132,7 +120,7 @@ void AWitchAIController::Tick(float DeltaTime)
 		break;
 
 	case(3):
-		if (LineOfSightTo(PlayerActorArray[0]))
+		if (LineOfSightTo(PlayerActorArray[0]) && (DistStoreArray[0] >= 0 && DistStoreArray[0] <= MaxEyeRange && DotProductArray[0] >= 0))
 		{
 			SetFocus(PlayerActorArray[0]);
 
@@ -148,7 +136,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			Witch->setbCanActorMove(false);
 		}
 
-		else if (LineOfSightTo(PlayerActorArray[1]))
+		else if (LineOfSightTo(PlayerActorArray[1]) && (DistStoreArray[1] >= 0 && DistStoreArray[1] <= MaxEyeRange && DotProductArray[1] >= 0))
 		{
 			SetFocus(PlayerActorArray[1]);
 			if (Witch != nullptr)
@@ -163,7 +151,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			Witch->setbCanActorMove(false);
 		}
 
-		else if (LineOfSightTo(PlayerActorArray[2]))
+		else if (LineOfSightTo(PlayerActorArray[2]) && (DistStoreArray[2] >= 0 && DistStoreArray[2] <= MaxEyeRange && DotProductArray[2] >= 0))
 		{
 			SetFocus(PlayerActorArray[2]);
 			if (Witch != nullptr)
@@ -188,7 +176,7 @@ void AWitchAIController::Tick(float DeltaTime)
 		break;
 		
 	case(4):
-		if (LineOfSightTo(PlayerActorArray[0]))
+		if (LineOfSightTo(PlayerActorArray[0]) && (DistStoreArray[0] >= 0 && DistStoreArray[0] <= MaxEyeRange && DotProductArray[0] >= 0))
 		{
 			SetFocus(PlayerActorArray[0]);
 
@@ -204,7 +192,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			Witch->setbCanActorMove(false);
 		}
 
-		else if (LineOfSightTo(PlayerActorArray[1]))
+		else if (LineOfSightTo(PlayerActorArray[1]) && (DistStoreArray[1] >= 0 && DistStoreArray[1] <= MaxEyeRange && DotProductArray[1] >= 0))
 		{
 			SetFocus(PlayerActorArray[1]);
 			if (Witch != nullptr)
@@ -219,7 +207,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			Witch->setbCanActorMove(false);
 		}
 
-		else if (LineOfSightTo(PlayerActorArray[2]))
+		else if (LineOfSightTo(PlayerActorArray[2]) && (DistStoreArray[2] >= 0 && DistStoreArray[2] <= MaxEyeRange && DotProductArray[2] >= 0))
 		{
 			SetFocus(PlayerActorArray[2]);
 			if (Witch != nullptr)
@@ -234,7 +222,7 @@ void AWitchAIController::Tick(float DeltaTime)
 			Witch->setbCanActorMove(false);
 		}
 
-		else if (LineOfSightTo(PlayerActorArray[3]))
+		else if (LineOfSightTo(PlayerActorArray[3]) && (DistStoreArray[3] >= 0 && DistStoreArray[3] <= MaxEyeRange && DotProductArray[3] >= 0))
 		{
 			SetFocus(PlayerActorArray[3]);
 			if (Witch != nullptr)
@@ -279,4 +267,21 @@ void AWitchAIController::CheckDeath()
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), false);
 	}
 }
+
+void AWitchAIController::CheckDistanceAndDirectionToPlayer()
+{
+	FVector PlayerLocStore;
+	FVector PawnForwardVector = ControlledPawn->GetActorForwardVector();
+	FVector EnemyLocStore = ControlledPawn->GetActorLocation();
+
+	for (int i = 0; i < PlayerActorArray.Num(); i++)
+	{
+		PlayerLocStore = PlayerActorArray[i]->GetActorLocation();
+		DistStoreArray[i] = (FMath::Sqrt(((PlayerLocStore.X - EnemyLocStore.X) * (PlayerLocStore.X - EnemyLocStore.X)) + ((PlayerLocStore.Y - EnemyLocStore.Y) * (PlayerLocStore.Y - EnemyLocStore.Y)) + ((PlayerLocStore.Z - EnemyLocStore.Z) * (PlayerLocStore.Z - EnemyLocStore.Z))));
+
+		DotProductArray[i] = FVector::DotProduct(PawnForwardVector, (PlayerLocStore - EnemyLocStore).GetSafeNormal());
+
+	}
+}
+
 

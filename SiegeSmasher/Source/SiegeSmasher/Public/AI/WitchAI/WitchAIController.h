@@ -9,9 +9,7 @@
 #include "../AIWitch.h"
 #include "WitchAIController.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SIEGESMASHER_API AWitchAIController : public AAIController
 {
@@ -35,6 +33,12 @@ protected:
 	TArray<AActor*> PlayerActorArray;
 	FTimerHandle Timer;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+	UAIPerceptionComponent* AIPerception;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception")
+	UAISenseConfig_Sight* SightConfig;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -43,4 +47,10 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
+
+	float DistStoreArray[4];
+	float DotProductArray[4];
+	int32 MaxEyeRange = 3500;
+
+	void CheckDistanceAndDirectionToPlayer();
 };

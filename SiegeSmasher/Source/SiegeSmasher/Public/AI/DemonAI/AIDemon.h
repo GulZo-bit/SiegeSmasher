@@ -6,8 +6,6 @@
 #include "GameFramework/Character.h"
 #include "AI/SplineController.h"
 #include "../Enemies/EnemyBase.h"
-#include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISenseConfig_Sight.h"
 #include "AI/DemonAI/DemonFists.h"
 #include "AI/BoolAnimInstance.h"
 #include "AIDemon.generated.h"

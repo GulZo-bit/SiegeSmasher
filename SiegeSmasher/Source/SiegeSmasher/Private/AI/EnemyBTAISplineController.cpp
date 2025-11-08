@@ -9,20 +9,11 @@
 void AEnemyBTAISplineController::BeginPlay()
 {
 	Super::BeginPlay();
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Begin play called")));
 	if (AIBehavior != nullptr)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Found Behaviour tree")));
 		RunBehaviorTree(AIBehavior);
 
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMainCharacterTest::StaticClass(), PlayerActorArray);
-		/*for (int i = 0; i < PlayerActorArray.Num(); i++)
-		{
-			if (PlayerActorArray[i] != nullptr)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Player Found")));
-			}
-		}*/
 	}
 }
 
