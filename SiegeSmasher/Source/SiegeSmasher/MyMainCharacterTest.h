@@ -310,6 +310,9 @@ public:
 
 	void Server_SetHealth_Implementation(float HealthStore);
 
+	UFUNCTION()
+	void LocalPlaySound(USoundBase* Sound);
+
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void Multi_PlaySound(USoundBase* Sound);
 	void Multi_PlaySound_Implementation(USoundBase* Sound);
