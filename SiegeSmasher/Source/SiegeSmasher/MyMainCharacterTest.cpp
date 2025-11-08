@@ -473,7 +473,6 @@ void AMainCharacterTest::Server_StopAim_Implementation()
 	if (ChargeWidget != nullptr)
 	{
 		ChargeWidget->SetChargeAmount(CurrentCharge);
-
 	}
 }
 
@@ -518,6 +517,12 @@ void AMainCharacterTest::StopAim()
 		SetArrowDrawn(false);
 		SetArrowFired(true);
 		isCharging = false;
+
+		CurrentCharge = 0.0f;
+		if (ChargeWidget != nullptr)
+		{
+			ChargeWidget->SetChargeAmount(CurrentCharge);
+		}
 	}
 }
 
@@ -896,27 +901,26 @@ void AMainCharacterTest::setHealth(float HealthStore)
 {
 	if (HasAuthority()) 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Damaged")));
 		Health = HealthStore;
-		ChargeWidget->SetHealthAmount(Health);
+		if (ChargeWidget != nullptr)
+		{
+			ChargeWidget->SetHealthAmount(Health);
+		}
 
 		if (Health <= 0)
 		{
 			PlayerDeath();
-
 		}
 
 	}
 	else 
 	{
 		Server_SetHealth(HealthStore);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Health: %f"), Health));
 	}
 }
 
 void AMainCharacterTest::Server_SetHealth_Implementation(float HealthStore)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Player Damaged Called On Server")));
 	Health = HealthStore;
 
 	if (Health <= 0)
@@ -925,6 +929,14 @@ void AMainCharacterTest::Server_SetHealth_Implementation(float HealthStore)
 
 	}
 
+}
+
+void AMainCharacterTest::LocalPlaySound(USoundBase* Sound)
+{
+	if (Sound != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, GetActorLocation());
+	}
 }
 
 float AMainCharacterTest::getHealth()

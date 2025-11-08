@@ -36,6 +36,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* AttackSpellMontage;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* FireballSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* HealingSound;
+
 	UFUNCTION(Server, Reliable)
 	void Server_PlayAttackMontage();
 

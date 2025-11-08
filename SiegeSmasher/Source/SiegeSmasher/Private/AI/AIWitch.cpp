@@ -80,11 +80,21 @@ void AAIWitch::PlayAttack()
 	if (GetLocalRole() < ROLE_Authority)
 	{
 		Server_PlayAttackMontage();
+		if (FireballSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("Fireball Sound Played")));
+			UGameplayStatics::PlaySoundAtLocation(this, FireballSound, GetActorLocation());
+		}
 	}
 	
 	else
 	{
 		Multicast_PlayAttackMontage();
+		if (FireballSound != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("Fireball Sound Played")));
+			UGameplayStatics::PlaySoundAtLocation(this, FireballSound, GetActorLocation());
+		}
 	}
 }
 
