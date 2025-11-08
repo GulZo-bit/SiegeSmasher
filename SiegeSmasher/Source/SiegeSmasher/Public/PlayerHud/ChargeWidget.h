@@ -12,6 +12,7 @@
 #include  "Components/CanvasPanelSlot.h"  
 #include "Components/Border.h" 
 #include "Components/BorderSlot.h"
+#include "../ServerObject/ServerObject.h"
 #include "ChargeWidget.generated.h"
 
 
@@ -54,7 +55,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int GetPoints();
+
+	void SetServerObjectRef(AServerObject* ServerObjectPtr);
+	void UpdatePlayerLeaderBoardInfo(int Points, int Kills, int PlayerId); 
 	
+	void RefreshPlayerLeaderboardInfo();
+
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaxPlayerNum", meta = (ClampMin = "1", ClampMax = "4"))
@@ -80,13 +87,14 @@ protected:
 	FSlateFontInfo LeaderboardFont;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardTextColour");
 	FSlateColor LeaderboardTextColour;
-	void SetLoggedPlayerNum(int LoggedNum);
+
 private:
 	void GenerateLeaderBoard();
 	TArray<UTextBlock*> LeaderBoardItems; 
 	UBorder* LeaderboardBorder = nullptr; 
 	UBorder* LeaderboardHeader = nullptr;
 	UGridPanel* LeaderboardGrid = nullptr; 
+	AServerObject* ServerobjectRef = nullptr;
 
 	int LoggedPlayerNumber = 0;
 

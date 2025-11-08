@@ -8,7 +8,8 @@
 #include "InputActionValue.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/CapsuleComponent.h" 
+#include "ServerObject/ServerObject.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerHud/ChargeWidget.h"
@@ -77,7 +78,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* JumpAction;
 
-
+	
 
 	//Move input action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
@@ -128,7 +129,7 @@ public:
 	void DecrementPlayerScore(int Increment);
 	void IncrementPlayerKills(); 
 
-	
+	UChargeWidget* GetPlayerWidget();
 
 	//input for triggering the shooting action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
@@ -233,11 +234,7 @@ public:
 
 	void Server_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
 	
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_HandleTowerPlacement(FVector CamForward, FVector CamPosition);
-
-	void Multicast_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition);
-
+	
 
 
 	UFUNCTION(Server,Reliable) 
@@ -255,10 +252,23 @@ public:
 	void Multicast_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 	void Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 
+	
+
 	void SpawnSelected();
 	UFUNCTION(Server, Reliable)
 	void Server_SpawnSelected(bool PlacingTower, bool ToggleTower);
 	void Server_SpawnSelected_Implementation(bool PlacingTower, bool ToggleTower);
+
+
+	UFUNCTION(Server,Reliable)
+	void Server_RefreshLeaderboard();
+	void Server_RefreshLeaderboard_Implementation(); 
+
+	UFUNCTION(NetMulticast,Reliable) 
+	void Multicast_RefreshLeaderboard(); 
+	void Multicast_RefreshLeaderboard_Implementation();
+
+	void RefreshLeaderBoard();
 
 	UFUNCTION(Server,Reliable) 
 	void Server_SwitchTower(int SelectedIndex, bool ToggleTower); 
@@ -273,12 +283,22 @@ public:
 	void Server_DisplaySelected();
 	void Server_DisplaySelected_Implementation();
 
-	/*UFUNCTION(Server, Reliable); 
-	void Server_SetPlayerId(int );
-	void Server_SetPlayerId_Implementation(int PlayerId);
+	
 
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_IncrementLoggedPlayerCount();*/
+	UFUNCTION(Server,Reliable) 
+	void Server_AssignPlayerId(int Id);
+	void Server_AssignPlayerId_Implementation(int Id);
+
+	
+
+	UFUNCTION(Server, Reliable)
+	void Server_IncrementLoggedPlayerCount(); 
+	void Server_IncrementLoggedPlayerCount_Implementation();
+
+	
+	int GetScore(); 
+	int GetKills();
+
 
 
 	UFUNCTION(Server,Reliable)
@@ -295,23 +315,44 @@ public:
 	void Multi_PlaySound_Implementation(USoundBase* Sound);
 	bool Multi_PlaySound_Validate(USoundBase* Sound);
 
+	UFUNCTION()
+	void PlayerDeath();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdateChargeBar();
+
+	void Multicast_UpdateChargeBar_Implementation();
+
+	UPROPERTY()
+	FVector PlayerRespawnPoint;
+
 
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)
 	void CallCreateLobby();
 
 	UFUNCTION(BlueprintCallable)
-	void CallClientTravel(const FString& Address); 
+	void CallClientTravel(const FString& Address);  
+
+	void AdjustLeaderBoardValues(int LeaderboardPlayerPoints, int LeaderboardPlayerKils);
+
 protected:
 	UFUNCTION()
-	void UpdatePointsUi();
+	void UpdatePlayerScoreUi();
 	UPROPERTY(Replicated)
     int PlayerKills = 0;
-	UPROPERTY(ReplicatedUsing = UpdatePointsUi);
+	UPROPERTY(ReplicatedUsing = UpdatePlayerScoreUi);
 	int PlayerPoints = 0; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* SelfDamage;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCast_UpdateLeaderBoardInfo(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId); 
+
+	void MultiCast_UpdateLeaderBoardInfo_Implementation(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId);
+
+	void UpdateLeaderBoardInfo();
 
 	void DamageYourself();
 
@@ -325,7 +366,17 @@ protected:
 	USoundBase* DrawingSound;
 	
 	UPROPERTY(Replicated);
-	int PlayerId = 0;
+	int PlayerId = 0; 
+
+	
+	AServerObject* ServerObjectRef = nullptr;
+
+	void SetUpPlayerId();
+
+	UFUNCTION(NetMulticast,Reliable) 
+	void Multicast_SetLeaderBoardTxt(int NewPlayerPoint, int NewPlayerKills, int LeaderBoardPlayerId); 
+	void Multicast_SetLeaderBoardTxt_Implementation(int NewPlayerPoints, int NewPlayerKills, int LeaderBoardPlayerId);
+
 private:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 

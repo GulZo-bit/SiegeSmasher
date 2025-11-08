@@ -42,7 +42,7 @@ AMainCharacterTest::AMainCharacterTest()
 void AMainCharacterTest::BeginPlay()
 {
 	Super::BeginPlay();
-
+	World = GetWorld();
 	if (SpringArmComponent != nullptr)
 	{
 		//Set Location and Rotation
@@ -63,13 +63,13 @@ void AMainCharacterTest::BeginPlay()
 	//Adding the input mapping context to the main character
 	/*A reference to the player controller class is being cast to the controller that is currently controlling this actor*/
 	AssignedPlayerController = Cast<APlayerController>(Controller);
+
 	if (AssignedPlayerController)
 	{
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Bgeing play called for character ")));
 		InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(AssignedPlayerController->GetLocalPlayer());
 		
-
 		if (InputSubsystem)
 		{
 			//Adding our defaultcontext to the input subsystem that each local player has.
@@ -78,7 +78,11 @@ void AMainCharacterTest::BeginPlay()
 			InputSubsystem->AddMappingContext(DefaultContext, 0);
 		}
 	}
+	
+	ServerObjectRef = Cast<AServerObject>(UGameplayStatics::GetActorOfClass(World,AServerObject::StaticClass()));
+	
 	//checks if the reference to the player hud is not empty
+
 	if (PlayerHUD != nullptr) 
 	{
 
@@ -87,22 +91,44 @@ void AMainCharacterTest::BeginPlay()
 			//creates the widget of the ChargeWidget class in the current world
 			ChargeWidget = CreateWidget<UChargeWidget>(GetWorld(), PlayerHUD);
 			//if the widget was created successfully, add it to viewport
-			if (ChargeWidget != nullptr)
+
+			
+
+			if (ChargeWidget != nullptr )
 			{
+
 				ChargeWidget->AddToViewport();
 				ChargeWidget->SetHealthAmount(Health);
+				
+				
+				ChargeWidget->SetServerObjectRef(ServerObjectRef);
+				ServerObjectRef->SetPlayerStateToHandle(this);
+
+				if (HasAuthority()) {
+					ServerObjectRef->SetHost(this);
+				}
 			}
+
+			
 		}
 	}
+	
 
-	World = GetWorld();
 	InitialiseTowers();
 
 	TraceParams = FCollisionQueryParams();
 	TraceParams.AddIgnoredActor(this);
 	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(TPSCameraComponent == nullptr)));
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Health: %f"), Health));
+	PlayerRespawnPoint = GetActorLocation();
+
+
+	SetUpPlayerId();
+
+
+	//RefreshLeaderBoard();
+	
+
 }
 
 // Called every frame
@@ -111,16 +137,18 @@ void AMainCharacterTest::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	ChargeShot(DeltaTime);
 	//if Charge widget is not empty, update the charge amount in the widget
-	if (ChargeWidget != nullptr) 
-	{ 
-		ChargeWidget->SetChargeAmount(CurrentCharge); 
+	if (ChargeWidget != nullptr)
+	{
+		ChargeWidget->SetChargeAmount(CurrentCharge);
+
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Leaderboard player count %d"), ChargeWidget->GetLoggedPlayerNum()));
+
 
 	}
+	
+
+
 	TowerPlacementHandle();
-
-	
-	
-
 
 }
 
@@ -395,6 +423,19 @@ bool AMainCharacterTest::Multi_UpdateCharge_Validate()
 	return true;
 }
 
+
+void AMainCharacterTest::Multicast_UpdateChargeBar_Implementation()
+{
+	if (ChargeWidget != nullptr)
+	{
+		CurrentCharge = 0.0f;
+		ChargeWidget->SetChargeAmount(CurrentCharge);
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("Current Charge: %f"), CurrentCharge));
+
+	}
+}
+
+
 void AMainCharacterTest::Server_UpdateCharge_Implementation(float ClientCharge)
 {
 	ChargeFinal = ClientCharge;
@@ -424,6 +465,16 @@ void AMainCharacterTest::Server_StopAim_Implementation()
 	SetArrowDrawn(false);
 	SetArrowFired(true);
 	isCharging = false;
+
+	CurrentCharge = 0.0f;
+	Multicast_UpdateChargeBar();
+
+	CurrentCharge = 0.0f;
+	if (ChargeWidget != nullptr)
+	{
+		ChargeWidget->SetChargeAmount(CurrentCharge);
+
+	}
 }
 
 bool AMainCharacterTest::Server_StopAim_Validate()
@@ -491,6 +542,19 @@ bool AMainCharacterTest::Multi_PlaySound_Validate(USoundBase* Sound)
 {
 	return true;
 }
+
+
+void AMainCharacterTest::PlayerDeath()
+{
+	SetActorLocation(PlayerRespawnPoint);
+	DecrementPlayerScore(100);
+	if (PlayerPoints < 0)
+	{
+		PlayerPoints = 0;
+	}
+	Health = 100.0f;
+}
+
 
 
 //Abandon hope all who go past this line
@@ -591,7 +655,7 @@ void AMainCharacterTest::ClientSwitchTower()
 		}
 	}
 
-
+	
 
 
 	Server_SwitchTower(index,TogglePlacingTowers);
@@ -653,7 +717,6 @@ void AMainCharacterTest::InitialiseTowers()
 
 		currentInstance = world->SpawnActor<ATowePrePlaceObjectHelper>(towerType, SpawnTransForm, SpawnParameters);
 		TowerPrePlacementObjects.Add(currentInstance);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Tower placement objects num %d "), TowerPrePlacementObjects.Num()));
 		currentInstance->SetActorHiddenInGame(true);
 		currentInstance->SetActorEnableCollision(false);
 		currentInstance->DisableTick();
@@ -726,14 +789,60 @@ void AMainCharacterTest::CallClientTravel(const FString& Address)
 }
 
 
+void AMainCharacterTest::AdjustLeaderBoardValues(int LeaderboardPlayerPoints, int LeaderboardPlayerKils)
+{
+	if (HasAuthority()) {
 
-void AMainCharacterTest::UpdatePointsUi()
+
+		ServerObjectRef->AdjustLeaderBoardPlayerInfo(LeaderboardPlayerPoints, LeaderboardPlayerKils, PlayerId);
+
+
+
+	}
+
+
+}
+
+
+
+void AMainCharacterTest::UpdatePlayerScoreUi()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Update charge ui called")));
+	
+
 	if (ChargeWidget != nullptr) {
 		ChargeWidget->SetPoints(PlayerPoints);
 	}
 	
+}
+
+
+void AMainCharacterTest::MultiCast_UpdateLeaderBoardInfo_Implementation(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId)
+{
+	if (ChargeWidget != nullptr) {
+
+		ChargeWidget->UpdatePlayerLeaderBoardInfo(NewPlayerPoints, NewPlayerKills, TargetPlayerId);
+
+	}
+
+
+
+}
+
+
+
+void AMainCharacterTest::UpdateLeaderBoardInfo()
+{
+	if (HasAuthority()) {
+
+		ServerObjectRef->UpdateStoredLeaderBoardInfo(PlayerPoints, PlayerKills, PlayerId);
+		MultiCast_UpdateLeaderBoardInfo(PlayerPoints, PlayerKills, PlayerId);
+
+		
+
+	}
+
+
 }
 
 void AMainCharacterTest::DamageYourself()
@@ -749,6 +858,39 @@ void AMainCharacterTest::UpdateHealthWidget()
 		ChargeWidget->SetHealthAmount(Health);
 	}
 }
+void AMainCharacterTest::SetUpPlayerId()
+{
+
+	if (HasAuthority() && ServerObjectRef != nullptr) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Magenta, FString::Printf(TEXT("INCREMENTING PLAYER ID ON SERVER OBJECT BEFORE INCREMENT %d"),ServerObjectRef->GetPlayerCurrentCount()));
+		ServerObjectRef->IncrementPlayerCount();
+		PlayerId = ServerObjectRef->GetCurrentPlayerId();  
+
+	
+		/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, FString::Printf(TEXT("PLAYER ID ON SERVER %d"), PlayerId));
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("INCREMENTING PLAYER ID ON SERVER OBJECT AFTER INCREMENT %d"), ServerObjectRef->GetPlayerCurrentCount()));*/
+
+	}
+	
+
+}
+
+
+
+void AMainCharacterTest::Multicast_SetLeaderBoardTxt_Implementation(int NewPlayerPoints, int NewPlayerKills, int LeaderboardPlayerId)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("multi cast to set leaderboard called")));
+	if (ChargeWidget != nullptr) {
+
+		//ChargeWidget->UpdatePlayerLeaderBoardInfo(NewPlayerPoints, NewPlayerKills, LeaderboardPlayerId);
+
+
+
+	}
+
+}
 
 void AMainCharacterTest::setHealth(float HealthStore)
 {
@@ -757,6 +899,13 @@ void AMainCharacterTest::setHealth(float HealthStore)
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Player Damaged")));
 		Health = HealthStore;
 		ChargeWidget->SetHealthAmount(Health);
+
+		if (Health <= 0)
+		{
+			PlayerDeath();
+
+		}
+
 	}
 	else 
 	{
@@ -769,12 +918,23 @@ void AMainCharacterTest::Server_SetHealth_Implementation(float HealthStore)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Player Damaged Called On Server")));
 	Health = HealthStore;
+
+	if (Health <= 0)
+	{
+		PlayerDeath();
+
+	}
+
 }
 
 float AMainCharacterTest::getHealth()
 {
 	return Health;
 }
+
+
+
+
 
 void AMainCharacterTest::SwitchTowers()
 {
@@ -797,8 +957,6 @@ void AMainCharacterTest::SwitchTowers()
 				DisplaySelected();
 			}
 		
-			
-			
 			break;
 
 		}
@@ -809,10 +967,6 @@ void AMainCharacterTest::SwitchTowers()
 	}
 	
 }
-
-
-
-
 
 
 
@@ -872,13 +1026,7 @@ void AMainCharacterTest::Server_HandleTowerPlacement_Implementation(FVector CamF
 
 }
 
-void AMainCharacterTest::Multicast_HandleTowerPlacement_Implementation(FVector CamForward, FVector CamPosition)
-{
-	
 
-
-
-}
 
 void AMainCharacterTest::Server_SetPlaceTower_Implementation(bool PlaceTower)
 {
@@ -1000,6 +1148,56 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,b
 	
 }
 
+void AMainCharacterTest::Server_RefreshLeaderboard_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("server refreshing leaderboard for client with id %d"), PlayerId));
+	Multicast_RefreshLeaderboard();
+
+
+}
+
+void AMainCharacterTest::Multicast_RefreshLeaderboard_Implementation()
+{
+
+	if (ChargeWidget != nullptr && ServerObjectRef != nullptr) {
+
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT(" multi cats called refreshing leaderboard for player with id %d"), PlayerId));
+		ChargeWidget->RefreshPlayerLeaderboardInfo();
+
+
+	}
+
+
+}
+
+void AMainCharacterTest::RefreshLeaderBoard()
+{
+	
+	if (HasAuthority() ) {
+
+		//GEngine->AddOnScreenDebugMessage(-1,25.0f,FColor::Magenta,FString::Printf(TEXT("SERVER OBJECT HOST WAS NULL %d"), (int)(ServerObjectRef->GetHost() == nullptr)));
+		
+		Multicast_RefreshLeaderboard();
+		/*if (ChargeWidget == nullptr) {
+			ServerObjectRef->GetHost()->RefreshLeaderBoard();
+			return;
+		}*/
+		
+	
+		
+	}
+	else {
+		Server_RefreshLeaderboard();
+
+	}
+
+
+	
+}	
+	
+
+
+
 
 
 void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex, bool ToggleTower)
@@ -1033,6 +1231,47 @@ void AMainCharacterTest::Server_DisplaySelected_Implementation()
 
 }
 
+void AMainCharacterTest::Server_AssignPlayerId_Implementation(int Id)
+{
+
+	PlayerId = Id;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incemeting player count for leader board %d"), PlayerId));
+
+
+}
+
+
+
+
+
+
+void AMainCharacterTest::Server_IncrementLoggedPlayerCount_Implementation()
+{
+	if ( HasAuthority() && ServerObjectRef != nullptr) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Magenta, FString::Printf(TEXT("INCREMENTING PLAYER ID FOR CLIENT SERVER OBJECT ID BEFORE INC %d"), ServerObjectRef->GetPlayerCurrentCount()));
+		ServerObjectRef->IncrementPlayerCount();  
+
+		PlayerId = ServerObjectRef->GetCurrentPlayerId();
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, FString::Printf(TEXT("INCREMENTED PLAYER ID ON CLIENT %d"), PlayerId));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("PLAYER ID FOR CLIENT SERVER OBJECT ID AFTER INC %d"), ServerObjectRef->GetPlayerCurrentCount()));
+
+	}
+	
+
+}
+
+int AMainCharacterTest::GetScore()
+{
+	return PlayerPoints;
+}
+
+int AMainCharacterTest::GetKills()
+{
+	return PlayerKills;
+}
+
 void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
 {
 	if (Selected != nullptr && !ToggleTower) {
@@ -1053,7 +1292,7 @@ void AMainCharacterTest::IncrementPlayerScore(int Increment)
 		if (IsLocallyControlled()) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score server %d "), PlayerPoints));
 
-			UpdatePointsUi();
+			UpdatePlayerScoreUi();
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score %d "), PlayerPoints));
 	}
@@ -1073,7 +1312,7 @@ void AMainCharacterTest::DecrementPlayerScore(int Increment)
 		if (IsLocallyControlled()) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score server %d "), PlayerPoints));
 
-			UpdatePointsUi();
+			UpdatePlayerScoreUi();
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score %d "), PlayerPoints));
 	}
@@ -1088,10 +1327,15 @@ void AMainCharacterTest::IncrementPlayerKills()
 	
 	if (HasAuthority()) {
 		PlayerKills++; 
-
+		
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incrementing Player kills %d"), PlayerKills));
 	}
 
+}
+
+UChargeWidget* AMainCharacterTest::GetPlayerWidget()
+{
+	return ChargeWidget;
 }
 
 
