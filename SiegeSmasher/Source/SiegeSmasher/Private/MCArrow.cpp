@@ -130,9 +130,10 @@ void AMCArrow::FireInDirection(const FVector& ShootDirection, float Charge)
 
 void AMCArrow::IncrementPlayerPointsRef(int ScoreIncrement)
 {
-	if (PlayerRef != nullptr) {
+	if (PlayerRef != nullptr ) {
 
 		PlayerRef->IncrementPlayerScore(ScoreIncrement);
+	    PlayerRef->UpdateLeaderBoardInfo();
 	}
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ARROW WAS NULL WHEN INCREASING POINTS")));
@@ -143,6 +144,7 @@ void AMCArrow::IncrementPlayerKillsRef()
 	if (PlayerRef != nullptr) {
 
 		PlayerRef->IncrementPlayerKills();
+		PlayerRef->UpdateLeaderBoardInfo();
 
 
 	}

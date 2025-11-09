@@ -45,6 +45,24 @@ void AEnemyBase::DamageEnemy(float Damage)
 		CurrentHealth -= Damage;
 		GEngine->AddOnScreenDebugMessage (-1,3.0f,FColor::Orange,FString::Printf(TEXT("Current Health for enemy: %f"), CurrentHealth));
 
+		
+	
+	}
+
+}
+
+void AEnemyBase::DamageEnemy(float Damage, AMainCharacterTest* PlayerRef)
+{
+	if (HasAuthority() && PlayerRef != nullptr) {
+		CurrentHealth -= Damage;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Orange, FString::Printf(TEXT("Current Health for enemy: %f"), CurrentHealth));
+		bool BelowZero = CurrentHealth <= 0.0f;
+		PlayerRef->IncrementPlayerScore(ScoreIncrementOnKill * BelowZero);
+		PlayerRef->IncrementPlayerKills(1 * BelowZero);
+		PlayerRef->IncrementPlayerScore(ScoreIncrementOnHit);
+	   
+		PlayerRef->UpdateLeaderBoardInfo();
+
 	}
 
 }
@@ -91,6 +109,7 @@ int  AEnemyBase::CalculateWaveContribution(float FractionalWaveNumber)
 	CurrentWaveContribution = EnemyStartingCount + ceil(FractionalWaveNumber * WavePolynomialConstantOne + (FractionalWaveNumber * FractionalWaveNumber) * WavePolynomialConstantTwo);
 	return CurrentWaveContribution;
 }
+
 
 // Called to bind functionality to input
 void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -172,7 +191,7 @@ void AEnemyBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActo
 					TempArrow->IncrementPlayerPointsRef(ScoreIncrementOnHit);
 
 				}
-			
+			   
 			} 
 
 			OtherActor->Destroy();

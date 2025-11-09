@@ -45,23 +45,16 @@ void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 	
 		if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
 
-
-			Enemy->DamageEnemy(Damage);
 			
-			IncrementPlayerScore(Enemy->GetScoreIncOnKill() * (Enemy->GetHealth() <= 0.0f)); 
-			IncrementPlayerScore(Enemy->GetScoreIncOnHit() * (Enemy->GetHealth() > 0.0f));
-
-
+			Enemy->DamageEnemy(Damage,PlayerRef);
+			
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Tower projectile hitting enemy")));
 
 
 
 		}
-	
-	
 
-	
-	World->DestroyActor(this);
+	    World->DestroyActor(this);
 
 
 
@@ -127,7 +120,7 @@ void ATowerProjectileBase::IncrementPlayerScore(int Increment) {
 	if (PlayerRef != nullptr && HasAuthority()) {
 
 		PlayerRef->IncrementPlayerScore(Increment);
-
+		
 	}
 
 

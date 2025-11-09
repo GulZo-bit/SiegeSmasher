@@ -42,6 +42,7 @@ void AWallSpikeTrapTower::TowerSetUp() {
 	TowerTimeLine->SetPlayRate(SwingPlayBackSpeed);
 	TowerTimeLine->SetLooping(false); 
 
+	TowerHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 
 }
@@ -103,8 +104,9 @@ void AWallSpikeTrapTower::TowerActive(float& DeltaTime) {
 	      
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower begin swing ")));
 		IsSwinging = true;
-		Multicast_PlayTowerTimeLine(SwingPlayBackSpeed);
 		MultiCast_SetTowerHitBoxEnabled(ECollisionEnabled::QueryOnly);
+
+		Multicast_PlayTowerTimeLine(SwingPlayBackSpeed);
 		
 		   
 	}
@@ -146,20 +148,21 @@ void AWallSpikeTrapTower::HandleNewEnemy(AEnemyBase * Enemy)
 
 
 void AWallSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
-	if (IsSwinging || HasSwung || RequiresReset) { 
+	
 
 		  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Wall Spike Trap Damaging enemy")));
 		
 		  if (HasAuthority()) {
+			  if (IsSwinging || HasSwung || RequiresReset) {
+				  DamageEnemyAndUpdatePlayerInfo(Enemy, TowerDamage);
+				  //Enemy->DamageEnemy(TowerDamage);
+				 /* IncrementAssignedPlayersScore(Enemy->GetScoreIncOnHit() * (int)(Enemy->GetHealth() > 0.0f));
 
-			  Enemy->DamageEnemy(TowerDamage);
-			  IncrementAssignedPlayersScore(Enemy->GetScoreIncOnHit() * (int)(Enemy->GetHealth() > 0.0f));
-                
-			  IncrementAssignedPlayersScore(Enemy->GetScoreIncOnKill() * (int)(Enemy->GetHealth() <= 0.0f)); 
+				  IncrementAssignedPlayersScore(Enemy->GetScoreIncOnKill() * (int)(Enemy->GetHealth() <= 0.0f)); */
 
-			  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Incremeting score wall spike trap score ")));
-
+				  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Incremeting score wall spike trap score ")));
+			  }
 		  }
-	}
 }
+
 

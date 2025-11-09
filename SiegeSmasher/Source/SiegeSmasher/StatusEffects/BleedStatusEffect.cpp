@@ -38,7 +38,8 @@ void UBleedStatusEffect::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 
 		EnemyRef->RemoveTowerStatusEffect(StatusEffectId);
-		IncrementAssignedPlayerScore(EnemyRef->GetScoreIncOnKill());
+		IncrementAssignedPlayerScore(EnemyRef->GetScoreIncOnKill(),EnemyRef->GetHealth());
+		
 		SetComponentTickEnabled(false);
 		return;
 

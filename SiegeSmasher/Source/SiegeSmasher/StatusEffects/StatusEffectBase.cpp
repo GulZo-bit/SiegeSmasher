@@ -69,11 +69,13 @@ void UStatusEffectBase::SetPlayerRef(AMainCharacterTest* PlayerScorePtr)
 	PlayerRef = PlayerScorePtr;
 }
 
-void UStatusEffectBase::IncrementAssignedPlayerScore(int Increment)
+void UStatusEffectBase::IncrementAssignedPlayerScore(int Increment,float EnemyHealth)
 {
 
 	if (PlayerRef != nullptr && PlayerRef->HasAuthority()) {
-		PlayerRef->IncrementPlayerScore(Increment);
+		PlayerRef->IncrementPlayerScore(Increment); 
+		PlayerRef->IncrementPlayerKills(1 * (EnemyHealth <= 0.0f));
+		PlayerRef->UpdateLeaderBoardInfo();
 	}
 
 

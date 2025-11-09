@@ -72,6 +72,9 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("distance to target %f"), ToTarget.SquaredLength()));
 	if (!LostLOs && !CurrentEnemyOutOfRange && EnemySingleTarget->GetHealth() > 0.0f) {
 
+
+	
+
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Ballista currently active")));
 		float Alignment = TargetDir.Dot(BallistaTurret->GetForwardVector());
 		FVector FromTarget = BallistaTurret->GetComponentLocation() - EnemySingleTarget->GetActorLocation();

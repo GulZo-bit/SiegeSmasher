@@ -36,7 +36,7 @@ public:
 	void SetEnemyRef(AEnemyBase* Enemy); 
 	void SetPlayerRef(AMainCharacterTest* PlayerScorePtr);
 	 
-	void IncrementAssignedPlayerScore(int Increment);
+	void IncrementAssignedPlayerScore(int Increment,float EnemyHealth);
 
 		
 };

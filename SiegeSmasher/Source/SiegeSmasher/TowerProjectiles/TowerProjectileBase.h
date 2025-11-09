@@ -43,7 +43,9 @@ protected:
 	float InitalPitch = 0.0f;
 	
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
-
+	FVector TargetPosition = FVector::ZeroVector;
+	UWorld* World = nullptr;
+	AMainCharacterTest* PlayerRef;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -56,7 +58,5 @@ public:
 	void SetPlayerRef(AMainCharacterTest* PlayerPtr);
 	void IncrementPlayerScore(int Increment);
 private:
-	FVector TargetPosition = FVector::ZeroVector;
-	UWorld* World = nullptr; 
-	AMainCharacterTest* PlayerRef;
+	
 };
