@@ -311,7 +311,7 @@ public:
 	void Server_SetHealth_Implementation(float HealthStore);
 
 	UFUNCTION()
-	void LocalPlaySound(USoundBase* Sound);
+	void PlayImpactSound();
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void Multi_PlaySound(USoundBase* Sound);
@@ -328,7 +328,6 @@ public:
 
 	UPROPERTY()
 	FVector PlayerRespawnPoint;
-
 
 	//Online Lobby 
 	UFUNCTION(BlueprintCallable)
@@ -367,6 +366,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* DrawingSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* ArrowImpact;
 	
 	UPROPERTY(Replicated);
 	int PlayerId = 0; 

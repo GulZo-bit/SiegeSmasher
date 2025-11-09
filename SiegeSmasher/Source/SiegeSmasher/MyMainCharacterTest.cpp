@@ -234,56 +234,62 @@ void AMainCharacterTest::Jumping()
 
 void AMainCharacterTest::Shoot()
 {
-	//Attempt to shoot a projectile.
-	if (ArrowClass)
+	if (TogglePlacingTowers == false)
 	{
-		// Get the camera transform.
-		FVector CameraLocation;
-		FRotator CameraRotation;
-		GetActorEyesViewPoint(CameraLocation, CameraRotation);
-		FRotator BowRotation = CameraRotation;
-		//gets the world the player is in
-		//UWorld* World = GetWorld();
-		if (World)
-		{//spawn parameters of the arrow
-			if (!HasAuthority())
-			{
-				//on client 
-				Server_UpdateCharge(CurrentCharge);
-				//Server_SpawnProjectile(CameraRotation, BowRotation);
-				Server_SpawnProjectile(CameraRotation, BowRotation);
-				CurrentCharge = 0;
-			}
 
-			else
-			{
-				if (FiringSound != nullptr)
+
+
+		//Attempt to shoot a projectile.
+		if (ArrowClass)
+		{
+			// Get the camera transform.
+			FVector CameraLocation;
+			FRotator CameraRotation;
+			GetActorEyesViewPoint(CameraLocation, CameraRotation);
+			FRotator BowRotation = CameraRotation;
+			//gets the world the player is in
+			//UWorld* World = GetWorld();
+			if (World)
+			{//spawn parameters of the arrow
+				if (!HasAuthority())
 				{
-					UGameplayStatics::PlaySoundAtLocation(this, FiringSound, GetActorLocation());
-				}
-				//on Server
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = this;
-				SpawnParams.Instigator = GetInstigator();
-				//creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
-				AMCArrow* Arrow = World->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
-				
-				
-				//if arrow has been succesfully created
-				if (Arrow)
-				{
-					Arrow->SetPlayerRef(this);
-					//changes the Bow rotation to be changed into a vector so that it shows a direction
-					FVector LaunchDirection = BowRotation.Vector();
-					//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
-					Arrow->FireInDirection(LaunchDirection, CurrentCharge);
-					//sets the bools for animations and turns off charging and resets the charge
-					SetArrowDrawn(false);
-					SetArrowFired(true);
-					isCharging = false;
-					//UE_LOG(LogTemp, Warning, TEXT("Function called on the server The Charge: %f Percent"), CurrentCharge);
+					//on client 
+					Server_UpdateCharge(CurrentCharge);
+					//Server_SpawnProjectile(CameraRotation, BowRotation);
+					Server_SpawnProjectile(CameraRotation, BowRotation);
 					CurrentCharge = 0;
+				}
 
+				else
+				{
+					if (FiringSound != nullptr)
+					{
+						UGameplayStatics::PlaySoundAtLocation(this, FiringSound, GetActorLocation());
+					}
+					//on Server
+					FActorSpawnParameters SpawnParams;
+					SpawnParams.Owner = this;
+					SpawnParams.Instigator = GetInstigator();
+					//creates an actor of the Arrow class in the world, passes in the class, position to spawm, rotation and the parameters
+					AMCArrow* Arrow = World->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CameraRotation, SpawnParams);
+
+
+					//if arrow has been succesfully created
+					if (Arrow)
+					{
+						Arrow->SetPlayerRef(this);
+						//changes the Bow rotation to be changed into a vector so that it shows a direction
+						FVector LaunchDirection = BowRotation.Vector();
+						//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
+						Arrow->FireInDirection(LaunchDirection, CurrentCharge);
+						//sets the bools for animations and turns off charging and resets the charge
+						SetArrowDrawn(false);
+						SetArrowFired(true);
+						isCharging = false;
+						//UE_LOG(LogTemp, Warning, TEXT("Function called on the server The Charge: %f Percent"), CurrentCharge);
+						CurrentCharge = 0;
+
+					}
 				}
 			}
 		}
@@ -430,7 +436,6 @@ void AMainCharacterTest::Multicast_UpdateChargeBar_Implementation()
 	{
 		CurrentCharge = 0.0f;
 		ChargeWidget->SetChargeAmount(CurrentCharge);
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("Current Charge: %f"), CurrentCharge));
 
 	}
 }
@@ -483,23 +488,30 @@ bool AMainCharacterTest::Server_StopAim_Validate()
 
 void AMainCharacterTest::DrawBow()
 {
-	if (!HasAuthority())
-	{
-		//Client
-		Server_DrawBow();
 
-	}
-	else
+	if (IsPlacingTower == false)
 	{
-		if (DrawingSound != nullptr)
+
+
+
+		if (!HasAuthority())
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, DrawingSound, GetActorLocation());
+			//Client
+			Server_DrawBow();
 
 		}
-		//Server
-		SetArrowFired(false);
-		SetArrowDrawn(true);
-		isCharging = true;
+		else
+		{
+			if (DrawingSound != nullptr)
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, DrawingSound, GetActorLocation());
+
+			}
+			//Server
+			SetArrowFired(false);
+			SetArrowDrawn(true);
+			isCharging = true;
+		}
 	}
 }
 
@@ -558,6 +570,11 @@ void AMainCharacterTest::PlayerDeath()
 		PlayerPoints = 0;
 	}
 	Health = 100.0f;
+
+	if (ChargeWidget != nullptr) {
+
+		UpdateHealthWidget();
+	}
 }
 
 
@@ -774,7 +791,6 @@ void AMainCharacterTest::ClientTowerPlacment()
 
 }
 
-
 void AMainCharacterTest::CallCreateLobby()
 {
 	UWorld* MultiWorld = GetWorld();
@@ -931,11 +947,11 @@ void AMainCharacterTest::Server_SetHealth_Implementation(float HealthStore)
 
 }
 
-void AMainCharacterTest::LocalPlaySound(USoundBase* Sound)
+void AMainCharacterTest::PlayImpactSound()
 {
-	if (Sound != nullptr)
+	if (ArrowImpact != nullptr)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, Sound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, ArrowImpact, GetActorLocation());
 	}
 }
 
