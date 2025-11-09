@@ -94,7 +94,7 @@ void AMainCharacterTest::BeginPlay()
 
 			
 
-			if (ChargeWidget != nullptr )
+			if (ChargeWidget != nullptr && ServerObjectRef != nullptr)
 			{
 
 				ChargeWidget->AddToViewport();
@@ -106,6 +106,7 @@ void AMainCharacterTest::BeginPlay()
 
 				if (HasAuthority()) {
 					ServerObjectRef->SetHost(this);
+					HighlightPlayerTagOnLeaderboard();
 				}
 			}
 
@@ -183,7 +184,8 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(SwitchTowerAction, ETriggerEvent::Started, this, &AMainCharacterTest::SwitchTowers);
 		
 		EnhancedInputComponent->BindAction(ToggleTowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleTowerPlacement);
-
+		
+		EnhancedInputComponent->BindAction(ToggleLeaderboardAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleLeaderboard);
 
 		EnhancedInputComponent->BindAction(SelfDamage, ETriggerEvent::Triggered, this, &AMainCharacterTest::DamageYourself);
 	}
@@ -819,13 +821,29 @@ void AMainCharacterTest::UpdatePlayerScoreUi()
 
 void AMainCharacterTest::MultiCast_UpdateLeaderBoardInfo_Implementation(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId)
 {
+
+	if (ServerObjectRef != nullptr) {
+		ServerObjectRef->UpdateStoredLeaderBoardInfo(PlayerPoints, PlayerKills, PlayerId);
+		if (UChargeWidget* PlayerWidget = ServerObjectRef->GetLocalPlayer()->GetPlayerWidget()) {
+
+			PlayerWidget->UpdatePlayerLeaderBoardInfo(NewPlayerPoints, NewPlayerKills, PlayerId);
+
+
+		}
+	}
+	
+
+}
+
+void AMainCharacterTest::UpdateLeaderboardInfo(int NewPlayerPoints, int NewPlayerKills, int PlayerIdToUpdate)
+{
+
 	if (ChargeWidget != nullptr) {
 
-		ChargeWidget->UpdatePlayerLeaderBoardInfo(NewPlayerPoints, NewPlayerKills, TargetPlayerId);
+	   ChargeWidget->UpdatePlayerLeaderBoardInfo(NewPlayerPoints, NewPlayerKills, PlayerIdToUpdate);
+
 
 	}
-
-
 
 }
 
@@ -835,7 +853,6 @@ void AMainCharacterTest::UpdateLeaderBoardInfo()
 {
 	if (HasAuthority()) {
 
-		ServerObjectRef->UpdateStoredLeaderBoardInfo(PlayerPoints, PlayerKills, PlayerId);
 		MultiCast_UpdateLeaderBoardInfo(PlayerPoints, PlayerKills, PlayerId);
 
 		
@@ -858,14 +875,35 @@ void AMainCharacterTest::UpdateHealthWidget()
 		ChargeWidget->SetHealthAmount(Health);
 	}
 }
+void AMainCharacterTest::HighlightPlayerTagOnLeaderboard()
+{
+
+	if (ChargeWidget != nullptr) {
+		ChargeWidget->HighlightPlayerTag(PlayerId);
+		GEngine->AddOnScreenDebugMessage(-1, 45.0f, FColor::Green, FString::Printf(TEXT("Server object ref was not nullptr")));
+	}
+
+
+
+
+
+}
+void AMainCharacterTest::HighlightPlayerTagOnLeaderboard(int LeaderBoardPlayerId)
+{
+	if (ChargeWidget != nullptr) {
+		ChargeWidget->HighlightPlayerTag(LeaderBoardPlayerId);
+		GEngine->AddOnScreenDebugMessage(-1, 45.0f, FColor::Green, FString::Printf(TEXT("Server object ref was not nullptr")));
+	}
+
+}
 void AMainCharacterTest::SetUpPlayerId()
 {
 
 	if (HasAuthority() && ServerObjectRef != nullptr) {
 
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Magenta, FString::Printf(TEXT("INCREMENTING PLAYER ID ON SERVER OBJECT BEFORE INCREMENT %d"),ServerObjectRef->GetPlayerCurrentCount()));
+		PlayerId = ServerObjectRef->GetPlayerCurrentCount();
 		ServerObjectRef->IncrementPlayerCount();
-		PlayerId = ServerObjectRef->GetCurrentPlayerId();  
 
 	
 		/*GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, FString::Printf(TEXT("PLAYER ID ON SERVER %d"), PlayerId));
@@ -875,6 +913,11 @@ void AMainCharacterTest::SetUpPlayerId()
 	}
 	
 
+}
+
+int AMainCharacterTest::GetPlayerId()
+{
+	return PlayerId;
 }
 
 
@@ -932,6 +975,14 @@ float AMainCharacterTest::getHealth()
 	return Health;
 }
 
+void AMainCharacterTest::Multicast_HighlightPlayerId_Implementation(int PlayerServerId)
+{
+
+	HighlightPlayerTagOnLeaderboard(PlayerServerId);
+}
+
+
+
 
 
 
@@ -966,6 +1017,22 @@ void AMainCharacterTest::SwitchTowers()
 		ClientSwitchTower();
 	}
 	
+}
+
+void AMainCharacterTest::ToggleLeaderboard()
+{
+	
+
+	if (ChargeWidget != nullptr) {
+		ToggleShowLeaderboard = !ToggleShowLeaderboard;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Toggle Leadeboard %d"), (int)ToggleShowLeaderboard));
+		ChargeWidget->HideLeaderBoard(ToggleShowLeaderboard);
+
+	}
+
+
+
+
 }
 
 
@@ -1051,7 +1118,8 @@ void AMainCharacterTest::SpawnSelected()
 				TowerRef->SetOwner(Controller); 
 				TowerRef->SetPlayerRef(this);
 				DecrementPlayerScore(Selected->GetTowerCost());
-				//TowerRef->SetPlayerRef(this);
+				UpdateLeaderBoardInfo();
+
 
 			}
 		}
@@ -1142,7 +1210,7 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,b
 		if (TowerRef) {
 			TowerRef->SetPlayerRef(this);
 			DecrementPlayerScore(Selected->GetTowerCost());
-
+			UpdateLeaderBoardInfo();
 		}
 	}
 	
@@ -1331,6 +1399,15 @@ void AMainCharacterTest::IncrementPlayerKills()
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incrementing Player kills %d"), PlayerKills));
 	}
 
+}
+
+void AMainCharacterTest::IncrementPlayerKills(int Increment)
+{
+	if (HasAuthority()) {
+		PlayerKills += Increment;
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Incrementing Player kills %d"), PlayerKills));
+	}
 }
 
 UChargeWidget* AMainCharacterTest::GetPlayerWidget()

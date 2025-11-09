@@ -387,6 +387,15 @@ void ATowerBase::ApplyDamage(AEnemyBase* Enemy){}
 void ATowerBase::TowerDormant(float& DeltaTime) {}
 void ATowerBase::TowerSetUp(){}
 
+void ATowerBase::DamageEnemyAndUpdatePlayerInfo(AEnemyBase* Enemy, float Damage)
+{
+
+	if (HasAuthority()) {
+
+		Enemy->DamageEnemy(Damage, PlayerRef);
+	}
+}
+
 void ATowerBase::Multicast_PlayTowerTimeLine_Implementation(float PlayBackSpeed)
 {
 	/*if (HasAuthority()) {
@@ -500,11 +509,17 @@ void ATowerBase::SetPlayerRef(AMainCharacterTest* PlayerPtr) {
 	PlayerRef = PlayerPtr;
 }
 
+
+
+
 void ATowerBase::IncrementAssignedPlayersScore(int increment)
 {
 
-	if (HasAuthority()) {
+	if (HasAuthority() && PlayerRef != nullptr) {
 		PlayerRef->IncrementPlayerScore(increment);
+		PlayerRef->UpdateLeaderBoardInfo();
+
+
 	}
 
 }

@@ -9,11 +9,14 @@
 #include "Components/GridPanel.h"
 #include "Components/ProgressBar.h"  
 #include "Components/CanvasPanel.h" 
-#include  "Components/CanvasPanelSlot.h"  
+#include  "Components/CanvasPanelSlot.h"   
+#include "Components/ScaleBox.h"
 #include "Components/Border.h" 
 #include "Components/BorderSlot.h"
 #include "../ServerObject/ServerObject.h"
 #include "ChargeWidget.generated.h"
+
+
 
 
 UCLASS()
@@ -61,7 +64,7 @@ public:
 	
 	void RefreshPlayerLeaderboardInfo();
 
-
+	void HighlightPlayerTag(int PlayerIdForTag);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaxPlayerNum", meta = (ClampMin = "1", ClampMax = "4"))
@@ -77,10 +80,11 @@ protected:
 	float LeaderboardTextPadding;  
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardVerticalPadding");
 	float LeaderboardTopPadding;
-    
+	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardVerticalPadding");
+	FSlateColor LeaderboardHighlightColour;
 
-
-    
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardName");
 	FString LeaderBoardTagName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardFont"); 
@@ -91,10 +95,16 @@ protected:
 private:
 	void GenerateLeaderBoard();
 	TArray<UTextBlock*> LeaderBoardItems; 
+	TArray<UScaleBox*> TagScaleBoxes;
+	TArray<UScaleBox*> ScoreScaleBoxes; 
+	TArray<UScaleBox*> KillsScaleBoxes;
+
 	UBorder* LeaderboardBorder = nullptr; 
 	UBorder* LeaderboardHeader = nullptr;
 	UGridPanel* LeaderboardGrid = nullptr; 
 	AServerObject* ServerobjectRef = nullptr;
+
+	UTextBlock* CreateText(FString Text);
 
 	int LoggedPlayerNumber = 0;
 

@@ -69,7 +69,7 @@ protected:
 	bool RequiresReset = false; 
 	bool StartedReset = false;
 	
-	
+	void DamageEnemyAndUpdatePlayerInfo(AEnemyBase* Enemy, float Damage);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerWaitTimeToReset");
 	float MaxWaitTimeToReset;

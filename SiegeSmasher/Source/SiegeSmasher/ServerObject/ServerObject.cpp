@@ -25,9 +25,8 @@ AServerObject::AServerObject()
 void AServerObject::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const {
 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AServerObject, CurrentPlayerCount);
 	DOREPLIFETIME(AServerObject, LeaderBoardInfo);
-
+	DOREPLIFETIME(AServerObject, CurrentPlayerCount);
 }
 
 void AServerObject::BeginPlay()
@@ -74,8 +73,8 @@ void AServerObject::IncrementPlayerCount()
 	   Host->GetPlayerWidget()->RefreshPlayerLeaderboardInfo();
    }
 
-   GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, FString::Printf(TEXT("incremeting server obejct count %d"), CurrentPlayerCount));
-   GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Replciated Tarray for leader board count for index for array %d "), LeaderBoardInfo.Items.Num() - 1));
+   //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, FString::Printf(TEXT("incremeting server obejct count %d"), CurrentPlayerCount));
+   //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Replciated Tarray for leader board count for index for array %d "), LeaderBoardInfo.Items.Num() - 1));
  /*  GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, FString::Printf("Server  current player id %d"), LeaderBoardInfo.ServerObjectRef->GetCurrentPlayerId());*/
 }
 
@@ -120,19 +119,23 @@ void AServerObject::MappPlayerIdToReplicatedId(int32 ReplicatedId)
 
 void AServerObject::UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKills, int PlayerId)
 {
+
 	try {
 
-		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints; 
+		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints;
 		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
-		LeaderBoardInfo.MarkItemDirty(LeaderBoardInfo.Items[PlayerId]);
-
 
 	}
 	catch (...) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID FOR LEADER BOARD INFO FOR SERVER OBJECT WAS NULL %d"),PlayerId));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID FOR LEADER BOARD INFO FOR SERVER OBJECT WAS NULL %d"), PlayerId));
 	}
 
+
+
+	
+
+	
 
 }
 
@@ -211,15 +214,45 @@ void AServerObject::OnRep_LeaderBoardState(FLeaderboardItems Old)
 
 	if (Old.Items.Num() < LeaderBoardInfo.Items.Num() && PlayerRef->GetPlayerWidget()) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing client leaderboard new player was added")));
+		GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing client leaderboard new player was added %d"),CurrentPlayerCount));
 
 		PlayerRef->GetPlayerWidget()->RefreshPlayerLeaderboardInfo();
 
+		PlayerRef->HighlightPlayerTagOnLeaderboard();
+
+
+	}
+
+	
+
+}
+
+AMainCharacterTest* AServerObject::GetLocalPlayer()
+{
+	return PlayerRef;
+}
+
+void AServerObject::Multicast_UpdatePlayerLeaderboardInfo_Implementation(int PlayerPoints, int PlayerKills, int PlayerId)
+{
+
+	try {
+
+		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints;
+		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
+
+
+
+	}
+	catch (...) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID FOR LEADER BOARD INFO FOR SERVER OBJECT WAS NULL %d"), PlayerId));
 	}
 
 
-
 }
+
+
+
 
 
 

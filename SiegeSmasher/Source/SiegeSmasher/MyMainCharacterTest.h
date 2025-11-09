@@ -96,7 +96,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* ToggleTowerPlacementAction;
 
-	int AssignedPlayerId = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	class UInputAction* ToggleLeaderboardAction;
+
 
 
 	//Calling for movement input
@@ -116,19 +118,21 @@ public:
 	void StopAim();
 	//increments the Current Charge variable
 	void ChargeShot(float DeltaTime);
-
+	// Place towers
 	void PlaceTower();
-
+	// allows player to toggle tower placement on and off
 	void ToggleTowerPlacement();
-
+	// swicth towers using number keys 
 	void SwitchTowers();
 
+	void ToggleLeaderboard();
 	void SetPlayerId(int Id);
+	void UpdateLeaderboardInfo(int NewPlayerPoints, int NewPlayerKills, int PlayerIdToUpdate);
 
 	void IncrementPlayerScore(int Increment);
 	void DecrementPlayerScore(int Increment);
 	void IncrementPlayerKills(); 
-
+	void IncrementPlayerKills(int Increment);
 	UChargeWidget* GetPlayerWidget();
 
 	//input for triggering the shooting action
@@ -182,6 +186,10 @@ public:
 	void setHealth(float HealthStore);
 
 	float getHealth();
+
+	UFUNCTION(NetMulticast,Reliable) 
+	void Multicast_HighlightPlayerId(int PlayerServerId); 
+	void Multicast_HighlightPlayerId_Implementation(int PlayerServerId);
 
 	UFUNCTION()
 	float GetCurrentCharge();
@@ -335,7 +343,11 @@ public:
 	void CallClientTravel(const FString& Address);  
 
 	void AdjustLeaderBoardValues(int LeaderboardPlayerPoints, int LeaderboardPlayerKils);
+	void UpdateLeaderBoardInfo();
 
+	int GetPlayerId();
+	void HighlightPlayerTagOnLeaderboard();
+	void HighlightPlayerTagOnLeaderboard(int LeaderBoardPlayerId);
 protected:
 	UFUNCTION()
 	void UpdatePlayerScoreUi();
@@ -352,7 +364,7 @@ protected:
 
 	void MultiCast_UpdateLeaderBoardInfo_Implementation(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId);
 
-	void UpdateLeaderBoardInfo();
+
 
 	void DamageYourself();
 
@@ -365,14 +377,19 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* DrawingSound;
 	
+	
+	
+
 	UPROPERTY(Replicated);
 	int PlayerId = 0; 
 
 	
 	AServerObject* ServerObjectRef = nullptr;
 
-	void SetUpPlayerId();
+	
 
+	void SetUpPlayerId();
+	
 	UFUNCTION(NetMulticast,Reliable) 
 	void Multicast_SetLeaderBoardTxt(int NewPlayerPoint, int NewPlayerKills, int LeaderBoardPlayerId); 
 	void Multicast_SetLeaderBoardTxt_Implementation(int NewPlayerPoints, int NewPlayerKills, int LeaderBoardPlayerId);
@@ -396,7 +413,7 @@ private:
 		bool IsPlacingTower = false;
 
 		bool TogglePlacingTowers = false;
-
+		bool ToggleShowLeaderboard = false;
 		FCollisionQueryParams TraceParams;
 		void DisplaySelected();
 		void HideSelected();

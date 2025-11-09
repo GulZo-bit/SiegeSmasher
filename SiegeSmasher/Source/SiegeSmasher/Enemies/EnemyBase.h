@@ -123,6 +123,7 @@ public:
 	void SetCurrentWaveContribution(int WaveContrib);
 	int GetStartingWave();
 	virtual void DamageEnemy(float Damage);
+	virtual void DamageEnemy(float Damage,AMainCharacterTest* PlayerRef);
 	void SetHealth(float Health); 
 	float GetHealth(); 
 	void AddToHealth(float Increase);

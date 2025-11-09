@@ -114,8 +114,9 @@ public:
 	int GetCurrentPlayerId();  
 	void SetHost(AMainCharacterTest* Character);
 	AMainCharacterTest* GetHost();
-	
-	UPROPERTY(Transient, Replicated);
+
+
+	UPROPERTY(Transient,Replicated);
 	int CurrentPlayerCount = 0;  
 
 	
@@ -138,7 +139,7 @@ public:
 	void LogMap();
 
 
-
+	AMainCharacterTest* GetLocalPlayer();
 	//FPlayerLeaderBoardInfo* GetPlayerInfo(int PlayerId);
 protected:
 	UFUNCTION()
@@ -148,7 +149,12 @@ protected:
 
 	AMainCharacterTest* PlayerRef;
 
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_UpdatePlayerLeaderboardInfo(int PlayerPoints, int PlayerKills, int PlayerId);
+	void Multicast_UpdatePlayerLeaderboardInfo_Implementation(int PlayerScore, int PlayerKills, int PlayerId);
 private: 
+
+
 
 	TMap<int,FPlayerLeaderBoardInfo> LeaderBoardPlayerInfo;
 
