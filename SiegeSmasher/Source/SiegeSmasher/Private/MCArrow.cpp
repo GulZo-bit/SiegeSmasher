@@ -100,7 +100,7 @@ void AMCArrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPri
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, FString::Printf(TEXT("Arrow Hit Sound Played")));
 
-		PlayerRef->LocalPlaySound(ImpactSound);
+		PlayerRef->PlayImpactSound();
 	}
 	Destroy();
 }
