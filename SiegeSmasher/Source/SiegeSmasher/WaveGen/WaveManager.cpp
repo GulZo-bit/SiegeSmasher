@@ -21,7 +21,7 @@ void AWaveManager::BeginPlay()
 	UE_LOG(LogTemp, Display, TEXT("Wave Manager Begin play called"));
 	for (int i = 0; i < EnemiesToSpawn.Num(); i++)
 	{
-		EnemiesToSpawn[i]->SetActorTickEnabled(false);
+		//EnemiesToSpawn[i]->SetActorTickEnabled(false);
 		EnemiesToSpawn[i]->SetActorEnableCollision(false);
 		EnemiesToSpawn[i]->SetActorHiddenInGame(true);
 	}
