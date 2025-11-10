@@ -68,6 +68,6 @@ void ADemonFists::ResetFistsOnDeath()
 void ADemonFists::ResetFistsOnSpawn()
 {
 	SetActorHiddenInGame(false);
-	SetActorEnableCollision(true);
+	//SetActorEnableCollision(true);
 	SetActorTickEnabled(true);
 }

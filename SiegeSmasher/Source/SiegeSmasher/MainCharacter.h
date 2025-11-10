@@ -90,7 +90,7 @@ public:
 
 	void setHealth(float HealthStore);
 
-	float getHealth();  
+	//float getHealth();  
 
 	void SwitchTowers();
 
@@ -110,6 +110,7 @@ public:
 	UCameraComponent* camera = nullptr;
 	UFUNCTION(BlueprintCallable)
 	void CallClientTravel(const FString& Address);
+
 private:
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 	TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects;

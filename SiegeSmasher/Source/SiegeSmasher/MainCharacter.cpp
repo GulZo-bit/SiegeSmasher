@@ -12,10 +12,10 @@
 // Sets default values
 AMainCharacter::AMainCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
-	TowerSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
+	//// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	//PrimaryActorTick.bCanEverTick = true;
+	//bReplicates = true;
+	//TowerSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
 	
 
 
@@ -25,50 +25,50 @@ AMainCharacter::AMainCharacter()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	camera = GetComponentByClass<UCameraComponent>();
-	World = GetWorld();
-	InitialiseTowers(); 
+	//camera = GetComponentByClass<UCameraComponent>();
+	//World = GetWorld();
+	//InitialiseTowers(); 
 
 
-    
-    
-	TraceParams = FCollisionQueryParams();
-	TraceParams.AddIgnoredActor(this);
-	GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(camera == nullptr)));
-	//Adding the input mapping context to the main character
-	/*A reference to the player controller class is being cast to the controller that is currently controlling this actor*/
-	AssignedPlayerController = Cast<APlayerController>(Controller);
-	if (AssignedPlayerController)
-	{
-		InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(AssignedPlayerController->GetLocalPlayer());
-		if (InputSubsystem)
-		{
-			//Adding our defaultcontext to the input subsystem that each local player has.
-			//The zero refers to its priority. With zero being the lowest priority.
-			//If we had multiple we would assign them differnt priority with asscending giving them higher priority.
-			InputSubsystem->AddMappingContext(DefaultContext, 0);
+ //   
+ //   
+	//TraceParams = FCollisionQueryParams();
+	//TraceParams.AddIgnoredActor(this);
+	//GLog->Log(FString::Printf(TEXT("cam is nullptr %d"), (int)(camera == nullptr)));
+	////Adding the input mapping context to the main character
+	///*A reference to the player controller class is being cast to the controller that is currently controlling this actor*/
+	//AssignedPlayerController = Cast<APlayerController>(Controller);
+	//if (AssignedPlayerController)
+	//{
+	//	InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(AssignedPlayerController->GetLocalPlayer());
+	//	if (InputSubsystem)
+	//	{
+	//		//Adding our defaultcontext to the input subsystem that each local player has.
+	//		//The zero refers to its priority. With zero being the lowest priority.
+	//		//If we had multiple we would assign them differnt priority with asscending giving them higher priority.
+	//		InputSubsystem->AddMappingContext(DefaultContext, 0);
 
-		
-		}
-	} 
+	//	
+	//	}
+	//} 
 
 
-	
+	//
 
-	/*if (AServerObject* InstanceServerObject = 
-		Cast<AServerObject>(UGameplayStatics::GetActorOfClass(World, AServerObject::StaticClass()))) {
-		
-		AssignServerObject(InstanceServerObject);
-		
-		SetPlayerId(InstanceServerObject->GetPlayerCurrentId());
-		InstanceServerObject->IncrementPlayerId();
-		
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Found server object")));
-	
-	
+	///*if (AServerObject* InstanceServerObject = 
+	//	Cast<AServerObject>(UGameplayStatics::GetActorOfClass(World, AServerObject::StaticClass()))) {
+	//	
+	//	AssignServerObject(InstanceServerObject);
+	//	
+	//	SetPlayerId(InstanceServerObject->GetPlayerCurrentId());
+	//	InstanceServerObject->IncrementPlayerId();
+	//	
+	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Found server object")));
+	//
+	//
 
-	}*/
-	
+	//}*/
+	//
 
 
 }
@@ -77,76 +77,76 @@ void AMainCharacter::BeginPlay()
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	FVector camForward = camera->GetForwardVector();
-	//   GEngine->AddOnScreenDebugMessage(-1,5.0f,FColor::Blue,FString::Printf(TEXT("Cam forward vector X:%f Y:%f Z:%f"),	camForward.X,camForward.Y,camForward.Z));
-	   //GLog->Log(FString::Printf(TEXT("Cam forward vector X:%f Y:%f Z:%f"), camForward.X, camForward.Y, camForward.Z));
+	//FVector camForward = camera->GetForwardVector();
+	////   GEngine->AddOnScreenDebugMessage(-1,5.0f,FColor::Blue,FString::Printf(TEXT("Cam forward vector X:%f Y:%f Z:%f"),	camForward.X,camForward.Y,camForward.Z));
+	//   //GLog->Log(FString::Printf(TEXT("Cam forward vector X:%f Y:%f Z:%f"), camForward.X, camForward.Y, camForward.Z));
 
-	HandleTowerPlacement();
+	//HandleTowerPlacement();
 
 }
 
 // Called to bind functionality to input
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	//Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 
-	//Setting up the actual bindings to the keys now.
-	//We check if the EnhancedInputComponenet has been casted to the PlayerInputComponent. If the check returns false the program will crash.
-	//Because the player wont be able to do any actions.
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMainCharacter::Jumping);
+	////Setting up the actual bindings to the keys now.
+	////We check if the EnhancedInputComponenet has been casted to the PlayerInputComponent. If the check returns false the program will crash.
+	////Because the player wont be able to do any actions.
+	//if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	//{
+	//	//Jumping
+	//	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AMainCharacter::Jumping);
 
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move);
+	//	//Moving
+	//	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move);
 
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacter::Look); 
+	//	//Looking
+	//	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacter::Look); 
 
-		EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Started, this, &AMainCharacter::PlaceTower);
+	//	EnhancedInputComponent->BindAction(TowerPlacementAction, ETriggerEvent::Started, this, &AMainCharacter::PlaceTower);
 
-		EnhancedInputComponent->BindAction(SwitchTowerAction, ETriggerEvent::Started, this, &AMainCharacter::SwitchTowers);
-
-
+	//	EnhancedInputComponent->BindAction(SwitchTowerAction, ETriggerEvent::Started, this, &AMainCharacter::SwitchTowers);
 
 
-	}
+
+
+	//}
 }
 
 void AMainCharacter::Server_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("server ownership of actor changed to player character")));
-	Multicast_SetPlayerOwnerShip(ActorToOwn);
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("server ownership of actor changed to player character")));
+	Multicast_SetPlayerOwnerShip(ActorToOwn);*/
 
 }
 
 void AMainCharacter::SetPlayerOwnerShip(AActor* ActorToOwn)
 {
 
-	if (HasAuthority()) {
-		//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on local")));
-		Multicast_SetPlayerOwnerShip(ActorToOwn);
-	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on server for client")));
-		Server_SetPlayerOwnerShip(ActorToOwn);
-	}
+	//if (HasAuthority()) {
+	//	//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on local")));
+	//	Multicast_SetPlayerOwnerShip(ActorToOwn);
+	//}
+	//else {
+	//	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Green, FString::Printf(TEXT("setting owner ship of actor on server for client")));
+	//	Server_SetPlayerOwnerShip(ActorToOwn);
+	//}
 
 }
 
 void AMainCharacter::Multicast_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
 {
 	
-	ActorToOwn->SetOwner(Controller);
+	/*ActorToOwn->SetOwner(Controller);*/
 
 }
 
 void AMainCharacter::SpawnSelected()
 {
 	
-	if (IsPlacingTower && Selected->GetCanPlaceTower()) {
+	/*if (IsPlacingTower && Selected->GetCanPlaceTower()) {
 		 
 		if (HasAuthority()) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("local host Placing tower")));
@@ -158,7 +158,7 @@ void AMainCharacter::SpawnSelected()
 		}
 	
 
-	}
+	}*/
 
 
 
@@ -171,9 +171,9 @@ void AMainCharacter::SpawnSelected()
 
 void AMainCharacter::Server_SpawnSelected_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Client called server Placing tower")));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Client called server Placing tower")));
 	ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
-
+*/
 
 
 }
@@ -181,53 +181,53 @@ void AMainCharacter::Server_SpawnSelected_Implementation()
 void AMainCharacter::Move(const FInputActionValue& Value)
 {
 	//Input is a Vector2d
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	//FVector2D MovementVector = Value.Get<FVector2D>();
 
-	//This is if the user is using a controller
-	if (Controller != nullptr)
-	{
-		//Find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+	////This is if the user is using a controller
+	//if (Controller != nullptr)
+	//{
+	//	//Find out which way is forward
+	//	const FRotator Rotation = Controller->GetControlRotation();
+	//	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		//Get the forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	//	//Get the forward vector
+	//	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		//Get the right vector
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	//	//Get the right vector
+	//	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		//Add movement
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
-	}
+	//	//Add movement
+	//	AddMovementInput(ForwardDirection, MovementVector.Y);
+	//	AddMovementInput(RightDirection, MovementVector.X);
+	//}
 }
 
 void AMainCharacter::Look(const FInputActionValue& Value)
 {
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	//FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
-	{
-		//Add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
+	//if (Controller != nullptr)
+	//{
+	//	//Add yaw and pitch input to controller
+	//	AddControllerYawInput(LookAxisVector.X);
+	//	AddControllerPitchInput(LookAxisVector.Y);
+	//}
 }
 
 void AMainCharacter::Jumping()
 {
-	Jump();
+	/*Jump();*/
 }
 
 void AMainCharacter::PlaceTower()
 {
-	SpawnSelected();
+	/*SpawnSelected();*/
 }
 
 void AMainCharacter::DisplaySelected()
 {
-	Selected->SetActorHiddenInGame(false);
-	Selected->SetActorEnableCollision(true);
+	/*Selected->SetActorHiddenInGame(false);
+	Selected->SetActorEnableCollision(true);*/
 
 
 }
@@ -235,53 +235,53 @@ void AMainCharacter::DisplaySelected()
 
 void AMainCharacter::HideSelected()
 {
-	Selected->SetActorHiddenInGame(true);
+	/*Selected->SetActorHiddenInGame(true);
 	Selected->SetActorEnableCollision(false);
-	Selected->SetActorTickEnabled(false);
+	Selected->SetActorTickEnabled(false);*/
 
 }
 
 void AMainCharacter::HandleTowerPlacement()
 {
 
-	if (Selected != nullptr) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,FString::Printf(TEXT("PlayerPlacingTower")));
-		FVector PlayerCameForward = camera->GetForwardVector();
+	//if (Selected != nullptr) {
+	//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,FString::Printf(TEXT("PlayerPlacingTower")));
+	//	FVector PlayerCameForward = camera->GetForwardVector();
 
-		FHitResult PlacementSurfaceResult = FHitResult();
+	//	FHitResult PlacementSurfaceResult = FHitResult();
 
-		FVector start = camera->GetComponentLocation() + PlayerCameForward;
+	//	FVector start = camera->GetComponentLocation() + PlayerCameForward;
 
-		FVector end = start + PlayerCameForward * PlayerPlacementDistances; 
-		IsPlacingTower = false;
-		
+	//	FVector end = start + PlayerCameForward * PlayerPlacementDistances; 
+	//	IsPlacingTower = false;
+	//	
 
-		if ( World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
-		{
-			UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
+	//	if ( World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
+	//	{
+	//		UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
 
-			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
-			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
-			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
-			FVector CamPos = camera->GetComponentLocation();
-			DrawDebugLine(World, start, end, FColor::Blue);
-			DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
-			IsPlacingTower =  Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward, CamPos, SurfaceTransform); 
-			
-			//Selected->SetActorHiddenInGame(IsPlacingTower);
-		
-			return;
-		} 
+	//		FVector SurfaceOrigin = HitComponent->GetComponentLocation();
+	//		FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
+	//		FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
+	//		FVector CamPos = camera->GetComponentLocation();
+	//		DrawDebugLine(World, start, end, FColor::Blue);
+	//		DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
+	//		IsPlacingTower =  Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward, CamPos, SurfaceTransform); 
+	//		
+	//		//Selected->SetActorHiddenInGame(IsPlacingTower);
+	//	
+	//		return;
+	//	} 
 
-		
-		
+	//	
+	//	
 
 
 
-		
+	//	
 
-	}
-	
+	//}
+	//
 
 
 }
@@ -290,31 +290,31 @@ void AMainCharacter::HandleTowerPlacement()
 void AMainCharacter::InitialiseTowers()
 {
 
-	ATowePrePlaceObjectHelper* currentInstance = nullptr;
-	UWorld* world = GetWorld();
-	FTransform SpawnTransForm = FTransform();
-	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
+	//ATowePrePlaceObjectHelper* currentInstance = nullptr;
+	//UWorld* world = GetWorld();
+	//FTransform SpawnTransForm = FTransform();
+	//FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+	//SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; 
 
-	GLog->Log(FString::Printf(TEXT("towers types to spawn count:%d"), TowerTypesToSpawn.Num()));
-	for (TSubclassOf<ATowePrePlaceObjectHelper>& towerType : TowerPrePlacementObjectsToSpawn ) {
+	//GLog->Log(FString::Printf(TEXT("towers types to spawn count:%d"), TowerTypesToSpawn.Num()));
+	//for (TSubclassOf<ATowePrePlaceObjectHelper>& towerType : TowerPrePlacementObjectsToSpawn ) {
 
-		currentInstance = world->SpawnActor<ATowePrePlaceObjectHelper>(towerType, SpawnTransForm, SpawnParameters);
-		TowerPrePlacementObjects.Add(currentInstance);
-		currentInstance->SetActorHiddenInGame(true);
-		currentInstance->SetActorEnableCollision(false);
-		currentInstance->DisableTick();
-		
-	
-	}
+	//	currentInstance = world->SpawnActor<ATowePrePlaceObjectHelper>(towerType, SpawnTransForm, SpawnParameters);
+	//	TowerPrePlacementObjects.Add(currentInstance);
+	//	currentInstance->SetActorHiddenInGame(true);
+	//	currentInstance->SetActorEnableCollision(false);
+	//	currentInstance->DisableTick();
+	//	
+	//
+	//}
 
 
-	/*if (TowerPrePlacementObjects.Num() > 0) {
+	///*if (TowerPrePlacementObjects.Num() > 0) {
 
-		Selected = TowerPrePlacementObjects[0];
-	 	DisplaySelected();
+	//	Selected = TowerPrePlacementObjects[0];
+	// 	DisplaySelected();
 
-	}*/
+	//}*/
 
 
 
@@ -358,39 +358,28 @@ void AMainCharacter::AlignTowerBeforePlacement()
 
 void AMainCharacter::CallCreateLobby()
 {
-	/*UWorld* MultiWorld = GetWorld();
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Lobby Created")));
-		MultiWorld->ServerTravel("/Game/Lobby?listen");
-	}*/
 	FString LobbyMapURL = TEXT("/Game/Lobby?listen");
 	UGameplayStatics::OpenLevel(GetWorld(), *LobbyMapURL);
 }
 
 void AMainCharacter::CallClientTravel(const FString& Address)
 {
-	/*APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
-	if (PlayerController)
-	{
-		PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
-	}*/
 	UGameplayStatics::OpenLevel(GetWorld(), *Address);
-	
 }
 
 void AMainCharacter::setHealth(float HealthStore)
 {
-	Health = HealthStore;
+	/*Health = HealthStore;*/
 }
 
-float AMainCharacter::getHealth()
-{
-	return Health;
-}
+//float AMainCharacter::getHealth()
+//{
+//	/*return Health;*/
+//}
 
 void AMainCharacter::SwitchTowers()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Switch  called")));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Switch  called")));
 
 	TArray<FKey> InputKeysToSwitchTower = InputSubsystem->QueryKeysMappedToAction(SwitchTowerAction);
 	for (int i = 0; i < InputKeysToSwitchTower.Num(); i++) {
@@ -410,7 +399,7 @@ void AMainCharacter::SwitchTowers()
 
 		}
 
-	}
+	}*/
 
 
 
@@ -420,20 +409,20 @@ void AMainCharacter::SwitchTowers()
 void AMainCharacter::Server_SetPlayerId_Implementation(int Id)
 { 
 
-	Multicast_SetPlayerId(Id);
+	/*Multicast_SetPlayerId(Id);*/
 
 
 }
 void AMainCharacter::Multicast_SetPlayerId_Implementation(int Id)
 {
 
-	PlayerId = Id;
+	/*PlayerId = Id;*/
 
 }
 void AMainCharacter::SetPlayerId(int Id)
 {
 
-	if (GetLocalRole() < ROLE_Authority) {
+	/*if (GetLocalRole() < ROLE_Authority) {
 
 
 		Server_SetPlayerId(Id);
@@ -443,7 +432,7 @@ void AMainCharacter::SetPlayerId(int Id)
 		return;
 	}
 	Multicast_SetPlayerId(Id);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Setting player id local host machine and multi casting from server for clients new host id is %d "), PlayerId));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Setting player id local host machine and multi casting from server for clients new host id is %d "), PlayerId));*/
 
 
 }

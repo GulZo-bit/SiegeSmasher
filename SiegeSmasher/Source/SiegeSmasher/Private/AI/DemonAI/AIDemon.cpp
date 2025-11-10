@@ -110,10 +110,13 @@ void AAIDemon::Tick(float DeltaTime)
 
 	else
 	{
-		RightFist->ResetFistsOnSpawn();
-		LeftFist->ResetFistsOnSpawn();
+		RightFist->SetActorEnableCollision(false);
+		LeftFist->SetActorEnableCollision(false);
 		if (bCanActorMove == true)
 		{
+
+			RightFist->ResetFistsOnSpawn();
+			LeftFist->ResetFistsOnSpawn();
 			//How long the current spline has been going for.
 			float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
 
@@ -169,6 +172,8 @@ void AAIDemon::Server_PlayAttackMontage_Implementation()
 
 void AAIDemon::Multicast_PlayAttackMontage_Implementation()
 {
+	RightFist->SetActorEnableCollision(true);
+	LeftFist->SetActorEnableCollision(true);
 	if (AttackAnimation != nullptr)
 	{
 		if (AttackSound != nullptr)
