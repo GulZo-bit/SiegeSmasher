@@ -191,17 +191,16 @@ void UChargeWidget::SetServerObjectRef(AServerObject* ServerObjectPtr)
 
 void UChargeWidget::UpdatePlayerLeaderBoardInfo(int Points, int Kills, int PlayerId)
 {
-	try {
+	if (PlayerId >= 0 && PlayerId < LeaderBoardItems.Num()) {
 		FString LeaderboardTxt = LeaderBoardTagName + FString::FromInt(PlayerId + 1) + " " + "Points:" + FString::FromInt(Points) + " Kills:" + FString::FromInt(Kills);
 
 		LeaderBoardItems[PlayerId]->SetText(FText::FromString(LeaderboardTxt));
 		LeaderBoardItems[PlayerId]->SetOpacity((LeaderboardBorder->GetRenderOpacity() > 0.0f));
+		return;
 	}
-	catch (...) {
+    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID WAS NULL WHEN TRYING TO UPDATE SLOT ON LEADERBOARD")));
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID WAS NULL WHEN TRYING TO UPDATE SLOT ON LEADERBOARD")));
-
-	}
+	
 }
 
 void UChargeWidget::RefreshPlayerLeaderboardInfo()

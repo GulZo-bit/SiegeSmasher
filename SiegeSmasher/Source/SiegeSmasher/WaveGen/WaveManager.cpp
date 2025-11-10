@@ -20,6 +20,9 @@ void AWaveManager::BeginPlay()
 	Super::BeginPlay(); 
 	
 	UE_LOG(LogTemp, Display, TEXT("Wave Manager Begin play called"));
+	UE_LOG(LogTemp, Display, TEXT("Wave manger enemies to spawn before iterating is %d"), EnemiesToSpawn.Num());
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Wave Enemies to spawn num before iteration: %d"), EnemiesToSpawn.Num()));
+
 	World = GetWorld();
 	FActorSpawnParameters SpawnParams = FActorSpawnParameters();
 
@@ -33,14 +36,16 @@ void AWaveManager::BeginPlay()
 		EnemyRef->SetActorEnableCollision(false);
 		EnemyRef->SetActorHiddenInGame(true);
 		EnemyRef->GetStartingWave();*/
-		EnemiesToSpawn[i]->SetActorHiddenInGame(true); 
+		//EnemiesToSpawn[i]->SetActorHiddenInGame(true); 
 		EnemiesToSpawn[i]->SetActorTickEnabled(false); 
-		EnemiesToSpawn[i]->SetActorEnableCollision(false);
+		//EnemiesToSpawn[i]->SetActorEnableCollision(false);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, FString::Printf(TEXT("Wave type: %d"), (int)EnemiesToSpawn[i]->GetEnemyWaveType()));
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Cyan, FString::Printf(TEXT("Wave type: %d"), (int)EnemiesToSpawn[i]->GetEnemyWaveType()));
 	}
 
+	UE_LOG(LogTemp, Display, TEXT("Wave manger enemies to spawn after iteration is %d"), EnemiesToSpawn.Num());
 
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Wave enemies to spawn num after iteration: %d"), EnemiesToSpawn.Num()));
 
 
 
@@ -68,6 +73,8 @@ void AWaveManager::UpdateCurrentWave(float DeltaTime)
 
 	WaveGlobalWaitTimer -= DeltaTime;
 
+
+	GLog->Log(FString::Printf(TEXT("Wait timer %f"), WaveGlobalWaitTimer));
 
 
 

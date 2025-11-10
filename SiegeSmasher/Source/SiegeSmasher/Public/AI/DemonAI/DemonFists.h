@@ -41,7 +41,7 @@ public:
 	UFUNCTION()
 	void OnOverLapEnd(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	float Damage = 5;
+	float Damage = 10;
 	bool bHit = false;
 
 	void ResetFistsOnDeath();	

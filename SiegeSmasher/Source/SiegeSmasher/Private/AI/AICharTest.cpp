@@ -76,7 +76,7 @@ void AAICharTest::BeginPlay()
 void AAICharTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	UE_LOG(LogTemp, Warning, TEXT("Vampire Current Health: %f Percent"), CurrentHealth);
 	if (this->GetHealth() <= 0)
 	{
 		if (AnimInstance != nullptr)
@@ -208,7 +208,6 @@ void AAICharTest::Multicast_PlayDeathMontage_Implementation()
 				Multicast_AnimIsDead(true);
 			}
 
-			this->SetActorEnableCollision(false);
 			AnimInstance->Montage_Play(DeathMontage);
 			bCanActorMove = false;
 		}
