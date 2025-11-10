@@ -87,12 +87,20 @@ void AEnemyBase::AddToHealth(float Increase)
 
 void AEnemyBase::ResetEnemyOnDeath()
 {
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
-	SetActorTickEnabled(false); 
-	Disabled = true;
+	if (HasAuthority())
+	{
+		Multicast_ResetOnDeath();
+	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("enemy reset on death disabled %d"), (int)Disabled));
+}
+
+void AEnemyBase::Multicast_ResetOnDeath_Implementation()
+{
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+	Disabled = true;
 }
 
 // Called every frame
@@ -131,20 +139,42 @@ bool AEnemyBase::GetIsDisabled()
 
 void AEnemyBase::ResetOnSpawn()
 {
-	SetActorHiddenInGame(false);
-	SetActorEnableCollision(true);
-	SetActorTickEnabled(true); 
-	Disabled = false;
-	CurrentHealth = MaxHealth;
+	//SetActorHiddenInGame(false);
+	//if (HasAuthority())
+	//{
+	//	//SetActorEnableCollision(true);
+	//	Multicast_SetCollision(true);
+	//}
+	//
+	//SetActorTickEnabled(true); 
+	//Disabled = false;
+	//CurrentHealth = MaxHealth;
+
+	//if (HasAuthority())
+	//{
+	//	//UBoolAnimInstance* Temp = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
+	//	//Temp->setIsDeadBool(false);
+
+	//	Multicast_AnimIsDead(false);
+	//}
 
 	if (HasAuthority())
 	{
-		//UBoolAnimInstance* Temp = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
-		//Temp->setIsDeadBool(false);
-
-		Multicast_AnimIsDead(false);
+		Multicast_ResetOnSpawn();
 	}
 	
+
+}
+
+void AEnemyBase::Multicast_ResetOnSpawn_Implementation()
+{
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	SetActorTickEnabled(true);
+	Disabled = false;
+	CurrentHealth = MaxHealth;
+
+	Multicast_AnimIsDead(false);
 
 }
 
@@ -257,6 +287,12 @@ void AEnemyBase::Multicast_AnimIsDead_Implementation(bool bStore)
 		GLog->Log("Anim Instance is not null");
 		AnimIsDead->setIsDeadBool(bStore);
 	}
+}
+
+
+void AEnemyBase::Multicast_SetCollision_Implementation(bool bStore)
+{
+	
 }
 
 int32 AEnemyBase::CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect)

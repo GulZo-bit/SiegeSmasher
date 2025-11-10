@@ -113,8 +113,13 @@ void AAIDemon::Tick(float DeltaTime)
 
 	else
 	{
-		RightFist->SetActorEnableCollision(false);
-		LeftFist->SetActorEnableCollision(false);
+		if(AnimInstance->Montage_GetIsStopped(AttackAnimation))
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Attack Animation is stopped")));
+			RightFist->SetActorEnableCollision(false);
+			LeftFist->SetActorEnableCollision(false);
+		}
+		
 		if (bCanActorMove == true)
 		{
 
@@ -222,7 +227,7 @@ void AAIDemon::Multicast_PlayDeathMontage_Implementation()
 				Multicast_AnimIsDead(true);
 			}
 
-			this->SetActorEnableCollision(false);
+			
 			AnimInstance->Montage_Play(DeathMontage);
 			bCanActorMove = false;
 		}

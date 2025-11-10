@@ -95,6 +95,7 @@ protected:
 	int StartingWave = 0; // wave 0 = 1(starts counting from 0) 
 	
 	void DecrementWaveEnemyAliveCount();
+	UPROPERTY(Replicated)
 	bool Disabled = false;
 
 	UBoolAnimInstance* AnimIsDead;
@@ -102,6 +103,19 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_AnimIsDead(bool bStore);
 	void Multicast_AnimIsDead_Implementation(bool bStore);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetCollision(bool bStore);
+	void Multicast_SetCollision_Implementation(bool bStore);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ResetOnDeath();
+	void Multicast_ResetOnDeath_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ResetOnSpawn();
+	void Multicast_ResetOnSpawn_Implementation();
+
 public:
 	int32 CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect);
 	void ApplyTowerStatusEffect(EnemyStatusEffect  StatusEffect); 
