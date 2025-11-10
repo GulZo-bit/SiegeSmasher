@@ -80,7 +80,12 @@ void AMainCharacterTest::BeginPlay()
 	}
 	
 	ServerObjectRef = Cast<AServerObject>(UGameplayStatics::GetActorOfClass(World,AServerObject::StaticClass()));
-	
+	ThroneRef = Cast<AThrone>(UGameplayStatics::GetActorOfClass(World, AThrone::StaticClass()));
+	GEngine->AddOnScreenDebugMessage(-1, 65.0f, FColor::Purple, FString::Printf(TEXT("Is throne refnull %d"), (int)(ThroneRef != nullptr)));
+
+
+
+
 	//checks if the reference to the player hud is not empty
 
 	if (PlayerHUD != nullptr) 
@@ -88,11 +93,13 @@ void AMainCharacterTest::BeginPlay()
 
 		if (IsLocallyControlled()) 
 		{
+			ThroneRef->SetPlayerRef(this);
+
+			GEngine->AddOnScreenDebugMessage(-1, 65.0f, FColor::Purple, FString::Printf(TEXT("Is throne refnull %d"), (int)(ThroneRef != nullptr)));
 			//creates the widget of the ChargeWidget class in the current world
 			ChargeWidget = CreateWidget<UChargeWidget>(GetWorld(), PlayerHUD);
 			//if the widget was created successfully, add it to viewport
 
-			
 
 			if (ChargeWidget != nullptr && ServerObjectRef != nullptr)
 			{
@@ -103,6 +110,9 @@ void AMainCharacterTest::BeginPlay()
 				
 				ChargeWidget->SetServerObjectRef(ServerObjectRef);
 				ServerObjectRef->SetPlayerStateToHandle(this);
+
+				ChargeWidget->SetThroneHealth(ThroneRef->ThroneHealth);
+
 
 				if (HasAuthority()) {
 					ServerObjectRef->SetHost(this);
@@ -186,8 +196,6 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(ToggleTowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleTowerPlacement);
 		
 		EnhancedInputComponent->BindAction(ToggleLeaderboardAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleLeaderboard);
-
-		EnhancedInputComponent->BindAction(SelfDamage, ETriggerEvent::Triggered, this, &AMainCharacterTest::DamageYourself);
 	}
 }
 
@@ -391,45 +399,45 @@ bool AMainCharacterTest::Server_ChargeShot_Validate(float DeltaTime)
 	return true;
 }
 
-void AMainCharacterTest::Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot)
-{
-	Multi_UpdateCharge();
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
-	AMCArrow* Arrow = GetWorld()->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CamRotation, SpawnParams);
-	//if arrow has been succesfully created
-	if (Arrow)
-	{
-		Arrow->SetPlayerRef(this);
+//void AMainCharacterTest::Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot)
+//{
+//	Multi_UpdateCharge();
+//	FActorSpawnParameters SpawnParams;
+//	SpawnParams.Owner = this;
+//	SpawnParams.Instigator = GetInstigator();
+//	AMCArrow* Arrow = GetWorld()->SpawnActor<AMCArrow>(ArrowClass, BowPosition->GetComponentLocation(), CamRotation, SpawnParams);
+//	//if arrow has been succesfully created
+//	if (Arrow)
+//	{
+//		Arrow->SetPlayerRef(this);
+//
+//		//changes the Bow rotation to be changed into a vector so that it shows a direction
+//		FVector LaunchDirection = BowRot.Vector();
+//		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
+//		Arrow->FireInDirection(LaunchDirection, ChargeFinal);
+//		//sets the bools for animations and turns off charging and resets the charge
+//		SetArrowDrawn(false);
+//		SetArrowFired(true);
+//		isCharging = false;
+//		//UE_LOG(LogTemp, Warning, TEXT("Multi Charge: %f Percent"), ChargeFinal);
+//		CurrentCharge = 0;
+//	}
+//}
+//
+//bool AMainCharacterTest::Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot)
+//{
+//	return true;
+//}
 
-		//changes the Bow rotation to be changed into a vector so that it shows a direction
-		FVector LaunchDirection = BowRot.Vector();
-		//calls the fire in direction function from the arrow which makes it fly into the direction the player is rotated in, also takes charge to scale arrow speed
-		Arrow->FireInDirection(LaunchDirection, ChargeFinal);
-		//sets the bools for animations and turns off charging and resets the charge
-		SetArrowDrawn(false);
-		SetArrowFired(true);
-		isCharging = false;
-		//UE_LOG(LogTemp, Warning, TEXT("Multi Charge: %f Percent"), ChargeFinal);
-		CurrentCharge = 0;
-	}
-}
-
-bool AMainCharacterTest::Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot)
-{
-	return true;
-}
-
-void AMainCharacterTest::Multi_UpdateCharge_Implementation()
-{
-	ChargeFinal = CurrentCharge;
-}
-
-bool AMainCharacterTest::Multi_UpdateCharge_Validate()
-{
-	return true;
-}
+//void AMainCharacterTest::Multi_UpdateCharge_Implementation()
+//{
+//	ChargeFinal = CurrentCharge;
+//}
+//
+//bool AMainCharacterTest::Multi_UpdateCharge_Validate()
+//{
+//	return true;
+//}
 
 
 void AMainCharacterTest::Multicast_UpdateChargeBar_Implementation()
@@ -578,10 +586,6 @@ void AMainCharacterTest::PlayerDeath()
 		UpdateHealthWidget();
 	}
 }
-
-
-
-//Abandon hope all who go past this line
 
 void AMainCharacterTest::Server_SetPlayerOwnerShip_Implementation(AActor* ActorToOwn)
 {
@@ -883,11 +887,6 @@ void AMainCharacterTest::UpdateLeaderBoardInfo()
 
 }
 
-void AMainCharacterTest::DamageYourself()
-{
-	setHealth(10);
-}
-
 void AMainCharacterTest::UpdateHealthWidget()
 {
 	if (ChargeWidget != nullptr) 
@@ -954,6 +953,14 @@ void AMainCharacterTest::Multicast_SetLeaderBoardTxt_Implementation(int NewPlaye
 
 	}
 
+}
+
+void AMainCharacterTest::SetBaseHealth(int NewHealth)
+{
+	if (ChargeWidget != nullptr) 
+	{
+		ChargeWidget->SetThroneHealth(NewHealth);
+	}
 }
 
 void AMainCharacterTest::setHealth(float HealthStore)
