@@ -214,6 +214,7 @@ void AAIDemon::Multicast_PlayDeathMontage_Implementation()
 				Multicast_AnimIsDead(true);
 			}
 
+			this->SetActorEnableCollision(false);
 			AnimInstance->Montage_Play(DeathMontage);
 			bCanActorMove = false;
 		}

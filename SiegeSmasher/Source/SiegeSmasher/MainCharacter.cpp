@@ -2,6 +2,7 @@
 
 
 #include "MainCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/Controller.h" 
 #include "DrawDebugHelpers.h"
 
@@ -357,20 +358,24 @@ void AMainCharacter::AlignTowerBeforePlacement()
 
 void AMainCharacter::CallCreateLobby()
 {
-	UWorld* MultiWorld = GetWorld();
+	/*UWorld* MultiWorld = GetWorld();
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Lobby Created")));
 		MultiWorld->ServerTravel("/Game/Lobby?listen");
-	}
+	}*/
+	FString LobbyMapURL = TEXT("/Game/Lobby?listen");
+	UGameplayStatics::OpenLevel(GetWorld(), *LobbyMapURL);
 }
 
 void AMainCharacter::CallClientTravel(const FString& Address)
 {
-	APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
+	/*APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
 	if (PlayerController)
 	{
 		PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
-	}
+	}*/
+	UGameplayStatics::OpenLevel(GetWorld(), *Address);
+	
 }
 
 void AMainCharacter::setHealth(float HealthStore)

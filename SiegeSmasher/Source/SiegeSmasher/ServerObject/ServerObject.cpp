@@ -50,22 +50,23 @@ void AServerObject::Tick(float DeltaTime)
 
 
 }
-
+// here we increment the player count for the server object 
 void AServerObject::IncrementPlayerCount()
 {
 	
 	//LeaderBoardPlayerInfo.Add({ CurrentPlayerCount,PlayerRef});
 	
    CurrentPlayerCount += 1;
-
+   // add the item to the replciated TArray used to track leaderboard state 
    int32 Index = LeaderBoardInfo.Items.Add(FPlayerLeaderBoardInfo());  
-   int32 RepId = LeaderBoardInfo.Items[LeaderBoardInfo.Items.Num() - 1].ReplicationID;
 
-
-
-   //LeaderBoardInfo.AddPlayerIdMappedToRepId(GetCurrentPlayerId(), RepId);
+   // mark the item as dirty meaning that the FFastArraySerializer interface will pick up that the
+   // there has been an additon to the TArray and modifiy it accordingly  on each client 
    LeaderBoardInfo.MarkItemDirty(LeaderBoardInfo.Items[Index]);
 
+   // as we are using a replciation call back to modify the TArray storing leaderboard state on the client 
+   // that wont get called for the server so when we are adding an item to the leaderboard we check if the server 
+   // object we are modififying has a host and if they do we also update and refresh their leaderboard to show the new player 
    if (Host != nullptr) {
 
 	   GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing server leaderboard new player was added")));
@@ -110,26 +111,25 @@ void AServerObject::SetPlayerStateToHandle(AMainCharacterTest* PlayerPtr)
 
 }
 
-void AServerObject::MappPlayerIdToReplicatedId(int32 ReplicatedId)
-{
 
-	//PlayerIdsToPlayerInfoIndex.Add({ GetCurrentPlayerId(),ReplicatedId });
-
-}
 
 void AServerObject::UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKills, int PlayerId)
 {
 
-	try {
-
+	if (HasPlayerInfo(PlayerId)) {
 		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints;
 		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
 
 	}
+	/*try {
+	    LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints;
+		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
+	
+	}
 	catch (...) {
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID FOR LEADER BOARD INFO FOR SERVER OBJECT WAS NULL %d"), PlayerId));
-	}
+	}*/
 
 
 
@@ -139,23 +139,10 @@ void AServerObject::UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKill
 
 }
 
-void AServerObject::AdjustLeaderBoardPlayerInfo(int PlayerPoints, int PlayerKills, int PlayerId)
-{
-	Multicast_AdjustPlayerInfo(PlayerPoints, PlayerKills, PlayerId);
-
-}
 
 
 
-void AServerObject::Multicast_AdjustPlayerInfo_Implementation(int PlayerPoints, int PlayerKills, int PlayerId)
-{
 
-	if (LeaderBoardPlayerInfo.Find(PlayerId)) {
-
-	}
-
-
-}
 
 
 
@@ -163,21 +150,24 @@ void AServerObject::Multicast_AdjustPlayerInfo_Implementation(int PlayerPoints, 
 
 bool AServerObject::HasPlayerInfo(int PlayerId)
 {
-	try {
-
-		LeaderBoardInfo.Items[PlayerId]; 
-
-		return true;
 
 
-	}
-	catch (...) {
+	return PlayerId >= 0 && PlayerId < LeaderBoardInfo.Items.Num();
+	//try {
 
-		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Player id did not exists %d"), PlayerId));
-		return false;
-	}
+	//	LeaderBoardInfo.Items[PlayerId]; 
+
+	//	return true;
+
+
+	//}
+	//catch (...) {
+
+	//	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Player id did not exists %d"), PlayerId));
+	//	return false;
+	//}
 }
-
+// used to check if the server object has a particualr player id on the leaderboard 
 FPlayerLeaderBoardInfo AServerObject::GetPlayerInfo(int PlayerId)
 {
 	if (HasPlayerInfo(PlayerId)) {
@@ -211,7 +201,12 @@ void AServerObject::LogMap()
 
 void AServerObject::OnRep_LeaderBoardState(FLeaderboardItems Old)
 {
-
+	// when we recive a replciation call back for our TArray that is storing the leaderboard state
+	// we track if the Array size increased meaning a player was added on the server side 
+	// so we update the player UI using the player ref that is assigned on begin play 
+	// (this being the locally controlled player for this server object on the client) 
+	// and we also ensure to refresh the players highlight on the leaderboard ensuring they know
+	// which player they are
 	if (Old.Items.Num() < LeaderBoardInfo.Items.Num() && PlayerRef->GetPlayerWidget()) {
 
 		GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing client leaderboard new player was added %d"),CurrentPlayerCount));
@@ -232,6 +227,11 @@ AMainCharacterTest* AServerObject::GetLocalPlayer()
 	return PlayerRef;
 }
 
+// this is a multicast that is broadcasted to all relevant clients from the server when ever a players leaderboard info 
+// changes updating the contained info across each server objects TArray(that implmenets the FFastArraySerializer interface) 
+// since this is a multicast done from the server on each server object the state for each of server objects on each locally 
+// controlled client is automatcially updated so no need to mark the TArray as dirty(which would mean it has to be replciated) saving 
+// on bandwidth usage
 void AServerObject::Multicast_UpdatePlayerLeaderboardInfo_Implementation(int PlayerPoints, int PlayerKills, int PlayerId)
 {
 

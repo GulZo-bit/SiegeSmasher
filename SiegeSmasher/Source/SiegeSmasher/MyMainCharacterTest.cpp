@@ -816,19 +816,7 @@ void AMainCharacterTest::CallClientTravel(const FString& Address)
 }
 
 
-void AMainCharacterTest::AdjustLeaderBoardValues(int LeaderboardPlayerPoints, int LeaderboardPlayerKils)
-{
-	if (HasAuthority()) {
 
-
-		ServerObjectRef->AdjustLeaderBoardPlayerInfo(LeaderboardPlayerPoints, LeaderboardPlayerKils, PlayerId);
-
-
-
-	}
-
-
-}
 
 
 
@@ -1057,7 +1045,7 @@ void AMainCharacterTest::SwitchTowers()
 void AMainCharacterTest::ToggleLeaderboard()
 {
 	
-
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("Toggle leaderboard called ")));
 	if (ChargeWidget != nullptr) {
 		ToggleShowLeaderboard = !ToggleShowLeaderboard;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Toggle Leadeboard %d"), (int)ToggleShowLeaderboard));

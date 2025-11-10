@@ -40,6 +40,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	int ThroneHealth;
+	UScaleBox* CreateScaleBox(FString Name);
 
 	UFUNCTION()
 	void SetChargeAmount(float ChargeAmount);
@@ -99,6 +100,12 @@ protected:
 	FSlateFontInfo LeaderboardFont;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardTextColour");
 	FSlateColor LeaderboardTextColour;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardScaleBoxHeight"); 
+	float LeaderboardScaleBoxHeight = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardScaleBoxHeight");
+	float LeaderboardScaleBoxRightPadding = 0.0f;
 
 private:
 	void GenerateLeaderBoard();
