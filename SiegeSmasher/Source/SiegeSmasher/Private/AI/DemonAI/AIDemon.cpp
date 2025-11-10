@@ -18,11 +18,14 @@ void AAIDemon::BeginPlay()
 	Super::BeginPlay();
 	
 	//Attach Fists
-	RightFist = GetWorld()->SpawnActor<ADemonFists>(DemonFistClass);
-	LeftFist = GetWorld()->SpawnActor<ADemonFists>(DemonFistClass);
+	FActorSpawnParameters SpawnParamaters = FActorSpawnParameters();
+	SpawnParamaters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	RightFist = GetWorld()->SpawnActor<ADemonFists>(DemonFistClass, FTransform(), SpawnParamaters);
+	LeftFist = GetWorld()->SpawnActor<ADemonFists>(DemonFistClass, FTransform(), SpawnParamaters);
 
 	if (RightFist != nullptr)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Fists Attached")));
 		RightFist->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("RightHandSocket"));
 		RightFist->SetOwner(this);
 	}

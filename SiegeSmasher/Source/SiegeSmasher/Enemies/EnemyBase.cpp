@@ -12,6 +12,9 @@ AEnemyBase::AEnemyBase()
 	PrimaryActorTick.bCanEverTick = true;
 	StatusEffectTest = CreateDefaultSubobject<UStatusEffectBase>("StatusEffectTest");
 	BleedStatusEffect = CreateDefaultSubobject<UBleedStatusEffect>("BleedStatusEffect");
+
+	bAlwaysRelevant = true;
+	NetCullDistanceSquared = 0;
 }
 
 // Called when the game starts or when spawned

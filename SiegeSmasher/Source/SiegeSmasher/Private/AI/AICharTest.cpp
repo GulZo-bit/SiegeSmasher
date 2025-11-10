@@ -76,7 +76,7 @@ void AAICharTest::BeginPlay()
 void AAICharTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	UE_LOG(LogTemp, Warning, TEXT("Vampire Current Health: %f Percent"), CurrentHealth);
 	if (this->GetHealth() <= 0)
 	{
 		if (AnimInstance != nullptr)
