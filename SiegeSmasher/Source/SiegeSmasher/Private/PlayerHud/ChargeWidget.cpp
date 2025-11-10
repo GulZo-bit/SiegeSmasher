@@ -47,7 +47,7 @@ void UChargeWidget::GenerateLeaderBoard()
 
 		FVector2D LeaderboardTopLeft = LeaderboardCanvasSlot->GetPosition();
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT(" max player num %d"), MaxPlayerNum));
-
+		FVector2D LeaderboardSize = LeaderboardCanvasSlot->GetSize();
 		for (int i = 0; i < MaxPlayerNum; i++) {
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Itertaing max player num")));
@@ -55,23 +55,35 @@ void UChargeWidget::GenerateLeaderBoard()
 			FString PlayerTag = LeaderBoardTagName + FString::FromInt(i + 1);
 			UTextBlock* Text = CreateText(PlayerTag);
 
-			/*Text->SetFont(LeaderboardFont);
-			Text->SetColorAndOpacity(LeaderboardTextColour);
-			Text->SetText(FText::FromString(PlayerTag));*/
+			UScaleBox* TextScaleBox = CreateScaleBox(FString("Scale " + FString::FromInt(i)));
+			LeaderboardGrid->GetParent()->AddChild(TextScaleBox);
+
+			UCanvasPanelSlot* TextScaleCanvasSlot = Cast<UCanvasPanelSlot>(TextScaleBox->Slot);
+
+			TextScaleCanvasSlot->SetSize(FVector2D(LeaderboardSize.X - LeaderboardScaleBoxRightPadding, LeaderboardScaleBoxHeight));
+
+			TextScaleCanvasSlot->SetAnchors(LeaderboardCanvasSlot->GetAnchors());
+			TextScaleCanvasSlot->SetPosition(TextPosition);
+			TextScaleBox->AddChild(Text);
+
 
 			/*Text->SetFont(LeaderboardFont);
 			Text->SetColorAndOpacity(LeaderboardTextColour);
 			Text->SetText(FText::FromString(PlayerTag));*/
 
+			/*Text->SetFont(LeaderboardFont);
+			Text->SetColorAndOpacity(LeaderboardTextColour);
+			Text->SetText(FText::FromString(PlayerTag));*/
 
 
-			LeaderboardGrid->GetParent()->AddChild(Text);
-			UCanvasPanelSlot* TextCanvasSlot = Cast<UCanvasPanelSlot>(Text->Slot);
-			 
 
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("canvas text slot is null %d "), (int)(TextCanvasSlot == nullptr)));
-			TextCanvasSlot->SetAnchors(LeaderboardCanvasSlot->GetAnchors());
-			TextCanvasSlot->SetPosition(TextPosition);
+		/*	LeaderboardGrid->GetParent()->AddChild(Text);*/
+			//UCanvasPanelSlot* TextCanvasSlot = Cast<UCanvasPanelSlot>(Text->Slot);
+			// 
+
+			////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("canvas text slot is null %d "), (int)(TextCanvasSlot == nullptr)));
+			//TextCanvasSlot->SetAnchors(LeaderboardCanvasSlot->GetAnchors());
+			//TextCanvasSlot->SetPosition(TextPosition);
 			Text->SetVisibility(ESlateVisibility::Visible);
 
 			Text->SetOpacity(0.0f);
@@ -98,6 +110,19 @@ UTextBlock* UChargeWidget::CreateText(FString TextContent)
 	return Text;
 }
 	
+
+UScaleBox* UChargeWidget::CreateScaleBox(FString Name)
+{
+	UScaleBox* ScaleBox = WidgetTree->ConstructWidget<UScaleBox>(UScaleBox::StaticClass(), FName(Name));
+
+	ScaleBox->SetStretch(EStretch::ScaleToFit); 
+
+	
+
+
+
+	return ScaleBox;
+}
 
 void UChargeWidget::SetChargeAmount(float ChargeAmount)
 {

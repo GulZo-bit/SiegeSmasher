@@ -25,6 +25,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyTypesToSpawn"); 
+	//TArray<TSubclassOf<AEnemyBase>> EnemyTypesToSpawn;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemiesToSpawn");
 	TArray<AEnemyBase*> EnemiesToSpawn;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveSpawnPoints");
@@ -43,8 +45,8 @@ public:
 	void EnemySetUp();
 	// variables for wave generation
 private:
-	float WaveGlobalWaitTimerMax = 5.0f;
-	float WaveGlobalWaitTimer = 5.0f;
+	float WaveGlobalWaitTimerMax = 10.0f;
+	float WaveGlobalWaitTimer = 0.0f;
 	int WaveNumber = 0;
 	int TotalEnemiesSpawned = 0;
 	int WaveEnemyCount = 0;
@@ -52,12 +54,11 @@ private:
 	int baseStartingEnemyCount = 8;
 	float WavePolynomialConstantOne = 0.7f;
 	float WavePolynomialConstantTwo = 0.2f;
-
+	
 	void UpdateSpawning(float DeltaTime);
 	void CheckSpawnPoints(float DeltaTime);
 	void EvaluateEnemySpawning();
 	AEnemyBase* GetExistingInstance(EnemyTypes EnemyType);
-
 
 	// track current spawn point status
 private:
@@ -76,8 +77,8 @@ private:
 	TMap<EnemyTypes, TArray<AEnemyBase*>> EnemyPools;
 	TMap<EnemyTypes, int> EnemyWaveContribution;
 	TMap<EnemyTypes, int> EnemyAvailablePoolIndicies;
-
-
+	
+	UWorld* World = nullptr;
 
 
 };
