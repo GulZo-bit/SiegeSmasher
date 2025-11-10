@@ -71,6 +71,9 @@ public:
 	UPROPERTY(Replicated);
 	float ChargeFinal;
 
+	UPROPERTY()
+	bool CanShoot = true;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputMappingContext* DefaultContext; //The defult input mapping context. This will change depending on what context the player is in such as driving.

@@ -10,6 +10,7 @@
 #include "Throne.generated.h"
 
 class AMainCharacterTest;
+class AEnemyBase;
 
 UCLASS()
 class SIEGESMASHER_API AThrone : public AActor

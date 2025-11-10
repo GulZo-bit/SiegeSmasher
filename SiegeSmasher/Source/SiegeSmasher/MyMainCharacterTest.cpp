@@ -237,14 +237,12 @@ void AMainCharacterTest::Look(const FInputActionValue& Value)
 
 void AMainCharacterTest::Jumping()
 {
-
-	Server_SetPlaceTower(!IsPlacingTower);
 	Jump();
 }
 
 void AMainCharacterTest::Shoot()
 {
-	if (TogglePlacingTowers == false)
+	if (CanShoot == true && CurrentCharge != 0.0f || !IsPlacingTower && CurrentCharge != 0.0f)
 	{
 
 
@@ -499,7 +497,7 @@ bool AMainCharacterTest::Server_StopAim_Validate()
 void AMainCharacterTest::DrawBow()
 {
 
-	if (IsPlacingTower == false)
+	if (CanShoot == true || !IsPlacingTower)
 	{
 
 
@@ -629,6 +627,7 @@ void AMainCharacterTest::PlaceTower()
 void AMainCharacterTest::ToggleTowerPlacement()
 {
 	TogglePlacingTowers = !TogglePlacingTowers;
+	CanShoot = !CanShoot ;
 	
 	if (!HasAuthority()) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Toggle place tower client %d"), (int)TogglePlacingTowers));

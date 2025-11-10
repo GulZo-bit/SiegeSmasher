@@ -3,6 +3,7 @@
 
 #include "Throne.h"
 #include "../MyMainCharacterTest.h"
+#include "SiegeSmasher/Enemies/EnemyBase.h"
 
 // Sets default values
 AThrone::AThrone()
@@ -80,7 +81,13 @@ void AThrone::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 
 void AThrone::DecrementThroneHealth()
 {
-	ThroneHealth -= 1.0f;
+	ThroneHealth -= 1;
+
+	if (ThroneHealth <= 0) 
+	{
+
+
+	}
 }
 
 void AThrone::UpdateThroneHealth()
@@ -109,6 +116,13 @@ void AThrone::EnemyOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 			DecrementThroneHealth();
 			PlayerRef->SetBaseHealth(ThroneHealth);
 		}
+	}
+
+	AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor);
+
+	if (Enemy) 
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy cast success")));
 	}
 }
 
