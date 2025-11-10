@@ -152,7 +152,7 @@ bool AServerObject::HasPlayerInfo(int PlayerId)
 {
 
 
-	return PlayerId > 0 && PlayerId < LeaderBoardInfo.Items.Num();
+	return PlayerId >= 0 && PlayerId < LeaderBoardInfo.Items.Num();
 	//try {
 
 	//	LeaderBoardInfo.Items[PlayerId]; 

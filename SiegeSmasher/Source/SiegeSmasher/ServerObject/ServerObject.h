@@ -23,7 +23,7 @@ class AMainCharacterTest;
 // keep track of the items within the array using the FFastArraySerilazier interface(discussed below)  as they 
 // specifc elements of the TArray are replciated across the network from the server to the clients 
 
-.
+
 USTRUCT() 
 struct FPlayerLeaderBoardInfo: public FFastArraySerializerItem {
 
