@@ -28,7 +28,7 @@ USTRUCT()
 struct FPlayerLeaderBoardInfo: public FFastArraySerializerItem {
 
 	GENERATED_BODY() 
-	// the data we want the itme within the arrya to store 
+	// the data we want the item within the array to store 
 	UPROPERTY();
 	int LeaderboardPlayerScore;
 	UPROPERTY();
@@ -63,7 +63,7 @@ struct FLeaderboardItems:public FFastArraySerializer
 	GENERATED_BODY()
 
 
-	// here we have a TArray memeebr variable that is the array we will replicate using the FFastArraySerializer interface
+	// here we have a TArray member variable that is the array we will replicate using the FFastArraySerializer interface
 	UPROPERTY();
 	TArray<FPlayerLeaderBoardInfo> Items; 
 	
