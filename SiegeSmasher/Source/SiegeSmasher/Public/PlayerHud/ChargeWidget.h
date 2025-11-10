@@ -38,6 +38,8 @@ public:
 	UPROPERTY(BlueprintReadOnly) 
 	int PlayerPoints;
 
+	UPROPERTY(BlueprintReadOnly)
+	int ThroneHealth;
 	UScaleBox* CreateScaleBox(FString Name);
 
 	UFUNCTION()
@@ -67,6 +69,11 @@ public:
 	void RefreshPlayerLeaderboardInfo();
 
 	void HighlightPlayerTag(int PlayerIdForTag);
+
+	UFUNCTION(BlueprintCallable)
+	int GetThroneHealth();
+
+	void SetThroneHealth(int NewHealth);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaxPlayerNum", meta = (ClampMin = "1", ClampMax = "4"))

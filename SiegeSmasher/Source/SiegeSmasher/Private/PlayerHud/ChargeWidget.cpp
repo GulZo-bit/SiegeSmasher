@@ -253,3 +253,13 @@ void UChargeWidget::HighlightPlayerTag(int PlayerIdForTag)
 
 }
 
+int UChargeWidget::GetThroneHealth()
+{
+	return ThroneHealth;
+}
+
+void UChargeWidget::SetThroneHealth(int NewHealth)
+{
+	ThroneHealth = NewHealth;
+}
+

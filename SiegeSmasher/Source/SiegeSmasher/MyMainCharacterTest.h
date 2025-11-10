@@ -19,6 +19,7 @@
 #include "Towers/TowerBase.h" 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h" 
+#include "Throne.h"
 #include "MyMainCharacterTest.generated.h"
 
 UCLASS()
@@ -203,16 +204,16 @@ public:
 	void Server_ChargeShot_Implementation(float DeltaTime);
 	bool Server_ChargeShot_Validate(float DeltaTime);
 
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void Multi_SpawnProjectile(FRotator CamRotation, FRotator BowRot);
-	void Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot);
-	bool Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot);
+	//UFUNCTION(NetMulticast, Reliable, WithValidation)
+	//void Multi_SpawnProjectile(FRotator CamRotation, FRotator BowRot);
+	//void Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot);
+	//bool Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot);
 
 
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void Multi_UpdateCharge();
-	void Multi_UpdateCharge_Implementation();
-	bool Multi_UpdateCharge_Validate();
+	//UFUNCTION(NetMulticast, Reliable, WithValidation)
+	//void Multi_UpdateCharge();
+	//void Multi_UpdateCharge_Implementation();
+	//bool Multi_UpdateCharge_Validate();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_UpdateCharge(float ClientCharge);
@@ -350,6 +351,10 @@ public:
 	int GetPlayerId();
 	void HighlightPlayerTagOnLeaderboard();
 	void HighlightPlayerTagOnLeaderboard(int LeaderBoardPlayerId);
+
+
+	UFUNCTION()
+	void SetBaseHealth(int NewHealth);
 protected:
 	UFUNCTION()
 	void UpdatePlayerScoreUi();
@@ -358,17 +363,10 @@ protected:
 	UPROPERTY(ReplicatedUsing = UpdatePlayerScoreUi);
 	int PlayerPoints = 0; 
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	class UInputAction* SelfDamage;
-
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCast_UpdateLeaderBoardInfo(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId); 
 
 	void MultiCast_UpdateLeaderBoardInfo_Implementation(int NewPlayerPoints, int NewPlayerKills, int TargetPlayerId);
-
-
-
-	void DamageYourself();
 
 	UFUNCTION()
 	void UpdateHealthWidget();
@@ -391,7 +389,7 @@ protected:
 	
 	AServerObject* ServerObjectRef = nullptr;
 
-	
+	AThrone* ThroneRef = nullptr;
 
 	void SetUpPlayerId();
 	
