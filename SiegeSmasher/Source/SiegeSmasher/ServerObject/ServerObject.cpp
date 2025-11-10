@@ -227,30 +227,6 @@ AMainCharacterTest* AServerObject::GetLocalPlayer()
 	return PlayerRef;
 }
 
-// this is a multicast that is broadcasted to all relevant clients from the server when ever a players leaderboard info 
-// changes updating the contained info across each server objects TArray(that implmenets the FFastArraySerializer interface) 
-// since this is a multicast done from the server on each server object the state for each of server objects on each locally 
-// controlled client is automatcially updated so no need to mark the TArray as dirty(which would mean it has to be replciated) saving 
-// on bandwidth usage
-void AServerObject::Multicast_UpdatePlayerLeaderboardInfo_Implementation(int PlayerPoints, int PlayerKills, int PlayerId)
-{
-
-	try {
-
-		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints;
-		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
-
-
-
-	}
-	catch (...) {
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID FOR LEADER BOARD INFO FOR SERVER OBJECT WAS NULL %d"), PlayerId));
-	}
-
-
-}
-
 
 
 

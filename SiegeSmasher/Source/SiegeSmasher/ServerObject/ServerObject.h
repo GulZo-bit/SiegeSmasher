@@ -162,10 +162,8 @@ protected:
 
 	AMainCharacterTest* PlayerRef;
 
-	UFUNCTION(NetMulticast,Reliable)
-	void Multicast_UpdatePlayerLeaderboardInfo(int PlayerPoints, int PlayerKills, int PlayerId);
-	void Multicast_UpdatePlayerLeaderboardInfo_Implementation(int PlayerScore, int PlayerKills, int PlayerId);
-private: 
+
+ private: 
 
 
 
