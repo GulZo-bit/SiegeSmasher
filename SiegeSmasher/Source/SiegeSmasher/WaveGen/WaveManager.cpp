@@ -47,7 +47,7 @@ void AWaveManager::BeginPlay()
 
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Wave enemies to spawn num after iteration: %d"), EnemiesToSpawn.Num()));
 
-
+	ServerObjectRef = Cast<AServerObject>( UGameplayStatics::GetActorOfClass(World, AServerObject::StaticClass()));
 
 
 }
@@ -87,12 +87,18 @@ bool AWaveManager::CheckWaveEnd() {
 
 	if (WaveEnemyCount == TotalEnemiesSpawned && AliveEnemyCount == 0) {
 
-		
+		if (HasAuthority() && ServerObjectRef != nullptr) {
+			ServerObjectRef->IncrementPlayerWaveNumber();
+		}
+
 		BeginWave();
+		
 		WaveNumber++;
 		WaveGlobalWaitTimer = WaveGlobalWaitTimerMax;
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("wave global wait timer reset to %f"), WaveGlobalWaitTimer));
 		
+
+
 		GLog->Log(FString::Printf(TEXT("wave global wait timer reset to %f"), WaveGlobalWaitTimer));
 		return true;
 	}

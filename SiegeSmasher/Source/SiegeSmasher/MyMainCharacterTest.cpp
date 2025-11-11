@@ -581,10 +581,8 @@ void AMainCharacterTest::PlayerDeath()
 {
 	SetActorLocation(PlayerRespawnPoint);
 	DecrementPlayerScore(100);
-	if (PlayerPoints < 0)
-	{
-		PlayerPoints = 0;
-	}
+	UpdateLeaderBoardInfo();
+	
 	Health = 100.0f;
 
 	if (ChargeWidget != nullptr) {
@@ -1426,7 +1424,10 @@ void AMainCharacterTest::DecrementPlayerScore(int Increment)
 	if (HasAuthority()) {
 
 
-		PlayerPoints -= Increment;
+		PlayerPoints -= Increment; 
+
+		PlayerPoints *= ((int)(PlayerPoints > 0));
+
 		if (IsLocallyControlled()) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Incrementing player score server %d "), PlayerPoints));
 
