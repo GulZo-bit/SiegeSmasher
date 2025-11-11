@@ -75,6 +75,12 @@ public:
 
 	void SetThroneHealth(int NewHealth);
 
+
+	UFUNCTION(BlueprintCallable)
+	int GetPlayerWaveNumber(); 
+
+	void SetPlayerWaveNumber(int WaveNumber);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaxPlayerNum", meta = (ClampMin = "1", ClampMax = "4"))
 	int MaxPlayerNum = 4; 
@@ -93,7 +99,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardVerticalPadding");
 	FSlateColor LeaderboardHighlightColour;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardName");
 	FString LeaderBoardTagName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardFont"); 
@@ -107,13 +113,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardScaleBoxHeight");
 	float LeaderboardScaleBoxRightPadding = 0.0f;
 
+
+
+
 private:
 	void GenerateLeaderBoard();
 	TArray<UTextBlock*> LeaderBoardItems; 
 	TArray<UScaleBox*> TagScaleBoxes;
 	TArray<UScaleBox*> ScoreScaleBoxes; 
 	TArray<UScaleBox*> KillsScaleBoxes;
-
+	
 	UBorder* LeaderboardBorder = nullptr; 
 	UBorder* LeaderboardHeader = nullptr;
 	UGridPanel* LeaderboardGrid = nullptr; 
@@ -122,5 +131,7 @@ private:
 	UTextBlock* CreateText(FString Text);
 
 	int LoggedPlayerNumber = 0;
+
+	int DisplayedPlayerWaveNumber = 0;
 
 };

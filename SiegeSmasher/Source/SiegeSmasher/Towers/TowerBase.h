@@ -36,6 +36,16 @@
 
 
 class AMainCharacterTest;
+
+
+// the tower base class is the main parent class for all of the towers that are seen in game 
+// and it is used to create an interface that all the child classes can tap into and override based on what functionaility they need 
+//to add. it acts as a state machine with states such as dormant active and resetting providing virtual functions to the child 
+// tower classes that they can overide to add fucntionaility to the state machine 
+// this makes it much quicker to create new towers with different functionaility and also reduces code duplication 
+// across the board for the tower classes
+
+
 UCLASS()
 class SIEGESMASHER_API ATowerBase : public AActor, public IGenericTeamAgentInterface
 {
@@ -51,38 +61,50 @@ public:
   	bool ResolvePlacement(FVector& SurfaceHalfExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos, FTransform& surfaceTransform);
 
 	//void SetPlayerRef(AMainCharacterTest* PlayerPtr);
-
+	// used to increment the players score who is assigned to a specifc tower 
+	// this refernce is created when the player creates and spawns a tower on the server  
 	void IncrementAssignedPlayersScore(int increment);
-
+	// get the box used to determine if the player has correctly fit the tower to the surface they are trying to place the tower on
 	UBoxComponent* GetPlacmentBox();
 protected:
 	// Called when the game starts or when spawned
 
 	virtual void BeginPlay() override;
+	// determine if the tower is in the active state 
 	UPROPERTY(Replicated);
 	bool CurrentyActive = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlacementCollider");
 	UBoxComponent* BoxColliderForObjectPlacement;
+
+	// timline  call back events that can be bound to using the asscoiatied virtual methods in this class 
+	//if the tower makes use of a timeline for animation 
 	FOnTimelineEvent TowerEndAction;  
 	FOnTimelineFloat TowerTimeLineInterpEvent; 
+
+	// represent the reset state of the tower 
 	bool RequiresReset = false; 
 	bool StartedReset = false;
 	
+	//used to damage a player and update the associated players leaderboard info
 	void DamageEnemyAndUpdatePlayerInfo(AEnemyBase* Enemy, float Damage);
-
+	// timers for cooldown of tower 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerWaitTimeToReset");
 	float MaxWaitTimeToReset;
 	float WaitTimeToReset = 0.0f;
 	
+	// mutlicast method that is called on the server to play the timeline asscoiated with the towers action 
+    // playing the time line for every client and the server
 	UFUNCTION(NetMulticast,Reliable)
 	void Multicast_PlayTowerTimeLine(float PlayBackSpeed);
 	void Multicast_PlayTowerTimeLine_Implementation(float PlayBackSpeed);
 
+	// opposite of above 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ReverseTowerTimeLine(float PlayBackSpeed);
 	void Multicast_ReverseTowerTimeLine_Implementation(float PlayBackSpeed); 
 
+	// used to disable and enable collision for towers across the network from the server 
 	UFUNCTION(NetMulticast,Reliable)
 	void Multicast_SetTriggerBoxCollision(ECollisionEnabled::Type ColType); 
 	void Multicast_SetTriggerBoxCollision_Implementation(ECollisionEnabled::Type ColType);
@@ -94,8 +116,12 @@ protected:
 
 	float CoolDownAfterReset = 0.0f;
 	
+	// virtual function associated with the end state for the timeline used for the towers action 
+	// allowing the child class to ovveride this and manipluate any data they need once their timeline animation has finished 
+	//(they have performed their action)
 	UFUNCTION()
 	virtual void TowerTimeLineEnd();
+	// represent  the towers inactive state
 	virtual void TowerDormant(float& DeltaTime);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTriggerBox")
 	UBoxComponent* TriggerRangeBox;
@@ -115,12 +141,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerSurfaceAlignmentAxis");
 	FVector AlignmentAxis = FVector::ZeroVector;
 
+
+	// curve used to control the pace of the tower time line
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTimeLineCurve"); 
 	UCurveFloat* TowerTimeLineCurve;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerDamage");
 	float TowerDamage = 0.0f;
 	
+	// intepalation method that is bound to the tower time line that can be overriden to suite the child class needs 
 	UFUNCTION() 
 	virtual void TowerTimeLineInterp(float value); 
 
@@ -129,9 +158,11 @@ protected:
 
 	
 	//bool NeedsNewTargets = true; 
+
+	// overlap begin method for detecting objects entering the range of the tower 
 	UFUNCTION()
 	virtual void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	// used to damage objects(primarily enemies) that are in the towers range  
 	UFUNCTION() 
 	virtual void OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
@@ -139,24 +170,36 @@ protected:
 
 
 	virtual void HandleNewEnemy(AEnemyBase* EnemyBase); 
+
+	// maniuplate the towers state when the reset timer is finished 
 	virtual void TowerReset();
-	virtual void TowerSetUp();
+	// called in begin play of base class allowing child classes to set up any extra variables they need 
+	virtual void TowerSetUp(); 
+	//represent active state of tower
 	virtual void TowerActive(float& DeltaTime) ;
+	// how the tower effects enemies when  it damages them 
 	virtual void ApplyDamage(AEnemyBase* Enemy);
 
+	// used for AI perception to allow for certain enemies such as the demon enemy to sense towers 
 	FGenericTeamId TeamID;
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Stats")
 	float Health = 100.0f;
+	// used for replciating any variables that are associated with the state of the tower(in the scope of enemy base)
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerMainStatusEffect")
+	// certain towers such as the floor spike trap can apply a status effect to enemies 
+	// the id of the main status effect for the tower is represented by this variable 
 	EnemyStatusEffect TowerMainStatusEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerMainStatusEffect"); 
 	float MainStatusEffectDuration = 0.0f; 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerMainStatusEffect", meta = (ClampMin = "0.1", ClampMax = "1.0"));
 	float MainStatusEffectIncreaseScalar = 0.0f;
 	AMainCharacterTest* PlayerRef; 
+	
+	// allows the response of the various collision boxes on the tower to be set for a certain collision channel 
+	// useful for situations  where towers shouldnt  or should overlap a specifc collision object type 
 	UFUNCTION(NetMulticast, Reliable) 
 	void Multicast_SetTowerHitBoxCollisionResponse(ECollisionChannel Channel, ECollisionResponse CollisionResponse); 
 	void Multicast_SetTowerHitBoxCollisionResponse_Implementation(ECollisionChannel Channel, ECollisionResponse CollisionResponse);
@@ -169,7 +212,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	// perception component that allows AI such as the demon to sense the towers and attack them 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components") 
 	UAIPerceptionStimuliSourceComponent* StimuliSourceComponent;
 	void SetPlayerRef(AMainCharacterTest* PlayerPtr);
 	void setHealth(float HealthStore);
