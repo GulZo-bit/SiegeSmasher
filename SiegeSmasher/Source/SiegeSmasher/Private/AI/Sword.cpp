@@ -24,6 +24,9 @@ ASword::ASword()
 	
 	Mesh->OnComponentBeginOverlap.AddDynamic(this, &ASword::OnOverLapBegin);
 	Mesh->OnComponentEndOverlap.AddDynamic(this, &ASword::OnOverLapEnd);
+
+	bAlwaysRelevant = true;
+	NetCullDistanceSquared = 0;
 }
 
 // Called when the game starts or when spawned
@@ -97,12 +100,22 @@ void ASword::ResetHit()
 
 void ASword::ResetSwordOnDeath()
 {
+	Multicast_ResetSwordOnDeath();
+}
+
+void ASword::ResetSwordOnRespawn()
+{
+	Multicast_ResetSwordOnRespawn();
+}
+
+void ASword::Multicast_ResetSwordOnDeath_Implementation()
+{
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);
 }
 
-void ASword::ResetSwordOnRespawn()
+void ASword::Multicast_ResetSwordOnRespawn_Implementation()
 {
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);

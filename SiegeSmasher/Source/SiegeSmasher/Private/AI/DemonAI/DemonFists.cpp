@@ -19,6 +19,9 @@ ADemonFists::ADemonFists()
 
 	Capsule->OnComponentBeginOverlap.AddDynamic(this, &ADemonFists::OnOverLapBegin);
 	Capsule->OnComponentEndOverlap.AddDynamic(this, &ADemonFists::OnOverLapEnd);
+
+	bAlwaysRelevant = true;
+	NetCullDistanceSquared = 0;
 }
 
 // Called when the game starts or when spawned
@@ -60,12 +63,22 @@ void ADemonFists::OnOverLapEnd(UPrimitiveComponent* OverlappedComp, class AActor
 
 void ADemonFists::ResetFistsOnDeath()
 {
+	Multicast_ResetFistsOnDeath();
+}
+
+void ADemonFists::ResetFistsOnSpawn()
+{
+	Multicast_ResetFistsOnRespawn();
+}
+
+void ADemonFists::Multicast_ResetFistsOnDeath_Implementation()
+{
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);
 }
 
-void ADemonFists::ResetFistsOnSpawn()
+void ADemonFists::Multicast_ResetFistsOnRespawn_Implementation()
 {
 	SetActorHiddenInGame(false);
 	//SetActorEnableCollision(true);

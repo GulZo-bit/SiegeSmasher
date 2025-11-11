@@ -82,6 +82,12 @@ void AAIDemon::BeginPlay()
 	AnimInstance = GetMesh()->GetAnimInstance();
 }
 
+
+bool AAIDemon::getDeathAnimFinsihed()
+{
+	return bDeathAnimFinished;
+}
+
 // Called every frame
 void AAIDemon::Tick(float DeltaTime)
 {
@@ -106,6 +112,7 @@ void AAIDemon::Tick(float DeltaTime)
 					RightFist->ResetFistsOnDeath();
 					LeftFist->ResetFistsOnDeath();
 					bCanActorMove = false;
+					bDeathAnimFinished = true;
 				}
 			}
 		}
@@ -113,7 +120,9 @@ void AAIDemon::Tick(float DeltaTime)
 
 	else
 	{
-		if(AnimInstance->Montage_GetIsStopped(AttackAnimation))
+		bDeathAnimFinished = false;
+		SoundCount = 0;
+		if(AnimInstance != nullptr && AnimInstance->Montage_GetIsStopped(AttackAnimation))
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Attack Animation is stopped")));
 			RightFist->SetActorEnableCollision(false);
@@ -218,22 +227,26 @@ void AAIDemon::Server_PlayDeathMontage_Implementation()
 void AAIDemon::Multicast_PlayDeathMontage_Implementation()
 {
 	bCanActorMove = false;
-	if (DeathMontage != nullptr)
+	if (DeathMontage != nullptr && AnimInstance != nullptr && AnimIsDead != nullptr)
 	{
-		if (AnimInstance != nullptr)
-		{
-			if (HasAuthority())
-			{
-				Multicast_AnimIsDead(true);
-			}
+			GLog->Log("Anim Instance is not null");
+			AnimIsDead->setIsDeadBool(true);
+			
 
+			if (SoundCount == 0)
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+				GLog->Log("Played Sound");
+				SoundCount += 1;
+			}
 			
 			AnimInstance->Montage_Play(DeathMontage);
 			bCanActorMove = false;
-		}
+		
 	}
 
 }
+
 
 void AAIDemon::setbCanActorMove(bool bStore)
 {

@@ -16,6 +16,8 @@ AHealAuraLight::AHealAuraLight()
 	RootComponent = OuterSpotLight;
 	InnerSpotLight->AttachToComponent(OuterSpotLight, FAttachmentTransformRules::KeepRelativeTransform);
 	BrightnessMultiplier = 20.0f;
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned

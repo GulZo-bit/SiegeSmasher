@@ -46,4 +46,13 @@ public:
 
 	void ResetFistsOnDeath();	
 	void ResetFistsOnSpawn();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ResetFistsOnDeath();
+	void Multicast_ResetFistsOnDeath_Implementation();
+
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ResetFistsOnRespawn();
+	void Multicast_ResetFistsOnRespawn_Implementation();
 };

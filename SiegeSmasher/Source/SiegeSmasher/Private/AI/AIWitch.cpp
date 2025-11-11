@@ -131,7 +131,7 @@ void AAIWitch::Multicast_PlayLightTimeLine_Implementation(AHealAuraLight* LightS
 
 void AAIWitch::HealEnemy()
 {
-	if (HealZone != nullptr)
+	if (HasAuthority() && HealZone != nullptr)
 	{
 		GLog->Log("Found HealZone");
 
@@ -148,18 +148,19 @@ void AAIWitch::HealEnemy()
 					GLog->Log("Healing Enemies");
 					AEnemyBase* AICharTemp = Cast<AEnemyBase>(ActorStore[i]);
 					AICharTemp->AddToHealth(20);
-
-					UChildActorComponent* ChildActorStore = Cast<UChildActorComponent>(AICharTemp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
+					
+					/*UChildActorComponent* ChildActorStore = Cast<UChildActorComponent>(AICharTemp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
 					if (ChildActorStore != nullptr)
 					{
 						AHealAuraLight* HealAuraLightStore = Cast<AHealAuraLight>(ChildActorStore->GetChildActor());
 						if (HealAuraLightStore != nullptr)
 						{
 							GLog->Log("Found Heal Aura");
-							Server_PlayLightTimeLine(HealAuraLightStore);
+
+							AICharTemp->PlayHealTimeLine();
 						}
 
-					}
+					}*/
 				}
 			}
 		}
@@ -232,18 +233,22 @@ void AAIWitch::Server_PlayDeathMontage_Implementation()
 
 void AAIWitch::Multicast_PlayDeathMontage_Implementation()
 {
-	if (DeathMontage != nullptr)
+	if (DeathMontage != nullptr && AnimInstance != nullptr && AnimIsDead != nullptr)
 	{
-		if (AnimInstance != nullptr)
-		{
-			if (HasAuthority())
+			GLog->Log("Anim Instance is not null");
+			AnimIsDead->setIsDeadBool(true);
+
+			if (SoundCount == 0)
 			{
-				Multicast_AnimIsDead(true);
+				UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+				GLog->Log("Played Sound");
+				SoundCount += 1;
 			}
+			
 
 			AnimInstance->Montage_Play(DeathMontage);
 			bCanActorMove = false;
-		}
+		
 	}
 
 }
@@ -270,6 +275,7 @@ void AAIWitch::Tick(float DeltaTime)
 					Count = StartTime;
 					this->ResetEnemyOnDeath();
 					bCanActorMove = false;
+					bDeathAnimFinished = true;
 				}
 			}
 		}
@@ -277,6 +283,8 @@ void AAIWitch::Tick(float DeltaTime)
 
 	else
 	{
+		bDeathAnimFinished = false;
+		SoundCount = 0;
 		if (bCanActorMove == true)
 		{
 			//How long the current spline has been going for.
@@ -364,5 +372,10 @@ AWitch_Projectile* AAIWitch::getSpell()
 	{
 		return nullptr;
 	}
+}
+
+bool AAIWitch::getDeathAnimFinsihed()
+{
+	return bDeathAnimFinished;
 }
 
