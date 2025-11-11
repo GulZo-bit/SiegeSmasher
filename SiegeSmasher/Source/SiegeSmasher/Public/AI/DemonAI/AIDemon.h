@@ -75,4 +75,6 @@ public:
 
 	UPROPERTY()
 	ADemonFists* LeftFist;
+
+	virtual void EnemyReachedBase() override;
 };

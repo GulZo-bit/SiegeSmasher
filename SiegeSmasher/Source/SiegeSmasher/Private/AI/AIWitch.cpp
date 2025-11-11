@@ -353,6 +353,16 @@ bool AAIWitch::getbCanActorMove()
 	return bCanActorMove;
 }
 
+void AAIWitch::EnemyReachedBase()
+{
+	DecrementWaveEnemyAliveCount();
+	CubeStore->SetActorHiddenInGame(false);
+	CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+	Count = StartTime;
+	this->ResetEnemyOnDeath();
+	bCanActorMove = false;
+}
+
 AWitch_Projectile* AAIWitch::getSpell()
 {
 	if (Spell != nullptr)

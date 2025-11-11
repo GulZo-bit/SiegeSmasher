@@ -123,6 +123,14 @@ void AMainCharacterTest::BeginPlay()
 			
 		}
 	}
+	if(ServerGameOverWidgetToCreate != nullptr && ClientGameOverWidgetToCreate !=nullptr)
+	{
+		if (IsLocallyControlled()) 
+		{
+			ServerGameOverWidget = CreateWidget<UUserWidget>(GetWorld(), ServerGameOverWidgetToCreate);
+			ClientGameOverWidget = CreateWidget<UUserWidget>(GetWorld(), ClientGameOverWidgetToCreate);
+		}
+	}
 	
 
 	InitialiseTowers();
@@ -947,6 +955,26 @@ void AMainCharacterTest::SetBaseHealth(int NewHealth)
 	if (ChargeWidget != nullptr) 
 	{
 		ChargeWidget->SetThroneHealth(NewHealth);
+	}
+}
+
+void AMainCharacterTest::GameOver()
+{
+	if (HasAuthority() && IsLocallyControlled()) 
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("Added the ServerGameOver Widget to viewport")));
+		FInputModeUIOnly UIOnly = FInputModeUIOnly();
+		AssignedPlayerController->bShowMouseCursor = true;
+		AssignedPlayerController->SetInputMode(UIOnly);
+		ServerGameOverWidget->AddToViewport();
+	}
+
+	else if (IsLocallyControlled()) 
+	{
+		FInputModeUIOnly UIOnly = FInputModeUIOnly();
+		AssignedPlayerController->bShowMouseCursor = true;
+		AssignedPlayerController->SetInputMode(UIOnly);
+		ClientGameOverWidget->AddToViewport();
 	}
 }
 

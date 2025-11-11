@@ -95,7 +95,10 @@ void AThrone::UpdateThroneHealth()
 	if (PlayerRef != nullptr)
 	{
 		PlayerRef->SetBaseHealth(ThroneHealth);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Purple, FString::Printf(TEXT("Update Widget Replicate Using Called AFTER checking for null player ref")));
+		if (ThroneHealth <= 0)
+		{
+			PlayerRef->GameOver();
+		}
 	}
 }
 
@@ -108,13 +111,14 @@ void AThrone::EnemyOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 {
 	if (HasAuthority())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 65.0f, FColor::Purple, FString::Printf(TEXT("Is player refnull %d"), (int) (PlayerRef != nullptr)));
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Purple, FString::Printf(TEXT("Enemy Overlapped Base BEFORE checking null")));
 		if (PlayerRef != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("ENEMY OVERLAPPED BASE")));
 			DecrementThroneHealth();
 			PlayerRef->SetBaseHealth(ThroneHealth);
+			if(ThroneHealth <= 0)
+			{
+				PlayerRef->GameOver();
+			}
 		}
 	}
 
@@ -123,6 +127,7 @@ void AThrone::EnemyOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 	if (Enemy) 
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy cast success")));
+		Enemy->EnemyReachedBase();
 	}
 }
 

@@ -93,4 +93,6 @@ public:
 	//The public function that other classes will call to play the attack animation.
 	void PlayAttackMontage();
 	void PlayDeathMontage();
+
+	virtual void EnemyReachedBase() override;
 };

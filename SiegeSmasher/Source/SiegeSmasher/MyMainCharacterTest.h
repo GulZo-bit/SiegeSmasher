@@ -162,6 +162,19 @@ public:
 	UPROPERTY()
 	class UChargeWidget* ChargeWidget;
 
+	UPROPERTY(EditAnywhere,Category = "GameOver")
+	TSubclassOf<UUserWidget> ServerGameOverWidgetToCreate;
+
+	UPROPERTY(EditAnywhere, Category = "GameOver")
+	TSubclassOf<UUserWidget> ClientGameOverWidgetToCreate;
+
+	UPROPERTY()
+	UUserWidget* ServerGameOverWidget;
+
+	UPROPERTY()
+	UUserWidget* ClientGameOverWidget;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowersTypesToSpawn");
 	TArray<TSubclassOf<ATowerBase>> TowerTypesToSpawn;
 
@@ -358,6 +371,9 @@ public:
 
 	UFUNCTION()
 	void SetBaseHealth(int NewHealth);
+
+	UFUNCTION()
+	void GameOver();
 protected:
 	UFUNCTION()
 	void UpdatePlayerScoreUi();

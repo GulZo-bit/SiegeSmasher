@@ -106,4 +106,6 @@ public:
 	float Count = 0.0f;
 
 	UWorld* World;
+
+	virtual void EnemyReachedBase() override;
 };

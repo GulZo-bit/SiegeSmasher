@@ -129,6 +129,14 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 }
 
+void AEnemyBase::EnemyReachedBase()
+{
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+	Disabled = true;
+}
+
 bool AEnemyBase::GetIsDisabled()
 {
 	return Disabled;

@@ -191,6 +191,17 @@ void AAICharTest::PlayDeathMontage()
 	}
 }
 
+void AAICharTest::EnemyReachedBase()
+{
+	DecrementWaveEnemyAliveCount();
+	CubeStore->SetActorHiddenInGame(false);
+	CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+	Count = StartTime;
+	this->ResetEnemyOnDeath();
+	Sword->ResetSwordOnDeath();
+	bCanActorMove = false;
+}
+
 void AAICharTest::Server_PlayDeathMontage_Implementation()
 {
 	Multicast_PlayDeathMontage();

@@ -210,6 +210,18 @@ void AAIDemon::PlayDeathMontage()
 	}
 }
 
+void AAIDemon::EnemyReachedBase()
+{
+	DecrementWaveEnemyAliveCount();
+	CubeStore->SetActorHiddenInGame(false);
+	CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+	Count = StartTime;
+	this->ResetEnemyOnDeath();
+	RightFist->ResetFistsOnDeath();
+	LeftFist->ResetFistsOnDeath();
+	bCanActorMove = false;
+}
+
 void AAIDemon::Server_PlayDeathMontage_Implementation()
 {
 	Multicast_PlayDeathMontage();

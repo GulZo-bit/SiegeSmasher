@@ -128,6 +128,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override; 
 
+	//virtual function for resetting enemies when they reach the base
+	virtual void EnemyReachedBase();
+
 	bool GetIsDisabled();
 	// method used for objects pooling can be overidden by defining it in a child class 
 	// but i suggest calling the AEnemyBase class method 
