@@ -71,6 +71,11 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayDeathMontage();
+
+	bool bDeathAnimFinished = false;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* DeathSound;
+	int32 SoundCount = 0;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -83,6 +88,7 @@ public:
 	UAnimInstance* AnimInstance;
 	int32 iCount = 0;
 	void PlayAttack();
+
 
 	TArray<UActorComponent*> HealStore;
 	UBoxComponent* HealZone;
@@ -106,6 +112,8 @@ public:
 	float Count = 0.0f;
 
 	UWorld* World;
-
+	
 	virtual void EnemyReachedBase() override;
+
+	bool getDeathAnimFinsihed();
 };

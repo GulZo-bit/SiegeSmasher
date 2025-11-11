@@ -70,6 +70,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* AttackSound;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayDeathSound();
+	void Multicast_PlayDeathSound_Implementation();
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* DeathSound;
+
+	int32 SoundCount = 0;
+	bool bDeathAnimFinished = false;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -95,4 +104,6 @@ public:
 	void PlayDeathMontage();
 
 	virtual void EnemyReachedBase() override;
+
+	bool getDeathAnimFinsihed();
 };

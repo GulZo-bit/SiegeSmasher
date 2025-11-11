@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "AI/BoolAnimInstance.h"
+#include "AI/HealAuraLight.h"
 #include "EnemyBase.generated.h"
 #ifndef MAX_ENEMY_NUM
  #define MAX_ENEMY_NUM 150
@@ -69,10 +70,10 @@ protected:
 	int EnemyStartingCount = 8;
 	
 
-
 	float WavePolynomialConstantOne = 0.7f;
 	float WavePolynomialConstantTwo = 0.2f;
 	int CurrentWaveContribution = 0;
+	void SetTick(bool DisableTick);
 	UPROPERTY(); 
 	UStatusEffectBase* StatusEffectTest;
 
@@ -95,7 +96,6 @@ protected:
 	int StartingWave = 0; // wave 0 = 1(starts counting from 0) 
 	
 	void DecrementWaveEnemyAliveCount();
-	UPROPERTY(Replicated)
 	bool Disabled = false;
 
 	UBoolAnimInstance* AnimIsDead;
@@ -110,12 +110,24 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ResetOnDeath();
+
 	void Multicast_ResetOnDeath_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ResetOnSpawn();
 	void Multicast_ResetOnSpawn_Implementation();
 
+	virtual void StopAIBehaviour();
+
+	bool bHasBeenReset = false;
+
+	UCapsuleComponent* HurtBoxRef;
+
+	//UFUNCTION(NetMulticast, Reliable)
+	//void Multicast_PlayTimeLine();
+	//void Multicast_PlayTimeLineImplementation();
+
+	
 public:
 	int32 CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect);
 	void ApplyTowerStatusEffect(EnemyStatusEffect  StatusEffect); 
@@ -163,6 +175,13 @@ public:
 	int GetScoreIncOnKill(); 
 	int GetScoreIncOnHit();
 
+	void setHasBeenReset(bool bResetStore);
+	bool getHasBeenReset();
+
+	/*void PlayHealTimeLine();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealAura")
+	AHealAuraLight* HealAura;*/
 private:
 	int* WaveEnemyAliveCountRef;
 

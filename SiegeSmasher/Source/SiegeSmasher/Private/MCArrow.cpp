@@ -96,12 +96,12 @@ void AMCArrow::Tick(float DeltaTime)
 //called when the projectile hits something
 void AMCArrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (ImpactSound != nullptr)
+	/*if (ImpactSound != nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, FString::Printf(TEXT("Arrow Hit Sound Played")));
 
 		PlayerRef->PlayImpactSound();
-	}
+	}*/
 	Destroy();
 }
 

@@ -4,6 +4,7 @@
 #include "AI/WitchAI/WitchAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "BrainComponent.h"
 #include "TimerManager.h"
 
 void AWitchAIController::BeginPlay()
@@ -260,11 +261,22 @@ void AWitchAIController::CheckDeath()
 	if (Witch->GetHealth() <= 0)
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
+
+		if (Witch->getDeathAnimFinsihed() == true)
+		{
+			UBrainComponent* BrainComp = this->GetBrainComponent();
+			if (BrainComp != nullptr)
+			{
+				BrainComp->StopLogic(TEXT("Stopped by user action"));
+			}
+		}
 	}
 
-	else
+	else if(Witch->getHasBeenReset() == true)
 	{
+		RunBehaviorTree(AIBehavior);
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), false);
+		Witch->setHasBeenReset(false);
 	}
 }
 

@@ -52,6 +52,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* AttackSound;
 
+	bool bDeathAnimFinished = false;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* DeathSound;
+	int32 SoundCount = 0;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -77,4 +82,6 @@ public:
 	ADemonFists* LeftFist;
 
 	virtual void EnemyReachedBase() override;
+
+	bool getDeathAnimFinsihed();
 };

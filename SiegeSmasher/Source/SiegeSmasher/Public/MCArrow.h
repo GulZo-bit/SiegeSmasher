@@ -51,8 +51,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* WhooshingSound;
 
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* ImpactSound;
+	/*UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* ImpactSound;*/
 
 
 	// Projectile material

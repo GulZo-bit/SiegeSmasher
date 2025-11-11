@@ -18,7 +18,9 @@ void AAICharTest::BeginPlay()
 	Super::BeginPlay();
 	
 	//Sword Stuff
-	Sword = GetWorld()->SpawnActor<ASword>(SwordClass);
+	FActorSpawnParameters SpawnParamaters = FActorSpawnParameters();
+	SpawnParamaters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Sword = GetWorld()->SpawnActor<ASword>(SwordClass, FTransform(), SpawnParamaters);
 
 	if (Sword != nullptr)
 	{
@@ -72,6 +74,16 @@ void AAICharTest::BeginPlay()
 	AnimInstance = GetMesh()->GetAnimInstance();
 }
 
+
+void AAICharTest::Multicast_PlayDeathSound_Implementation()
+{
+	if (DeathSound != nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Death Sound Played")));
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	}
+}
+
 // Called every frame
 void AAICharTest::Tick(float DeltaTime)
 {
@@ -94,6 +106,7 @@ void AAICharTest::Tick(float DeltaTime)
 					this->ResetEnemyOnDeath();
 					Sword->ResetSwordOnDeath();
 					bCanActorMove = false;
+					bDeathAnimFinished = true;
 				}
 			}
 		}
@@ -101,7 +114,9 @@ void AAICharTest::Tick(float DeltaTime)
 
 	else
 	{
+		bDeathAnimFinished = false;
 		Sword->ResetSwordOnRespawn();
+		SoundCount = 0;
 		if (bCanActorMove == true)
 		{
 			//How long the current spline has been going for.
@@ -209,19 +224,22 @@ void AAICharTest::Server_PlayDeathMontage_Implementation()
 
 void AAICharTest::Multicast_PlayDeathMontage_Implementation()
 {
-	if (DeathMontage != nullptr)
+	if (DeathMontage != nullptr && AnimInstance != nullptr && AnimIsDead != nullptr)
 	{
-		if (AnimInstance != nullptr)
-		{
+			GLog->Log("Anim Instance is not null");
+			AnimIsDead->setIsDeadBool(true);
+			
 
-			if (HasAuthority())
+			if (SoundCount == 0)
 			{
-				Multicast_AnimIsDead(true);
+				UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+				GLog->Log("Played Sound");
+				SoundCount += 1;
 			}
 
 			AnimInstance->Montage_Play(DeathMontage);
 			bCanActorMove = false;
-		}
+		
 	}
 }
 
@@ -236,3 +254,7 @@ TArray<AActor*> AAICharTest::getCheckpoints()
 	return CheckpointStore;
 }
 
+bool AAICharTest::getDeathAnimFinsihed()
+{
+	return bDeathAnimFinished;
+}

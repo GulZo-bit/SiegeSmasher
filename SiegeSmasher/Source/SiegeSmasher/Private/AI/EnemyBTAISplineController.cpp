@@ -3,6 +3,7 @@
 
 #include "AI/EnemyBTAISplineController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -35,11 +36,21 @@ void AEnemyBTAISplineController::CheckDeath()
 	if (Vampire->GetHealth() <= 0)
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
+		if (Vampire->getDeathAnimFinsihed() == true)
+		{
+			UBrainComponent* BrainComp = this->GetBrainComponent();
+			if (BrainComp != nullptr)
+			{
+				BrainComp->StopLogic(TEXT("Stopped by user action"));
+			}
+		}
 	}
 
 	else
 	{
+		RunBehaviorTree(AIBehavior);
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), false);
+		Vampire->setHasBeenReset(false);
 	}
 }
 
