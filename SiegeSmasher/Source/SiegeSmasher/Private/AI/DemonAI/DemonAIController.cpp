@@ -3,6 +3,7 @@
 
 #include "AI/DemonAI/DemonAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
 #include "SiegeSmasher/Towers/TowerBase.h"
 
 ADemonAIController::ADemonAIController()
@@ -158,11 +159,23 @@ void ADemonAIController::CheckDeath()
 	if (Demon->GetHealth() <= 0)
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
+
+		if (Demon->getDeathAnimFinsihed() == true)
+		{
+			UBrainComponent* BrainComp = this->GetBrainComponent();
+			if (BrainComp != nullptr)
+			{
+				BrainComp->StopLogic(TEXT("Stopped by user action"));
+			}
+		}
+		
 	}
 
-	else
+	else if(Demon->getHasBeenReset() == true)
 	{
+		RunBehaviorTree(AIBehavior);
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), false);
+		Demon->setHasBeenReset(false);
 	}
 }
 

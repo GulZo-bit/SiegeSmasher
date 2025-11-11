@@ -70,6 +70,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* AttackSound;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayDeathSound();
+	void Multicast_PlayDeathSound_Implementation();
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* DeathSound;
+
+	int32 SoundCount = 0;
+	bool bDeathAnimFinished = false;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -93,4 +102,6 @@ public:
 	//The public function that other classes will call to play the attack animation.
 	void PlayAttackMontage();
 	void PlayDeathMontage();
+
+	bool getDeathAnimFinsihed();
 };

@@ -54,6 +54,15 @@ public:
 
 	void ResetSwordOnDeath();
 	void ResetSwordOnRespawn();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ResetSwordOnDeath();
+	void Multicast_ResetSwordOnDeath_Implementation();
+
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ResetSwordOnRespawn();
+	void Multicast_ResetSwordOnRespawn_Implementation();
 private:
 	
 };

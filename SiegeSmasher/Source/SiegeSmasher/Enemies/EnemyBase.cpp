@@ -4,6 +4,7 @@
 #include "EnemyBase.h"
 #include "../StatusEffects/BleedStatusEffect.h"  
 #include "../MyMainCharacterTest.h"
+#include "Components/ChildActorComponent.h"
 #include "MCArrow.h"
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -34,7 +35,27 @@ void AEnemyBase::BeginPlay()
 	InitialiseBleedStatusEffect();
 
 	AnimIsDead = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
+	HurtBoxRef = FindComponentByTag<UCapsuleComponent>(FName("EnemyHurtBox"));
 
+	//UChildActorComponent* HealAuraChildActor = Cast<UChildActorComponent>(FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAuraLight")));
+	/*TArray<UChildActorComponent*> Temp;
+	this->GetComponents(Temp, true);
+
+	for (int i = 0; i < Temp.Num(); i++)
+	{
+		
+		if (Temp[i]->ComponentHasTag(FName(TEXT("HealAuraLight"))))
+		{
+			GLog->Log("Found Heal aura child actor");
+		}
+	}*/
+	//if (HealAuraChildActor == nullptr)
+	//{
+	//	//GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Found Heal aura child actor")));
+	//	GLog->Log("Found Heal aura child actor");
+	//	//HealAura = Cast<AHealAuraLight>(HealAuraChildActor->GetChildActor());
+	//}
+	
 }
 
 int AEnemyBase::EnemyTest()
@@ -95,12 +116,22 @@ void AEnemyBase::ResetEnemyOnDeath()
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("enemy reset on death disabled %d"), (int)Disabled));
 }
 
+
+void AEnemyBase::SetTick(bool DisableTick) {
+
+	PrimaryActorTick.SetTickFunctionEnable(DisableTick);
+
+}
 void AEnemyBase::Multicast_ResetOnDeath_Implementation()
 {
 	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
-	SetActorTickEnabled(false);
+	//SetActorEnableCollision(false);
+	HurtBoxRef->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast for reset death")));
+	//SetActorTickEnabled(false);
+	SetTick(false);
 	Disabled = true;
+	bHasBeenReset = false;
 }
 
 // Called every frame
@@ -111,7 +142,7 @@ void AEnemyBase::Tick(float DeltaTime)
 	/*GLog->Log(FString::Printf(TEXT("Current health for enemy %f"), CurrentHealth));
 	GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("Current health for enemy %f"),CurrentHealth));*/
 
-
+	
 }
 
 int  AEnemyBase::CalculateWaveContribution(float FractionalWaveNumber)
@@ -169,13 +200,26 @@ void AEnemyBase::ResetOnSpawn()
 void AEnemyBase::Multicast_ResetOnSpawn_Implementation()
 {
 	SetActorHiddenInGame(false);
-	SetActorEnableCollision(true);
-	SetActorTickEnabled(true);
-	Disabled = false;
+	//SetActorEnableCollision(true);
+	HurtBoxRef->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//HurtBoxRef->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast for reset on spawn")));
+	//SetActorTickEnabled(true);
+	SetTick(true);
+	Disabled = false; 
+
 	CurrentHealth = MaxHealth;
+	if (AnimIsDead != nullptr)
+	{
+		GLog->Log("Anim Instance is not null");
+		AnimIsDead->setIsDeadBool(false);
+	}
+	//Multicast_AnimIsDead(false);
+	bHasBeenReset = true;
+}
 
-	Multicast_AnimIsDead(false);
-
+void AEnemyBase::StopAIBehaviour()
+{
 }
 
 int AEnemyBase::GetCurrentWaveContribution()
@@ -249,6 +293,16 @@ int AEnemyBase::GetScoreIncOnHit()
 	return ScoreIncrementOnHit;
 }
 
+void AEnemyBase::setHasBeenReset(bool bResetStore)
+{
+	bHasBeenReset = bResetStore;
+}
+
+bool AEnemyBase::getHasBeenReset()
+{
+	return bHasBeenReset;
+}
+
 void AEnemyBase::DecrementWaveEnemyAliveCount()
 {
 
@@ -294,6 +348,16 @@ void AEnemyBase::Multicast_SetCollision_Implementation(bool bStore)
 {
 	
 }
+
+//void AEnemyBase::Multicast_PlayTimeLine_Implementation()
+//{
+//	HealAura->getLightTimeLineComp()->PlayFromStart();
+//}
+//
+//void AEnemyBase::PlayHealTimeLine()
+//{
+//	Multicast_PlayTimeLine();
+//}
 
 int32 AEnemyBase::CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect)
 {
