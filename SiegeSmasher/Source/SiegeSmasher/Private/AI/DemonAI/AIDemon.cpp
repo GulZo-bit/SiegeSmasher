@@ -25,7 +25,6 @@ void AAIDemon::BeginPlay()
 
 	if (RightFist != nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Fists Attached")));
 		RightFist->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("RightHandSocket"));
 		RightFist->SetOwner(this);
 	}
@@ -124,7 +123,6 @@ void AAIDemon::Tick(float DeltaTime)
 		SoundCount = 0;
 		if(AnimInstance != nullptr && AnimInstance->Montage_GetIsStopped(AttackAnimation))
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Attack Animation is stopped")));
 			RightFist->SetActorEnableCollision(false);
 			LeftFist->SetActorEnableCollision(false);
 		}
@@ -169,7 +167,6 @@ void AAIDemon::PlayAttack()
 	{
 		if (AttackSound != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
 			UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
 		}
 		Server_PlayAttackMontage();
@@ -195,12 +192,10 @@ void AAIDemon::Multicast_PlayAttackMontage_Implementation()
 	{
 		if (AttackSound != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
 			UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
 		}
 		if (AnimInstance != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Green, FString::Printf(TEXT("Playing Animation")));
 			AnimInstance->Montage_Play(AttackAnimation);
 		}
 	}

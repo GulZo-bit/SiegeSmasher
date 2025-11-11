@@ -416,6 +416,8 @@ protected:
 	void Multicast_SetLeaderBoardTxt(int NewPlayerPoint, int NewPlayerKills, int LeaderBoardPlayerId); 
 	void Multicast_SetLeaderBoardTxt_Implementation(int NewPlayerPoints, int NewPlayerKills, int LeaderBoardPlayerId);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Points");
+	int StartingPoints = 1000;
 private:
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = nullptr;
 		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 

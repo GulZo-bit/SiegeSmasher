@@ -166,7 +166,7 @@ protected:
  private: 
 
 
-
+	int PlayerDefaultPoints = 1000;
 	TMap<int,FPlayerLeaderBoardInfo> LeaderBoardPlayerInfo;
 
 	

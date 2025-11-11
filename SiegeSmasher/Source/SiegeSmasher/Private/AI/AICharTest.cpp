@@ -79,7 +79,6 @@ void AAICharTest::Multicast_PlayDeathSound_Implementation()
 {
 	if (DeathSound != nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Death Sound Played")));
 		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
 	}
 }
@@ -158,7 +157,6 @@ void AAICharTest::PlayAttackMontage()
 		//This is also here to validate the request by the client initiating the action, then it calls the multicast.
 		if (AttackSound != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
 			UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
 		}
 		Server_PlayAttackMontage();
@@ -182,7 +180,6 @@ void AAICharTest::Multicast_PlayAttackMontage_Implementation()
 	{
 		if (AttackSound != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
 			UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
 		}
 

@@ -43,6 +43,8 @@ void AMainCharacterTest::BeginPlay()
 {
 	Super::BeginPlay();
 	World = GetWorld();
+
+	
 	if (SpringArmComponent != nullptr)
 	{
 		//Set Location and Rotation
@@ -85,11 +87,12 @@ void AMainCharacterTest::BeginPlay()
 
 
 
-
 	//checks if the reference to the player hud is not empty
 
 	if (PlayerHUD != nullptr) 
 	{
+
+
 
 		if (IsLocallyControlled()) 
 		{
@@ -116,8 +119,14 @@ void AMainCharacterTest::BeginPlay()
 
 				if (HasAuthority()) {
 					ServerObjectRef->SetHost(this);
+				
 					HighlightPlayerTagOnLeaderboard();
+
+
+
 				}
+
+
 			}
 
 			
@@ -133,6 +142,7 @@ void AMainCharacterTest::BeginPlay()
 	}
 	
 
+
 	InitialiseTowers();
 
 	TraceParams = FCollisionQueryParams();
@@ -144,6 +154,13 @@ void AMainCharacterTest::BeginPlay()
 
 	SetUpPlayerId();
 
+	PlayerPoints = StartingPoints;
+	
+		GEngine->AddOnScreenDebugMessage(-1, 65.0f, FColor::Red, FString::Printf(TEXT("SETTING PLAYER POINTD TO STARTING POINTS")));
+
+	UpdatePlayerScoreUi();
+		
+	
 
 	//RefreshLeaderBoard();
 	

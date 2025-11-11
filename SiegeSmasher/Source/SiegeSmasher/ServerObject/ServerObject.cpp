@@ -58,7 +58,7 @@ void AServerObject::IncrementPlayerCount()
 	
    CurrentPlayerCount += 1;
    // add the item to the replciated TArray used to track leaderboard state 
-   int32 Index = LeaderBoardInfo.Items.Add(FPlayerLeaderBoardInfo());  
+   int32 Index = LeaderBoardInfo.Items.Add(FPlayerLeaderBoardInfo(PlayerDefaultPoints,0));
 
    // mark the item as dirty meaning that the FFastArraySerializer interface will pick up that the
    // there has been an additon to the TArray and modifiy it accordingly  on each client 
@@ -71,7 +71,7 @@ void AServerObject::IncrementPlayerCount()
 
 	   GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing server leaderboard new player was added")));
 
-	   Host->GetPlayerWidget()->RefreshPlayerLeaderboardInfo();
+	   Host->GetPlayerWidget()->RefreshPlayerLeaderboardInfo(); 
    }
 
    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, FString::Printf(TEXT("incremeting server obejct count %d"), CurrentPlayerCount));

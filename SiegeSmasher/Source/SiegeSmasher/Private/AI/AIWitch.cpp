@@ -241,7 +241,6 @@ void AAIWitch::Multicast_PlayDeathMontage_Implementation()
 			if (SoundCount == 0)
 			{
 				UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
-				GLog->Log("Played Sound");
 				SoundCount += 1;
 			}
 			
