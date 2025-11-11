@@ -146,7 +146,10 @@ void AMainCharacterTest::BeginPlay()
 
 
 	//RefreshLeaderBoard();
-	
+	if (IsLocallyControlled()) 
+	{
+		AssignedPlayerController->bShowMouseCursor = false;
+	}
 
 }
 
@@ -960,12 +963,12 @@ void AMainCharacterTest::SetBaseHealth(int NewHealth)
 
 void AMainCharacterTest::GameOver()
 {
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	if (HasAuthority() && IsLocallyControlled()) 
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("Added the ServerGameOver Widget to viewport")));
 		FInputModeUIOnly UIOnly = FInputModeUIOnly();
 		AssignedPlayerController->bShowMouseCursor = true;
-		AssignedPlayerController->SetInputMode(UIOnly);
 		ServerGameOverWidget->AddToViewport();
 	}
 
@@ -973,7 +976,6 @@ void AMainCharacterTest::GameOver()
 	{
 		FInputModeUIOnly UIOnly = FInputModeUIOnly();
 		AssignedPlayerController->bShowMouseCursor = true;
-		AssignedPlayerController->SetInputMode(UIOnly);
 		ClientGameOverWidget->AddToViewport();
 	}
 }
