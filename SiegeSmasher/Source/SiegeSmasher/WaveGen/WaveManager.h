@@ -6,7 +6,12 @@
 #include "GameFramework/Actor.h" 
 #include "SpawnPoint.h" 
 #include"../Enemies/EnemyBase.h"
+#include "../ServerObject/ServerObject.h"
 #include "WaveManager.generated.h"
+
+
+
+
 
 UCLASS()
 class SIEGESMASHER_API AWaveManager : public AActor
@@ -31,6 +36,8 @@ protected:
 	TArray<AEnemyBase*> EnemiesToSpawn;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveSpawnPoints");
 	TArray<ASpawnPoint*> SpawnPoints;
+
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -69,7 +76,7 @@ private:
 	bool SpawnDebugTest = true;
 	FRandomStream random;
 	ASpawnPoint* CurrentSpawnPoint = nullptr;
-
+	AServerObject* ServerObjectRef = nullptr;
 	//EnemyStorage	
 private:
 

@@ -364,13 +364,14 @@ void ATowerBase::OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, AActor* Ot
 
 }
 
+
 void ATowerBase::OnHitBoxHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit event enemy")));
-
+	// cast to enemy base to ensure that the actor overlapped is an enemy 
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit event on  enemy")));
-
+		// if the 
 		ApplyDamage(Enemy);
 
 	}
@@ -382,11 +383,20 @@ void ATowerBase::OnHitBoxHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 // and implement them as stubs anyway as unreal needs to create an instance for UObjects to see them
 void ATowerBase::HandleNewEnemy(AEnemyBase* EnemyBase){}
 void ATowerBase::TowerReset() {}
+// this particular method is the main method for updating the towers actions when enemies are in range 
+// such as shooting the enemy or swinging at them 
 void ATowerBase::TowerActive(float& DeltaTime) {}
+// overide method for child classes to implment allowing them to appply damage in the way seen fit for that tower 
+// this method is then called generically in the overlap event bound to the hitbox in this parent class allowing you to deifn ethe apply damage 
+//without having to worry about implmenting the overlap event in the child class 
 void ATowerBase::ApplyDamage(AEnemyBase* Enemy){}
+// used to determine the towers behaviour when it is idle(should it keep checking for enemies, should it wait a certain amount of time during this state and become active again then,etc)
 void ATowerBase::TowerDormant(float& DeltaTime) {}
+
 void ATowerBase::TowerSetUp(){}
 
+// parent class method shared across all tower child classes that acts as a generic way to apply damage and 
+// update any values that need to be updated such as points on the player associated with the tower
 void ATowerBase::DamageEnemyAndUpdatePlayerInfo(AEnemyBase* Enemy, float Damage)
 {
 
@@ -396,6 +406,8 @@ void ATowerBase::DamageEnemyAndUpdatePlayerInfo(AEnemyBase* Enemy, float Damage)
 	}
 }
 
+
+// main rpc function called on the serveer to play the timeline associated with the tower across the server and clients
 void ATowerBase::Multicast_PlayTowerTimeLine_Implementation(float PlayBackSpeed)
 {
 	/*if (HasAuthority()) {
@@ -410,7 +422,7 @@ void ATowerBase::Multicast_PlayTowerTimeLine_Implementation(float PlayBackSpeed)
 	TowerTimeLine->SetPlayRate(PlayBackSpeed); 
 	TowerTimeLine->PlayFromStart();
 }
-
+// reverse the timeline back to the beggining through a multi cast to ensure it stays synced on both server and across clients
 void ATowerBase::Multicast_ReverseTowerTimeLine_Implementation(float PlayBackSpeed)
 {
 	/*if (HasAuthority()) {
@@ -457,23 +469,29 @@ void ATowerBase::Tick(float DeltaTime)
 
 
 	Super::Tick(DeltaTime); 
+	// if the tower should be in the active state
 	if (CurrentyActive) {
 	 
-
+		// call the overideen tower active method implemented in the child class 
 		TowerActive(DeltaTime); 
 		
 		
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("wait time to reset %f"), WaitTimeToReset));
+		// if we are the authoriative tower and have hit a point in the active state where a reset is required 
 		if (HasAuthority() && RequiresReset && (WaitTimeToReset -= DeltaTime) <= 0.0f) {
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("reset called  wait time to reset %f"), WaitTimeToReset));
-
+			// set requires reset to false 
 			RequiresReset = false;
+			// set the wait time for resetting back to the max set in the child via blueprint 
 			WaitTimeToReset = MaxWaitTimeToReset;
+			// call the reset method overriden by the child tower class  
 			TowerReset();
 				
 		}
 		return;
 	}
+	// if the tower is set to inactive during its active state we drop through the the dormant state of the tower 
+	// performing the required actions of the child tower while in this state
 	TowerDormant(DeltaTime);
 	
 	
