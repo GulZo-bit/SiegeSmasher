@@ -4,10 +4,7 @@
 #include "ServerObject.h"
 #include "../MyMainCharacterTest.h"
 // Sets default values
-
-
-
-
+// (comments are also in the header)s
 AServerObject::AServerObject()
 {
 	bReplicates = true;
@@ -27,6 +24,7 @@ void AServerObject::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AServerObject, LeaderBoardInfo);
 	DOREPLIFETIME(AServerObject, CurrentPlayerCount);
+	DOREPLIFETIME(AServerObject, PlayerWaveNumber);
 }
 
 void AServerObject::BeginPlay()
@@ -142,12 +140,6 @@ void AServerObject::UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKill
 
 
 
-
-
-
-
-
-
 bool AServerObject::HasPlayerInfo(int PlayerId)
 {
 
@@ -179,6 +171,19 @@ FPlayerLeaderBoardInfo AServerObject::GetPlayerInfo(int PlayerId)
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("COULD NOT FIND PLAYER ID WHEN REFRESHING LEADERBOARD ID: %d"), PlayerId)); 
 	
 	return FPlayerLeaderBoardInfo();
+
+
+}
+
+void AServerObject::OnRep_PlayerWaveNumber()
+{
+
+	if (PlayerRef != nullptr && PlayerRef->GetPlayerWidget()) {
+
+
+		PlayerRef->GetPlayerWidget()->SetPlayerWaveNumber(PlayerWaveNumber);
+
+	}
 
 
 }
@@ -219,6 +224,18 @@ void AServerObject::OnRep_LeaderBoardState(FLeaderboardItems Old)
 	}
 
 	
+
+}
+
+void AServerObject::IncrementPlayerWaveNumber()
+{
+	PlayerWaveNumber += 1; 
+	if (Host != nullptr && Host->GetPlayerWidget()) {
+
+		Host->GetPlayerWidget()->SetPlayerWaveNumber(PlayerWaveNumber);
+
+	}
+
 
 }
 

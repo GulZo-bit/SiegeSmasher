@@ -262,3 +262,14 @@ void UChargeWidget::SetThroneHealth(int NewHealth)
 	ThroneHealth = NewHealth;
 }
 
+int UChargeWidget::GetPlayerWaveNumber()
+{
+	return DisplayedPlayerWaveNumber;
+}
+
+
+void UChargeWidget::SetPlayerWaveNumber(int WaveNumber) {
+
+	DisplayedPlayerWaveNumber = WaveNumber;
+
+}

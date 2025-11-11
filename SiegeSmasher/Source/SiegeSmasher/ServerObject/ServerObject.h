@@ -146,12 +146,12 @@ public:
 	bool HasPlayerInfo(int PlayerId);
 
 	FPlayerLeaderBoardInfo GetPlayerInfo(int PlayerId);
-
-
+	UFUNCTION()
+	void OnRep_PlayerWaveNumber();
 
 	void LogMap();
 
-
+	void IncrementPlayerWaveNumber();
 	AMainCharacterTest* GetLocalPlayer();
 	//FPlayerLeaderBoardInfo* GetPlayerInfo(int PlayerId);
 protected:
@@ -161,7 +161,8 @@ protected:
 	FLeaderboardItems LeaderBoardInfo;
 
 	AMainCharacterTest* PlayerRef;
-
+	UPROPERTY(ReplicatedUsing  = OnRep_PlayerWaveNumber);
+	int PlayerWaveNumber = 0;
 
  private: 
 

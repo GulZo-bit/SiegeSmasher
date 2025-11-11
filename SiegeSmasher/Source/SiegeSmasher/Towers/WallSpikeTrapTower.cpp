@@ -54,7 +54,9 @@ void AWallSpikeTrapTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 }
 
-
+/// here we override the interp method defined in the tower base classs that gets bound to the tower time line in the tower 
+// base class to essentially lerp the rotation of the wall spike trap tower spikes rotating 90 degress away from the wall it 
+// was placed on using its current rotation 
 void AWallSpikeTrapTower::TowerTimeLineInterp(float value) {
 
 	//float newRotation = FMath::Lerp(WallTrapSpikes->GetComponentRotation().Yaw, SwingRotationAngle,value);
@@ -65,11 +67,15 @@ void AWallSpikeTrapTower::TowerTimeLineInterp(float value) {
 void AWallSpikeTrapTower::TowerTimeLineEnd() {
 
 
-
+	// if we have authority and the time line has reached its max value when this time line call back is executed
 	if (HasAuthority() && TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower time line end called %f"), TowerTimeLine->GetPlaybackPosition()));
+		
+		// update variables associated with the current state of the tower 
 		HasSwung = true;
+		//we also now need to reset the tower and setting this to true will start decrementing the reset timer for the tower 
 		RequiresReset = true;
+		// no longer swining once tower time line has reached its max value
 		IsSwinging = false;
        
 	}
@@ -82,13 +88,16 @@ void AWallSpikeTrapTower::TowerDormant(float& DeltaTime) {
 	
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("TowerRest timer %f"), CoolDownAfterReset));
+	// if  cooldowns for resetting the wall spike trap tower have been met 
 	if (HasAuthority() && StartedReset && !TowerTimeLine->IsReversing() && (CoolDownAfterReset -= DeltaTime) <= 0.0f){
 		 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower fully reset")));
-		CoolDownAfterReset = MaxCoolDownAfterReset; 
+		// reset cooldwon timer during reset
+		CoolDownAfterReset = MaxCoolDownAfterReset;
+		// alow tirgger box to detect enemies ensuring that the collision is synced across all connected machines
 		Multicast_SetTriggerBoxCollision(ECollisionEnabled::QueryOnly);
 
-
+		// we are no longer resetting 
 		StartedReset = false;
 		
 		
@@ -99,13 +108,15 @@ void AWallSpikeTrapTower::TowerDormant(float& DeltaTime) {
 }
 void AWallSpikeTrapTower::TowerActive(float& DeltaTime) {
 
-	
+	// if we have hit all the conditions to perform the action associated with this tower
 	if (HasAuthority() && !RequiresReset && !IsSwinging && !TowerTimeLine->IsReversing()) {
 	      
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower begin swing ")));
+		// begin swing
 		IsSwinging = true;
+		// enable colllision on the hit box swining out
 		MultiCast_SetTowerHitBoxEnabled(ECollisionEnabled::QueryOnly);
-
+		// play timeline on all connected machines from this authorative server instance
 		Multicast_PlayTowerTimeLine(SwingPlayBackSpeed);
 		
 		   
@@ -123,15 +134,21 @@ void AWallSpikeTrapTower::TowerActive(float& DeltaTime) {
 
 void AWallSpikeTrapTower::TowerReset()
 {
-	if (HasAuthority()) {
-		StartedReset = true; 
 
+	if (HasAuthority()) {
+		// we've started to reset
+		StartedReset = true; 
+		// diable collsion on both the hitbox and the trigger box 
+		// this is to rpevent enemies from overlapping with these while the wall spike trap is in 
+		// its dormant state otherwise it mat trigger an overlap too early and not register an event on an enemy when becoming active 
 		Multicast_SetTriggerBoxCollision(ECollisionEnabled::NoCollision);
 		MultiCast_SetTowerHitBoxEnabled(ECollisionEnabled::NoCollision);
-
+		// not active
 		CurrentyActive = false;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower starting reset ")));
-		HasSwung = false;
+		// we have no longer swung out
+		HasSwung = false; 
+		// reverse the time,line play back position on all connected machines 
 		Multicast_ReverseTowerTimeLine(SwingPlayBackSpeed);
 	
 	}
@@ -153,7 +170,12 @@ void AWallSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
 		  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Wall Spike Trap Damaging enemy")));
 		
 		  if (HasAuthority()) {
+			  // if we are able to attack the enemy and have authority on the server
 			  if (IsSwinging || HasSwung || RequiresReset) {
+
+				  // call the generic method implmenetd in the tower base class to give the player points 
+				  // base don if we both killed and hit an enemy or just hit an enemy this method also updates the players leaderboard
+				  // status across all connections 
 				  DamageEnemyAndUpdatePlayerInfo(Enemy, TowerDamage);
 				  //Enemy->DamageEnemy(TowerDamage);
 				 /* IncrementAssignedPlayersScore(Enemy->GetScoreIncOnHit() * (int)(Enemy->GetHealth() > 0.0f));
