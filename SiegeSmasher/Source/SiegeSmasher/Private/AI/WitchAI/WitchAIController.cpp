@@ -48,8 +48,10 @@ void AWitchAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Always checking death because if the enemy dies we need to stop their AI behaviour
 	CheckDeath();
 	CheckDistanceAndDirectionToPlayer();
+
 	//Switch for checking line of sight to each player.
 	switch (PlayerActorArray.Num())
 	{
@@ -57,13 +59,12 @@ void AWitchAIController::Tick(float DeltaTime)
 		if (LineOfSightTo(PlayerActorArray[0]) && (DistStoreArray[0] >= 0 && DistStoreArray[0] <= MaxEyeRange && DotProductArray[0] >= 0))
 		{
 			SetFocus(PlayerActorArray[0]);
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					//Sets the index for the fireball to attack the player that is being focused on.
-					Witch->getSpell()->setPlayerIndex(0);
-				}
+				
+				//Sets the index for the fireball to attack the player that is being focused on.
+				Witch->getSpell()->setPlayerIndex(0);
+				
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -84,12 +85,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		{
 			SetFocus(PlayerActorArray[0]);
 
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(0);
-				}
+				Witch->getSpell()->setPlayerIndex(0);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -99,12 +97,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		else if (LineOfSightTo(PlayerActorArray[1]) && (DistStoreArray[1] >= 0 && DistStoreArray[1] <= MaxEyeRange && DotProductArray[1] >= 0))
 		{
 			SetFocus(PlayerActorArray[1]);
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(1);
-				}
+				Witch->getSpell()->setPlayerIndex(1);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -125,12 +120,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		{
 			SetFocus(PlayerActorArray[0]);
 
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(0);
-				}
+				Witch->getSpell()->setPlayerIndex(0);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -140,12 +132,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		else if (LineOfSightTo(PlayerActorArray[1]) && (DistStoreArray[1] >= 0 && DistStoreArray[1] <= MaxEyeRange && DotProductArray[1] >= 0))
 		{
 			SetFocus(PlayerActorArray[1]);
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(1);
-				}
+				Witch->getSpell()->setPlayerIndex(1);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -155,12 +144,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		else if (LineOfSightTo(PlayerActorArray[2]) && (DistStoreArray[2] >= 0 && DistStoreArray[2] <= MaxEyeRange && DotProductArray[2] >= 0))
 		{
 			SetFocus(PlayerActorArray[2]);
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(2);
-				}
+				Witch->getSpell()->setPlayerIndex(2);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -181,12 +167,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		{
 			SetFocus(PlayerActorArray[0]);
 
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(0);
-				}
+				Witch->getSpell()->setPlayerIndex(0);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -196,12 +179,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		else if (LineOfSightTo(PlayerActorArray[1]) && (DistStoreArray[1] >= 0 && DistStoreArray[1] <= MaxEyeRange && DotProductArray[1] >= 0))
 		{
 			SetFocus(PlayerActorArray[1]);
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(1);
-				}
+				Witch->getSpell()->setPlayerIndex(1);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -211,12 +191,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		else if (LineOfSightTo(PlayerActorArray[2]) && (DistStoreArray[2] >= 0 && DistStoreArray[2] <= MaxEyeRange && DotProductArray[2] >= 0))
 		{
 			SetFocus(PlayerActorArray[2]);
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(2);
-				}
+				Witch->getSpell()->setPlayerIndex(2);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -226,12 +203,9 @@ void AWitchAIController::Tick(float DeltaTime)
 		else if (LineOfSightTo(PlayerActorArray[3]) && (DistStoreArray[3] >= 0 && DistStoreArray[3] <= MaxEyeRange && DotProductArray[3] >= 0))
 		{
 			SetFocus(PlayerActorArray[3]);
-			if (Witch != nullptr)
+			if (Witch != nullptr && Witch->getSpell() != nullptr)
 			{
-				if (Witch->getSpell() != nullptr)
-				{
-					Witch->getSpell()->setPlayerIndex(3);
-				}
+				Witch->getSpell()->setPlayerIndex(3);
 			}
 
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bIsPlayerSeen"), true);
@@ -258,6 +232,7 @@ void AWitchAIController::setHealBool()
 
 void AWitchAIController::CheckDeath()
 {
+	//If the enemy dies we need to play their death animation and disable their behaviour tree.
 	if (Witch->GetHealth() <= 0)
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
@@ -272,6 +247,7 @@ void AWitchAIController::CheckDeath()
 		}
 	}
 
+	//Once they get respawned we need to re-enable their behaviour tree
 	else if(Witch->getHasBeenReset() == true)
 	{
 		RunBehaviorTree(AIBehavior);
@@ -286,6 +262,7 @@ void AWitchAIController::CheckDistanceAndDirectionToPlayer()
 	FVector PawnForwardVector = ControlledPawn->GetActorForwardVector();
 	FVector EnemyLocStore = ControlledPawn->GetActorLocation();
 
+	//Checking the distance and direction between this enemy and each player.
 	for (int i = 0; i < PlayerActorArray.Num(); i++)
 	{
 		PlayerLocStore = PlayerActorArray[i]->GetActorLocation();

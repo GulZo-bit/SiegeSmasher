@@ -9,18 +9,16 @@ ASword::ASword()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//Setting up the sword
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 
-	//Mesh->BodyInstance.SetCollisionProfileName(TEXT("Enemy"));
-	//Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Mesh->BodyInstance.SetInstanceNotifyRBCollision(true);
 	Mesh->AttachToComponent(Root, FAttachmentTransformRules::KeepRelativeTransform);
 
 	Mesh->SetupAttachment(Root);
-	//Mesh->OnComponentHit.AddDynamic(this, &ASword::OnHit);
 	
 	Mesh->OnComponentBeginOverlap.AddDynamic(this, &ASword::OnOverLapBegin);
 	Mesh->OnComponentEndOverlap.AddDynamic(this, &ASword::OnOverLapEnd);
@@ -43,32 +41,9 @@ void ASword::Tick(float DeltaTime)
 
 }
 
-//void ASword::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-//{
-//	
-//	if (Cast<AMainCharacterTest>(OtherActor))
-//	{
-//		GetWorldTimerManager().ClearTimer(TimerHandle);
-//		GetWorldTimerManager().SetTimer(TimerHandle, this, &ASword::ResetHit, 1.0f, false, 0.1f);
-//
-//		//if (bHitDetected == false)
-//		//{
-//			AMainCharacterTest* MainChar = Cast<AMainCharacterTest>(OtherActor);
-//			MainChar->setHealth(MainChar->getHealth() - Damage);
-//			GLog->Log(FString::Printf(TEXT("PlayerHealth: %f"), MainChar->getHealth()));
-//			//GLog->Log(FString::SanitizeFloat(MainChar->GetVelocity().Length()));
-//		//}
-//		
-//	}
-//}
-
 void ASword::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
-	/*if (OtherActor && (OtherActor != this))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlap detected with: %s"), *OtherActor->GetName());
-	}*/
+	//On overlap with the main character we apply damage to them.
 	if (Cast<AMainCharacterTest>(OtherActor) )
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle);
@@ -84,12 +59,9 @@ void ASword::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 	}
 }
 
+//Once the overlap is done we don't want to be hitting the player anymore so we won't apply the damage.
 void ASword::OnOverLapEnd(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	/*if (OtherActor && (OtherActor != this))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlap Ended with: %s"), *OtherActor->GetName());
-	}*/
 	bHit = false;
 }
 

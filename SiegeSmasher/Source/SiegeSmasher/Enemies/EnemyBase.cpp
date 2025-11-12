@@ -44,14 +44,11 @@ int AEnemyBase::EnemyTest()
 	return 0;
 }
 
+//Damaging the enemy.
 void AEnemyBase::DamageEnemy(float Damage)
 {
 	if (HasAuthority()) {
 		CurrentHealth -= Damage;
-		GEngine->AddOnScreenDebugMessage (-1,3.0f,FColor::Orange,FString::Printf(TEXT("Current Health for enemy: %f"), CurrentHealth));
-
-		
-	
 	}
 
 }
@@ -60,7 +57,6 @@ void AEnemyBase::DamageEnemy(float Damage, AMainCharacterTest* PlayerRef)
 {
 	if (HasAuthority() && PlayerRef != nullptr) {
 		CurrentHealth -= Damage;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Orange, FString::Printf(TEXT("Current Health for enemy: %f"), CurrentHealth));
 		bool BelowZero = CurrentHealth <= 0.0f;
 		PlayerRef->IncrementPlayerScore(ScoreIncrementOnKill * BelowZero);
 		PlayerRef->IncrementPlayerKills(1 * BelowZero);
@@ -82,6 +78,7 @@ float AEnemyBase::GetHealth()
 	return CurrentHealth;
 }
 
+//Increase enemy health. Used for healing in the witch.
 void AEnemyBase::AddToHealth(float Increase)
 {
 	 CurrentHealth  = std::min((CurrentHealth + Increase),MaxHealth);
@@ -94,7 +91,7 @@ void AEnemyBase::ResetEnemyOnDeath()
 		Multicast_ResetOnDeath();
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("enemy reset on death disabled %d"), (int)Disabled));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("enemy reset on death disabled %d"), (int)Disabled));
 }
 
 
@@ -103,12 +100,14 @@ void AEnemyBase::SetTick(bool DisableTick) {
 	PrimaryActorTick.SetTickFunctionEnable(DisableTick);
 
 }
+
+//On death we need to hide our enemies and make sure the player can't collide with them.
 void AEnemyBase::Multicast_ResetOnDeath_Implementation()
 {
 	SetActorHiddenInGame(true);
 	//SetActorEnableCollision(false);
 	SetActorEnableCollision(false);
-	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast for reset death")));
+	//GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast for reset death")));
 	//SetActorTickEnabled(false);
 	SetTick(false);
 	Disabled = true;
@@ -126,6 +125,7 @@ void AEnemyBase::Tick(float DeltaTime)
 	
 }
 
+//Called from the wave manage and is used to calculate how many of each enemy should appear.
 int  AEnemyBase::CalculateWaveContribution(float FractionalWaveNumber)
 {
 
@@ -141,6 +141,7 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 }
 
+//For when the enemy reaches the base we need to hide them.
 void AEnemyBase::EnemyReachedBase()
 {
 	SetActorHiddenInGame(true);
@@ -159,24 +160,6 @@ bool AEnemyBase::GetIsDisabled()
 
 void AEnemyBase::ResetOnSpawn()
 {
-	//SetActorHiddenInGame(false);
-	//if (HasAuthority())
-	//{
-	//	//SetActorEnableCollision(true);
-	//	Multicast_SetCollision(true);
-	//}
-	//
-	//SetActorTickEnabled(true); 
-	//Disabled = false;
-	//CurrentHealth = MaxHealth;
-
-	//if (HasAuthority())
-	//{
-	//	//UBoolAnimInstance* Temp = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
-	//	//Temp->setIsDeadBool(false);
-
-	//	Multicast_AnimIsDead(false);
-	//}
 
 	if (HasAuthority())
 	{
@@ -186,14 +169,11 @@ void AEnemyBase::ResetOnSpawn()
 
 }
 
+//When the enemy respawns we need to essentially enable them again.
 void AEnemyBase::Multicast_ResetOnSpawn_Implementation()
 {
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
-
-	//SetActorEnableCollision(true);
-	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast for reset on spawn")));
-	//SetActorTickEnabled(true);
 	SetTick(true);
 	Disabled = false; 
 
@@ -203,12 +183,7 @@ void AEnemyBase::Multicast_ResetOnSpawn_Implementation()
 		GLog->Log("Anim Instance is not null");
 		AnimIsDead->setIsDeadBool(false);
 	}
-	//Multicast_AnimIsDead(false);
 	bHasBeenReset = true;
-}
-
-void AEnemyBase::StopAIBehaviour()
-{
 }
 
 int AEnemyBase::GetCurrentWaveContribution()
@@ -233,15 +208,10 @@ EnemyTypes AEnemyBase::GetEnemyWaveType()
 	return EnemyType;
 }
 
+//For the leader board.
 void AEnemyBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//GLog->Log("Enemy base is overlapping");
-
-	/*if (OtherActor && (OtherActor != this))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Overlap Begun with: %s"), *OtherActor->GetName());
-	}*/
-	
+		//On overlap with a ballista arrow we damage the enemy and increase the points of the player and their kill count if the enemy dies.
 		if (Cast<AMCArrow>(OtherActor))
 		{
 			AMCArrow* TempArrow = Cast<AMCArrow>(OtherActor);
@@ -292,6 +262,7 @@ bool AEnemyBase::getHasBeenReset()
 	return bHasBeenReset;
 }
 
+//Decreases the amount of enemies in the wave.
 void AEnemyBase::DecrementWaveEnemyAliveCount()
 {
 
@@ -300,10 +271,10 @@ void AEnemyBase::DecrementWaveEnemyAliveCount()
 		if (WaveEnemyAliveCountRef != nullptr) {
 
 			(*WaveEnemyAliveCountRef)--;
-			GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Orange, FString::Printf(TEXT("Enemy alive count decremented by enemy new count %d"), (*WaveEnemyAliveCountRef)));
+			//GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Orange, FString::Printf(TEXT("Enemy alive count decremented by enemy new count %d"), (*WaveEnemyAliveCountRef)));
 		}
 		else {
-			GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("WAVE ENEMY ALIVE COUNT ON ENEMY WAS NULL")));
+			//GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("WAVE ENEMY ALIVE COUNT ON ENEMY WAS NULL")));
 
 
 		}
@@ -332,27 +303,12 @@ void AEnemyBase::Multicast_AnimIsDead_Implementation(bool bStore)
 	}
 }
 
-
-void AEnemyBase::Multicast_SetCollision_Implementation(bool bStore)
-{
-	
-}
-
-//void AEnemyBase::Multicast_PlayTimeLine_Implementation()
-//{
-//	HealAura->getLightTimeLineComp()->PlayFromStart();
-//}
-//
-//void AEnemyBase::PlayHealTimeLine()
-//{
-//	Multicast_PlayTimeLine();
-//}
-
 int32 AEnemyBase::CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect)
 {
 	return (CurrentStatusEffects & StatusEffect)  ;
 }
 
+//Applies the status effect associated with a tower to the enemy.
 void AEnemyBase::ApplyTowerStatusEffect(EnemyStatusEffect StatusEffect) {
 	if (HasAuthority()) {
 		AvailableStatusEffects[StatusEffect]->SetComponentTickEnabled(true);
@@ -371,10 +327,7 @@ void AEnemyBase::RemoveTowerStatusEffect(EnemyStatusEffect StatusEffect)
 	}
 }
 
-
-
-
-
+//If the enemy comes into contact with another tower whilst having a status effect. Increase the status effects duration.
 void AEnemyBase::IncreaseTowerStatusEffectDuration(EnemyStatusEffect Id, float Increment,AMainCharacterTest* EffectPlayerRef)
 {	
 		AvailableStatusEffects[Id]->IncreaseDuration(Increment);
@@ -408,9 +361,4 @@ void AEnemyBase::DisablePrimaryTick()
 {
     
 	PrimaryActorTick.bCanEverTick = false;
-
-
-
-
-
 }

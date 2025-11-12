@@ -22,8 +22,10 @@ void AEnemyBTAISplineController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Always checking death because if the enemy dies we need to stop their AI behaviour
 	CheckDeath();
 
+	//Their default is to move to the the spline movement actor which is moving along the spline.
 	GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
 
 	CheckDistanceAndDirectionToPlayer();
@@ -32,7 +34,7 @@ void AEnemyBTAISplineController::Tick(float DeltaTime)
 
 void AEnemyBTAISplineController::CheckDeath()
 {
-
+	//If the enemy dies we need to play their death animation and disable their behaviour tree.
 	if (Vampire->GetHealth() <= 0)
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
@@ -46,7 +48,8 @@ void AEnemyBTAISplineController::CheckDeath()
 		}
 	}
 
-	else
+	//Once they get respawned we need to re-enable their behaviour tree
+	else if(Vampire->getHasBeenReset() == true)
 	{
 		RunBehaviorTree(AIBehavior);
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), false);
@@ -85,6 +88,7 @@ void AEnemyBTAISplineController::CheckDistanceAndDirectionToPlayer()
 	FVector PawnForwardVector = ControlledPawn->GetActorForwardVector();
 	FVector EnemyLocStore = ControlledPawn->GetActorLocation();
 	
+	//Checking the distance and direction between this enemy and each player.
 	for (int i =0 ; i < PlayerActorArray.Num(); i++)
 	{
 		PlayerLocStore = PlayerActorArray[i]->GetActorLocation();
@@ -95,6 +99,7 @@ void AEnemyBTAISplineController::CheckDistanceAndDirectionToPlayer()
 	}
 
 	//Chooses the correct if statement based on how many players are playing the game.
+	//If a player is close the attack animation plays.
 	switch (PlayerActorArray.Num())
 	{
 	case(1):

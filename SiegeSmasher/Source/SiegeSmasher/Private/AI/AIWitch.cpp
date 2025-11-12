@@ -63,17 +63,11 @@ void AAIWitch::BeginPlay()
 			
 		}
 	}
+	//Box component used to find overlapping actors.
 	HealZone = this->FindComponentByClass<UBoxComponent>();
-	//HealStore = GetComponentsByTag(UBoxComponent::StaticClass(), TEXT("HealZone"));
-	/*for (int i = 0; i < Temp.Num(); i++)
-	{
-		if (Temp[i] != nullptr)
-		{
-			
-		}
-	}*/
 }
 
+//Play attack animation
 void AAIWitch::PlayAttack()
 {
 	
@@ -82,7 +76,6 @@ void AAIWitch::PlayAttack()
 		Server_PlayAttackMontage();
 		if (FireballSound != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("Fireball Sound Played")));
 			UGameplayStatics::PlaySoundAtLocation(this, FireballSound, GetActorLocation());
 		}
 	}
@@ -106,7 +99,6 @@ void AAIWitch::Multicast_PlayAttackMontage_Implementation()
 
 		if (FireballSound != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::Printf(TEXT("Fireball Sound Played")));
 			UGameplayStatics::PlaySoundAtLocation(this, FireballSound, GetActorLocation());
 		}
 
@@ -129,16 +121,18 @@ void AAIWitch::Multicast_PlayLightTimeLine_Implementation(AHealAuraLight* LightS
 	LightStore->getLightTimeLineComp()->PlayFromStart();
 }
 
+//Healing other enemies
 void AAIWitch::HealEnemy()
 {
 	if (HasAuthority() && HealZone != nullptr)
 	{
 		GLog->Log("Found HealZone");
 
+		//Store all the actors that are in the heal zone
 		TArray<AActor*> ActorStore;
-		//TArray<AAICharTest*> VampStore;
 		HealZone->GetOverlappingActors(ActorStore);
 
+		//Every enemy that is in the heal zone gets healed with 20 health.
 		for (int i = 0; i < ActorStore.Num(); i++)
 		{
 			if (ActorStore[i] != nullptr)
@@ -148,25 +142,13 @@ void AAIWitch::HealEnemy()
 					GLog->Log("Healing Enemies");
 					AEnemyBase* AICharTemp = Cast<AEnemyBase>(ActorStore[i]);
 					AICharTemp->AddToHealth(20);
-					
-					/*UChildActorComponent* ChildActorStore = Cast<UChildActorComponent>(AICharTemp->FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAura")));
-					if (ChildActorStore != nullptr)
-					{
-						AHealAuraLight* HealAuraLightStore = Cast<AHealAuraLight>(ChildActorStore->GetChildActor());
-						if (HealAuraLightStore != nullptr)
-						{
-							GLog->Log("Found Heal Aura");
-
-							AICharTemp->PlayHealTimeLine();
-						}
-
-					}*/
 				}
 			}
 		}
 	}
 }
 
+//Play heal animation
 void AAIWitch::PlayHealSpellMontage()
 {
 	if (GetLocalRole() < ROLE_Authority)
@@ -174,7 +156,6 @@ void AAIWitch::PlayHealSpellMontage()
 
 		if (HealingSound != nullptr)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
 			UGameplayStatics::PlaySoundAtLocation(this, HealingSound, GetActorLocation());
 		}
 		Server_PlayHealSpellMontage();
@@ -194,25 +175,20 @@ void AAIWitch::Server_PlayHealSpellMontage_Implementation()
 void AAIWitch::Multicast_PlayHealSpellMontage_Implementation()
 {
 
-	if (HealSpellMontage != nullptr)
+	if (HealSpellMontage != nullptr && AnimInstance != nullptr)
 	{
-		//AnimInstance = GetMesh()->GetAnimInstance();
-
-		if (AnimInstance != nullptr)
+		if (HealingSound != nullptr)
 		{
-
-			if (HealingSound != nullptr)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::Printf(TEXT("Fireball Sound Played")));
-				UGameplayStatics::PlaySoundAtLocation(this, HealingSound, GetActorLocation());
-			}
-			AnimInstance->Montage_Play(HealSpellMontage);
-			iHealCount = 0;
+			UGameplayStatics::PlaySoundAtLocation(this, HealingSound, GetActorLocation());
 		}
+		AnimInstance->Montage_Play(HealSpellMontage);
+		iHealCount = 0;
+		
 	}
 
 }
 
+//Play death montage
 void AAIWitch::PlayDeathMontage()
 {
 	if (GetLocalRole() < ROLE_Authority)
@@ -258,28 +234,28 @@ void AAIWitch::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Resetting the witch when she is killed
 	if (this->GetHealth() <= 0)
 	{
-		if (AnimInstance != nullptr)
+		if (AnimInstance != nullptr && AnimInstance->Montage_IsPlaying(DeathMontage))
 		{
-			if (AnimInstance->Montage_IsPlaying(DeathMontage))
-			{
-				float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
+			float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
 
-				if (MontageTimeStore >= 3.0f)
-				{
-					DecrementWaveEnemyAliveCount();
-					CubeStore->SetActorHiddenInGame(false);
-					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
-					Count = StartTime;
-					this->ResetEnemyOnDeath();
-					bCanActorMove = false;
-					bDeathAnimFinished = true;
-				}
+			if (MontageTimeStore >= 3.0f)
+			{
+				DecrementWaveEnemyAliveCount();
+				CubeStore->SetActorHiddenInGame(false);
+				CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+				Count = StartTime;
+				this->ResetEnemyOnDeath();
+				bCanActorMove = false;
+				bDeathAnimFinished = true;
+				
 			}
 		}
 	}
 
+	//If the witch is alive we do the math for moving across the spline.
 	else
 	{
 		bDeathAnimFinished = false;
@@ -307,22 +283,27 @@ void AAIWitch::Tick(float DeltaTime)
 	
 	
 
-	if (AnimInstance != nullptr)
+	if (AnimInstance != nullptr )
 	{
+		//Make sure to spawn the spell at the correct stage of the animation.
+		
 		if (AnimInstance->Montage_IsPlaying(AttackSpellMontage))
 		{
-			float MontageTimeStore = AnimInstance->Montage_GetPosition(AttackSpellMontage);
+			float AttackMontageTimeStore = AnimInstance->Montage_GetPosition(AttackSpellMontage);
 			//UE_LOG(LogTemp, Log, TEXT("Current Montage Time: %f"), MontageTimeStore);
-			if (MontageTimeStore >= 1.23f && iCount < 1)
+			if (AttackMontageTimeStore >= 1.23f && iCount < 1)
 			{
 				if (HasAuthority())
 				{
 					Spell = GetWorld()->SpawnActor<AWitch_Projectile>(SpellClass, FTransform(FRotator(), GetMesh()->GetSocketLocation(TEXT("SpellSocket")), FVector(1.0f, 1.0f, 1.0f)));
 				}
 				iCount++;
+
 			}
 		}
+		
 
+		//Make sure to spawn the spell at the correct stage of the animation.
 		else if (AnimInstance->Montage_IsPlaying(HealSpellMontage))
 		{
 			float MontageTimeStore = AnimInstance->Montage_GetPosition(HealSpellMontage);
@@ -360,6 +341,7 @@ bool AAIWitch::getbCanActorMove()
 	return bCanActorMove;
 }
 
+//Reset the witch if she reaches the end of the level.
 void AAIWitch::EnemyReachedBase()
 {
 	DecrementWaveEnemyAliveCount();

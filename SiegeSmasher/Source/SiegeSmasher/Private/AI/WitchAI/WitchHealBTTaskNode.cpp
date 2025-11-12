@@ -18,6 +18,7 @@ EBTNodeResult::Type UWitchHealBTTaskNode::ExecuteTask(UBehaviorTreeComponent& Ow
 	AAIController* Controller = OwnerComp.GetAIOwner();
 	APawn* ControlledPawn = Controller->GetPawn();
 
+	//Plays heal animation using the BT.
 	if (ControlledPawn != nullptr)
 	{
 		Controller->GetBlackboardComponent()->SetValueAsBool(TEXT("bCanHeal"), false);

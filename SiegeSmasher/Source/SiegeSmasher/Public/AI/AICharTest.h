@@ -86,7 +86,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	bool bCanActorMove = true;
+	bool bCanActorMove = true; //Bool to stop the spline movement actor from moving.
 	void setbCanActorMove(bool bStore);
 	float Count = 0.0f;
 	UAnimInstance* AnimInstance;

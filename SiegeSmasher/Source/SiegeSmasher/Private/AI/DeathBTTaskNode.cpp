@@ -17,6 +17,7 @@ EBTNodeResult::Type UDeathBTTaskNode::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	AAIController* Controller = OwnerComp.GetAIOwner();
 	APawn* ControlledPawn = Controller->GetPawn();
 
+	//Plays death animation using the BT.
 	if (ControlledPawn != nullptr)
 	{
 		AAICharTest* Enemy = Cast<AAICharTest>(ControlledPawn);
