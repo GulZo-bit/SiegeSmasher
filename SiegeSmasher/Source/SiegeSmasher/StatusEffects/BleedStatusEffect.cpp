@@ -14,7 +14,6 @@ UBleedStatusEffect::UBleedStatusEffect()
 
 
 
-	// ...
 }
 
 
@@ -22,8 +21,7 @@ UBleedStatusEffect::UBleedStatusEffect()
 void UBleedStatusEffect::BeginPlay()
 {
 	Super::BeginPlay();
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("BLEED STATUS EFFECT BEGIN PLAY")));
-	// ...
+	
 	
 }
 
@@ -33,7 +31,8 @@ void UBleedStatusEffect::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-
+	//  if the enemy health hits zero while applying the bleed tower status effect we increment the assigned 
+	//  player points 
 	if (EnemyRef->GetHealth() <= 0.0f) {
 
 
@@ -45,6 +44,7 @@ void UBleedStatusEffect::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 
 	}
+	// damage the enmey and adjust itself if its health hasnt already hit 0
 	EnemyRef->DamageEnemy((BaseDamage * DeltaTime) );
 
 	

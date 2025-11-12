@@ -49,7 +49,6 @@ void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 			// call the generic damage functionn across all enemies which will dmaage the enemy on the server side and replciate to all clients
 			Enemy->DamageEnemy(Damage,PlayerRef);
 			
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Tower projectile hitting enemy")));
 
 
 
