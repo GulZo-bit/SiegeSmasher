@@ -37,7 +37,7 @@ void ABalistaTower::BeginPlay() {
 void ABalistaTower::Multicast_SetArrowHidden_Implementation(bool HideBallistaArrow)
 {
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("setting ballista arrow hidden %d "), (int)HideBallistaArrow));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("setting ballista arrow hidden %d "), (int)HideBallistaArrow));
 	BallistaArrow->SetHiddenInGame(HideBallistaArrow);
 
 
@@ -65,7 +65,11 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 
 	// establish a vector from the turret to the assigned enemy target
 	FVector BallistaTurretLocation = BallistaTurret->GetComponentLocation();
-	FVector ToTarget = EnemySingleTarget->GetActorLocation() - BallistaTurret->GetComponentLocation();
+	FVector ToTarget;
+	if (EnemySingleTarget != nullptr)
+	{
+		ToTarget = EnemySingleTarget->GetActorLocation() - BallistaTurret->GetComponentLocation();
+	}
 	FVector TargetDir = ToTarget.GetSafeNormal();
 
 	DrawDebugLine(GetWorld(), BallistaTurret->GetComponentLocation(), BallistaTurret->GetComponentLocation()+TargetDir * ToTarget.Length(), FColor::Cyan);
@@ -75,7 +79,7 @@ void ABalistaTower::TowerActive(float& DeltaTime) {
 		           BallistaTurretLocation + TargetDir * ToTarget.Length(), TowerNoLOSChannel);
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("distance to target %f"), ToTarget.SquaredLength()));
 	
-	if (!LostLOs && !CurrentEnemyOutOfRange && EnemySingleTarget->GetHealth() > 0.0f) {
+	if (EnemySingleTarget != nullptr && !LostLOs && !CurrentEnemyOutOfRange && EnemySingleTarget->GetHealth() > 0.0f) {
 
 
 	

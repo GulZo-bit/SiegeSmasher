@@ -183,7 +183,7 @@ void AWaveManager::EnemySetUp()
 		EnemyTypes EnemyType = EnemiesToSpawn[i]->GetEnemyWaveType();
 		if ( (EnemyAvailablePoolIndicies.Find(EnemyType) == nullptr) &&  EnemiesToSpawn[i]->GetStartingWave() <= WaveNumber) {
 
-			GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Blue,
+			GLog->Log( 
 				FString::Printf(TEXT(" new enemy added to available enemies %d wave number was %d"), (int)EnemyType, WaveNumber));
 			GLog->Log(FString::Printf(TEXT(" new enemy added to available enemies %d wave number was %d"), (int)EnemyType, WaveNumber));
 
@@ -214,18 +214,17 @@ void AWaveManager::EnemySetUp()
 		// add to the wave count the enemy WaveEnemyCount  tracking the total number of enemies for the wave 
 		WaveEnemyCount += NewEnemyWaveContrib; 
 
-		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("summing up wave contribution for enemy type: %d Contribution: %d"), EnemyType, NewEnemyWaveContrib));
+		GLog->Log(FString::Printf(TEXT("summing up wave contribution for enemy type: %d Contribution: %d"), EnemyType, NewEnemyWaveContrib));
 		// reset the pooling index for the enemy type to 0 as we have begun a new wave 
 		// this means we will reuse all the enemies that were spawned of this enemy type in this wave
 		EnemyAvailablePoolIndicies[EnemyType] = 0;
 		// update the map used to track the current enemy type's wave contribution
 		EnemyWaveContribution[EnemyType] = NewEnemyWaveContrib;
 
-		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Total wave contribution is now %d singualr contirbution is %d EnemyPool indicies is %d  "), WaveEnemyCount, EnemyWaveContribution[EnemyType],EnemyAvailablePoolIndicies[EnemyType]));
+		GLog->Log(FString::Printf(TEXT("Total wave contribution is now %d singualr contirbution is %d EnemyPool indicies is %d  "), WaveEnemyCount, EnemyWaveContribution[EnemyType],EnemyAvailablePoolIndicies[EnemyType]));
 
 
-	    GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-			FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));
+	    GLog->Log(FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));
 		GLog->Log(FString::Printf(TEXT(" new enemy added to  enemy pools type %d  wave number %d"), (int)EnemyType, WaveNumber));
 	}
 
@@ -304,7 +303,7 @@ void AWaveManager::EvaluateEnemySpawning()
 
 			// get the enemy located at the index we just randomly selected 
 			AvailableEnemies[CurrentAvailableEnemyIndex] = AvailableEnemies[randomAvailableEnemyIndex];
-			GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Green, FString::Printf(TEXT("Swapped index is %d"), randomAvailableEnemyIndex));
+			GLog->Log(FString::Printf(TEXT("Swapped index is %d"), randomAvailableEnemyIndex));
 			
 			GLog->Log(FString::Printf(TEXT("Swapped index is %d"), randomAvailableEnemyIndex));
 

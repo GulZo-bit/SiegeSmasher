@@ -33,6 +33,9 @@ ATowerBase::ATowerBase()
 	TowerTimeLine->SetIsReplicated(true);
 	TeamID = FGenericTeamId(1);
 
+	TriggerRangeBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel12, ECollisionResponse::ECR_Ignore);
+
+	BoxColliderForObjectPlacement->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel12, ECollisionResponse::ECR_Ignore);
 	/*PlayerRef = nullptr;*/
 }
 
@@ -336,10 +339,10 @@ void ATowerBase::OnOverLapBegin(UPrimitiveComponent* OverlapedComponent, AActor*
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
 	if (HasAuthority() ) {
 		AEnemyBase* EnemyToHandle = Cast<AEnemyBase>(OverlapedActor);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin ")));
 
 		if (EnemyToHandle != nullptr && EnemyToHandle->GetHealth() >0.0f) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin hit ")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("tower overlap begin hit ")));
 
 			CurrentyActive = true;
 		}
@@ -354,7 +357,7 @@ void ATowerBase::OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, AActor* Ot
 {
 
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit enemy")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit enemy")));
 
 		ApplyDamage(Enemy);
 
@@ -367,10 +370,10 @@ void ATowerBase::OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, AActor* Ot
 
 void ATowerBase::OnHitBoxHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit event enemy")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit event enemy")));
 	// cast to enemy base to ensure that the actor overlapped is an enemy 
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit event on  enemy")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Tower hit box hit event on  enemy")));
 		// if the 
 		ApplyDamage(Enemy);
 

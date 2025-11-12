@@ -48,7 +48,7 @@ void AProjectileTowerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 void AProjectileTowerBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("projectile tower called")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("projectile tower called")));
 	
 	    
 		AEnemyBase* NewEnemy = Cast<AEnemyBase>(OtherActor);
@@ -64,7 +64,7 @@ void AProjectileTowerBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 			// if this particualr insatcne of the prkectile tower is on the server we log the enemy 
 			// that just walked into range and add them to the currentenemiesinrange TArray
 			if (HasAuthority()) {
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy now in range index is: %d "), CurrentEnemiesInRange.Num()));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy now in range index is: %d "), CurrentEnemiesInRange.Num()));
 				GLog->Log(FString::Printf(TEXT("Enemy now in range index is: %d "), CurrentEnemiesInRange.Num()));
 				IndicesForEnemiesInRange.Add(NewEnemy, CurrentEnemiesInRange.Num());
 				CurrentEnemiesInRange.Add(NewEnemy);
@@ -89,7 +89,7 @@ void AProjectileTowerBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AAc
 		// if an enemy just walked out of range 
 		if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
 			
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("enemy went out of trigger box for ballista removing")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("enemy went out of trigger box for ballista removing")));
 			GLog->Log(FString::Printf(TEXT("enemy went out of trigger box for ballista removing")));
 			//    abs( CurrentEnemiesInRange.Num() - Previous)  ;
 			//  sizeOf(AEnemyBase*) *  
@@ -101,13 +101,13 @@ void AProjectileTowerBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AAc
 
 				// get the index of the enemy to remove as it has either been killed or has gone out of range 
 				int IndexOfEnemyToRemove = IndicesForEnemiesInRange[Enemy];
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy being removed  index is: %d"), IndexOfEnemyToRemove));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy being removed  index is: %d"), IndexOfEnemyToRemove));
 				GLog->Log(FString::Printf(TEXT("Enemy being removed  index is: %d"), IndexOfEnemyToRemove));
 
 				// here we are assigning  index set in the map for the current enemy reference at the back of the array 
 				// to the index we are about to remove 
 				IndicesForEnemiesInRange[CurrentEnemiesInRange[CurrentEnemiesInRange.Num() - 1]] = IndexOfEnemyToRemove;
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("new index for enemy that was swapped is: %d"), IndicesForEnemiesInRange[CurrentEnemiesInRange[CurrentEnemiesInRange.Num() - 1]]));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("new index for enemy that was swapped is: %d"), IndicesForEnemiesInRange[CurrentEnemiesInRange[CurrentEnemiesInRange.Num() - 1]]));
 				GLog->Log(FString::Printf(TEXT("new index for enemy that was swapped is: %d"), IndicesForEnemiesInRange[CurrentEnemiesInRange[CurrentEnemiesInRange.Num() - 1]]));
 				// perform a remove at swap on the current enemies in range TArray swapping the back element 
 				// with the one we mark at the specifc index to remove(which is why we perform the swap above to ensure the map 
@@ -165,7 +165,7 @@ void AProjectileTowerBase::ShootProjectile(FVector Position,FRotator Rotation)
 	if (HasAuthority()) {
 		ATowerProjectileBase* ProjectilRef = World->SpawnActor<ATowerProjectileBase>(Projectile, FTransform(Rotation, Position, FVector::OneVector), ProjectileSpawnParameters);
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Ballista shooting projectile")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Ballista shooting projectile")));
 		if (ProjectilRef != nullptr) {
 			ProjectilRef->SetInitialPitch(Rotation.Pitch);
 			ProjectilRef->SetEnemyTarget(EnemySingleTarget); 
@@ -220,7 +220,7 @@ void AProjectileTowerBase::TrackEnemies(FVector Location)
 			GLog->Log(FString::Printf(TEXT("Projectile Batch Index Was Too Large For Current Batch Resetting")));
 
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Starting batch index is %d "), ProjectileBacthIndex));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Starting batch index is %d "), ProjectileBacthIndex));
 		GLog->Log(FString::Printf(TEXT("Starting batch index is %d "), ProjectileBacthIndex));
 		int StartingBatchIndex = ProjectileBacthIndex;
 		int MostOptimalIndex = 0;
@@ -237,7 +237,7 @@ void AProjectileTowerBase::TrackEnemies(FVector Location)
 				!World->LineTraceSingleByChannel(LOSHitResultForBatching, Location, CurrentEnemiesInRange[ProjectileBacthIndex]->GetActorLocation(), TowerNoLOSChannel)
 				) {
 
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy found during LOS batching number %d "), ProjectileBacthIndex));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy found during LOS batching number %d "), ProjectileBacthIndex));
 				GLog->Log(FString::Printf(TEXT("Enemy found during LOS batching number %d "), ProjectileBacthIndex));
 
 				// mark the batch as successful and record the new min dist and set the new chosen enemy from the batch
@@ -259,7 +259,7 @@ void AProjectileTowerBase::TrackEnemies(FVector Location)
 				CurrentyActive = true;
 				NoTargetsInRange = false;
 				CurrentEnemyOutOfRange = false;
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Found optimal enemy from batch index was %d "), MostOptimalIndex));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Found optimal enemy from batch index was %d "), MostOptimalIndex));
 				GLog->Log(FString::Printf(TEXT("Found optimal enemy from batch index was %d "), MostOptimalIndex));
 
 				
@@ -280,7 +280,7 @@ void AProjectileTowerBase::SortedClosestEnemiesInRange()
 	{
 			float ToCurrentTarget = (target.GetActorLocation() - GetActorLocation()).SquaredLength();
 			float ToOtherTarget = (Other.GetActorLocation() - GetActorLocation()).SquaredLength();
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Sort Called for enemy")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Sort Called for enemy")));
 			GLog->Log(FString::Printf(TEXT("Sort Called for enemy ")));
 			return (((AActor*)EnemySingleTarget) != &target) && ToCurrentTarget < ToOtherTarget;
 

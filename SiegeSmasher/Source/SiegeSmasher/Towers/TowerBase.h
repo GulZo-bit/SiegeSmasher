@@ -30,6 +30,11 @@
  #define EnemyObjects ECC_GameTraceChannel3
 #endif // !TowerPlacementBox
 
+#ifndef DemonFist
+ #define DemonFist ECC_GameTraceChannel12,
+#endif // !DemonFist
+
+
 
 
 

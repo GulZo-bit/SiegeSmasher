@@ -53,7 +53,7 @@ void AFloorSpikeTrapTower::ApplyBleedToEnemy(AEnemyBase* Enemy)
 	// if the enemy alrwayd has the bleed status effect
 	if (Enemy->CheckHasTowerStatusEffect(TowerMainStatusEffect)) {
 		
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Enemy aleady had status effect increasing duration")));
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Enemy aleady had status effect increasing duration")));
 	   // stack its duration rather than reapplying it
 		Enemy->IncreaseTowerStatusEffectDuration(TowerMainStatusEffect,
 			MainStatusEffectDuration * MainStatusEffectIncreaseScalar,PlayerRef);
@@ -61,7 +61,7 @@ void AFloorSpikeTrapTower::ApplyBleedToEnemy(AEnemyBase* Enemy)
 		return;
 	}
 	// if the enemy didint have the bleed status effect
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Enemy did not have status effect")));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT("Enemy did not have status effect")));
 	// apply the status effect and activate the bleed component on the enemy
 	Enemy->ApplyTowerStatusEffect(TowerMainStatusEffect); 
 	// set up the duration for the status effect and set the assinged player ref who's score/kills should be incremented if the enemy
@@ -73,7 +73,7 @@ void AFloorSpikeTrapTower::ApplyBleedToEnemy(AEnemyBase* Enemy)
 
 void AFloorSpikeTrapTower::TowerSetUp() {
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower SETUP ")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower SETUP ")));
 
 	/// in this cas rthis tower uses the tower timeline so we bind the overriden methods for the tower timeline call backs 
 	//provided by the tower base class 
@@ -104,7 +104,7 @@ void AFloorSpikeTrapTower::TowerTimeLineEnd() {
 
 	// when the timline reaches its end and we are the authoritative instance
 	if ( HasAuthority() && TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower time line end called %f"), TowerTimeLine->GetPlaybackPosition()));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower time line end called %f"), TowerTimeLine->GetPlaybackPosition()));
 
 		// we require a reset to reverse the time line and bring the spikes down 
 		RequiresReset = true;
@@ -182,7 +182,7 @@ void AFloorSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
 	// if we are currenlty able to attack the enemy
 	if ( SpikesUp || RequiresReset ) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT(" Spike Trap Damaging enemy")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT(" Spike Trap Damaging enemy")));
 		// deal the initial damage
 		Enemy->DamageEnemy(TowerDamage);
 		

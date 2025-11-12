@@ -32,7 +32,7 @@ AWallSpikeTrapTower::AWallSpikeTrapTower()
 
 void AWallSpikeTrapTower::TowerSetUp() {
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower SETUP ")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower SETUP ")));
 
 	TowerTimeLineInterpEvent.BindUFunction(this, FName("TowerTimeLineInterp"));
 	TowerEndAction.BindUFunction(this, FName("TowerTimeLineEnd")); 
@@ -69,7 +69,7 @@ void AWallSpikeTrapTower::TowerTimeLineEnd() {
 
 	// if we have authority and the time line has reached its max value when this time line call back is executed
 	if (HasAuthority() && TowerTimeLine->GetPlaybackPosition() >= 1.0f) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower time line end called %f"), TowerTimeLine->GetPlaybackPosition()));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower time line end called %f"), TowerTimeLine->GetPlaybackPosition()));
 		
 		// update variables associated with the current state of the tower 
 		HasSwung = true;
@@ -91,7 +91,7 @@ void AWallSpikeTrapTower::TowerDormant(float& DeltaTime) {
 	// if  cooldowns for resetting the wall spike trap tower have been met 
 	if (HasAuthority() && StartedReset && !TowerTimeLine->IsReversing() && (CoolDownAfterReset -= DeltaTime) <= 0.0f){
 		 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower fully reset")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower fully reset")));
 		// reset cooldwon timer during reset
 		CoolDownAfterReset = MaxCoolDownAfterReset;
 		// alow tirgger box to detect enemies ensuring that the collision is synced across all connected machines
@@ -111,7 +111,7 @@ void AWallSpikeTrapTower::TowerActive(float& DeltaTime) {
 	// if we have hit all the conditions to perform the action associated with this tower
 	if (HasAuthority() && !RequiresReset && !IsSwinging && !TowerTimeLine->IsReversing()) {
 	      
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower begin swing ")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower begin swing ")));
 		// begin swing
 		IsSwinging = true;
 		// enable colllision on the hit box swining out
@@ -145,7 +145,7 @@ void AWallSpikeTrapTower::TowerReset()
 		MultiCast_SetTowerHitBoxEnabled(ECollisionEnabled::NoCollision);
 		// not active
 		CurrentyActive = false;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower starting reset ")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Tower starting reset ")));
 		// we have no longer swung out
 		HasSwung = false; 
 		// reverse the time,line play back position on all connected machines 
@@ -167,7 +167,7 @@ void AWallSpikeTrapTower::HandleNewEnemy(AEnemyBase * Enemy)
 void AWallSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
 	
 
-		  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Wall Spike Trap Damaging enemy")));
+		  //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Wall Spike Trap Damaging enemy")));
 		
 		  if (HasAuthority()) {
 			  // if we are able to attack the enemy and have authority on the server
@@ -182,7 +182,7 @@ void AWallSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
 
 				  IncrementAssignedPlayersScore(Enemy->GetScoreIncOnKill() * (int)(Enemy->GetHealth() <= 0.0f)); */
 
-				  GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Incremeting score wall spike trap score ")));
+				  //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Incremeting score wall spike trap score ")));
 			  }
 		  }
 }

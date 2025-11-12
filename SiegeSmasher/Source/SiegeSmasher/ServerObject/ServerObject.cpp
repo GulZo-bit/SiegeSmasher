@@ -67,7 +67,7 @@ void AServerObject::IncrementPlayerCount()
    // object we are modififying has a host and if they do we also update and refresh their leaderboard to show the new player 
    if (Host != nullptr) {
 
-	   GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing server leaderboard new player was added")));
+	   GLog->Log(FString::Printf(TEXT("Refreshing server leaderboard new player was added")));
 
 	   Host->GetPlayerWidget()->RefreshPlayerLeaderboardInfo(); 
    }
