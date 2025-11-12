@@ -12,6 +12,10 @@
   #define TowerPlacementBoxObjectType ECC_GameTraceChannel9
 #endif // !TowerPlacementBoxObjectType
 
+
+// this is a dummy class for when the player is placing the tower it doesnt have any functionaility that the associated tower has but it 
+// has the necessary infomration to assits with placing the towers such as the size of their placement box to see if they will algin to a surface
+// and the cost of the tower to see if it can be placed based on the players points
 UCLASS()
 class SIEGESMASHER_API ATowePrePlaceObjectHelper : public AActor
 {

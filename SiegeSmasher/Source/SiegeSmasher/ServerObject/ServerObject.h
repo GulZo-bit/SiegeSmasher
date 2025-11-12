@@ -153,7 +153,6 @@ public:
 
 	void IncrementPlayerWaveNumber();
 	AMainCharacterTest* GetLocalPlayer();
-	//FPlayerLeaderBoardInfo* GetPlayerInfo(int PlayerId);
 protected:
 	UFUNCTION()
 	void OnRep_LeaderBoardState(FLeaderboardItems Old);

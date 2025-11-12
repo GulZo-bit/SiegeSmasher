@@ -19,6 +19,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	// configurable optiojns fo rthe spawn point that can be set as properties on the spawn point blueprint 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnPoint");
 	float AllocatedSpawnTimeMin = 1.5f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnPoint");
@@ -33,7 +34,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	float GetNewSpawnTime();
+	// spawn a new enemy
 	AEnemyBase* SpawnEnemy(AEnemyBase* EnemyRef);
+	//reset an existing enemy and move them to location of spawn point
 	AEnemyBase* SpawnAndResetExistingEnemyInstance(AEnemyBase* EnemyRef);
 	void ResetCoolDownTimer();
 	bool IsAvailable();

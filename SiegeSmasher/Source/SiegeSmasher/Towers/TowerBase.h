@@ -121,8 +121,7 @@ protected:
 	//(they have performed their action)
 	UFUNCTION()
 	virtual void TowerTimeLineEnd();
-	// represent  the towers inactive state
-	virtual void TowerDormant(float& DeltaTime);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTriggerBox")
 	UBoxComponent* TriggerRangeBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerTriggerBoxDim")
@@ -170,7 +169,8 @@ protected:
 
 
 	virtual void HandleNewEnemy(AEnemyBase* EnemyBase); 
-
+	// represent  the towers inactive state
+	virtual void TowerDormant(float& DeltaTime);
 	// maniuplate the towers state when the reset timer is finished 
 	virtual void TowerReset();
 	// called in begin play of base class allowing child classes to set up any extra variables they need 

@@ -35,6 +35,7 @@ void ATowerProjectileBase::BeginPlay()
 {
 
 	Super::BeginPlay();
+	// add the binding to the collision of the static mesh for it to damage enemies on collision
 	ProjectileMesh->OnComponentBeginOverlap.AddDynamic(this, &ATowerProjectileBase::OnOverLapBegin);
 	World = GetWorld();
 
@@ -42,10 +43,10 @@ void ATowerProjectileBase::BeginPlay()
 
 void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 
-	
+	// if we can succesfully cast to an enemy
 		if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
 
-			
+			// call the generic damage functionn across all enemies which will dmaage the enemy on the server side and replciate to all clients
 			Enemy->DamageEnemy(Damage,PlayerRef);
 			
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Tower projectile hitting enemy")));
@@ -53,7 +54,7 @@ void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 
 
 		}
-
+		// if the projectile overlaps with anything destroy it 
 	    World->DestroyActor(this);
 
 
@@ -86,7 +87,7 @@ void ATowerProjectileBase::SetEnemyTarget(AActor* Enemy)
 
 void ATowerProjectileBase::MoveToTarget(float DeltaTime)
 {
-	
+	// track the target if they exist 
 	if (Target != nullptr) {
 		TargetPosition = Target->GetActorLocation(); 
 
@@ -94,6 +95,7 @@ void ATowerProjectileBase::MoveToTarget(float DeltaTime)
 	}
 
 	
+	// lerp the projectile towards the enemy target while adjusting its rotation accordingly 
 	FVector CurrentDifference = TargetPosition - GetActorLocation(); 
 
 	double currentRotationAngleYaw = atan2(CurrentDifference.Y,CurrentDifference.X);  
@@ -101,7 +103,7 @@ void ATowerProjectileBase::MoveToTarget(float DeltaTime)
 
 	FQuat TravelRot = FRotator(InitalPitch, FMath::RadiansToDegrees(currentRotationAngleYaw),0.0f).Quaternion();
 
-	
+
 
 	SetActorLocation(FMath::VInterpConstantTo(GetActorLocation(), TargetPosition, DeltaTime, ProjectileSpeed));
 
@@ -115,16 +117,7 @@ void ATowerProjectileBase::SetPlayerRef(AMainCharacterTest* PlayerPtr) {
 	PlayerRef = PlayerPtr;
 }
 
-void ATowerProjectileBase::IncrementPlayerScore(int Increment) {
 
-	if (PlayerRef != nullptr && HasAuthority()) {
-
-		PlayerRef->IncrementPlayerScore(Increment);
-		
-	}
-
-
-}
 
 
 void ATowerProjectileBase::SetInitialPitch(float Pitch)
