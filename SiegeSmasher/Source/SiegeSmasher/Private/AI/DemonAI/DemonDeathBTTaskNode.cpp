@@ -17,6 +17,7 @@ EBTNodeResult::Type UDemonDeathBTTaskNode::ExecuteTask(UBehaviorTreeComponent& O
 	AAIController* Controller = OwnerComp.GetAIOwner();
 	APawn* ControlledPawn = Controller->GetPawn();
 
+	//Plays death animation using the BT.
 	if (ControlledPawn != nullptr)
 	{
 		AAIDemon* Demon = Cast<AAIDemon>(ControlledPawn);

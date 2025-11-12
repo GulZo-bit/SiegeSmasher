@@ -20,6 +20,7 @@ EBTNodeResult::Type UAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& Owner
 	AAIController* Controller = OwnerComp.GetAIOwner();
 	APawn* ControlledPawn = Controller->GetPawn();
 
+	//Plays attack animation using the BT.
 	if (ControlledPawn != nullptr)
 	{
 		AAICharTest* Enemy = Cast<AAICharTest>(ControlledPawn);

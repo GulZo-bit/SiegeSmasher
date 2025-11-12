@@ -105,10 +105,6 @@ protected:
 	void Multicast_AnimIsDead_Implementation(bool bStore);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SetCollision(bool bStore);
-	void Multicast_SetCollision_Implementation(bool bStore);
-
-	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ResetOnDeath();
 
 	void Multicast_ResetOnDeath_Implementation();
@@ -116,8 +112,6 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ResetOnSpawn();
 	void Multicast_ResetOnSpawn_Implementation();
-
-	virtual void StopAIBehaviour();
 
 	bool bHasBeenReset = false;
 

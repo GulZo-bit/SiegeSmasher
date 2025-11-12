@@ -17,6 +17,7 @@ EBTNodeResult::Type UDemonAttackBTTaskNode::ExecuteTask(UBehaviorTreeComponent& 
 	AAIController* Controller = OwnerComp.GetAIOwner();
 	APawn* ControlledPawn = Controller->GetPawn();
 
+	//Plays attack animation using the BT.
 	if (ControlledPawn != nullptr)
 	{
 		

@@ -88,29 +88,32 @@ void AAICharTest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	UE_LOG(LogTemp, Warning, TEXT("Vampire Current Health: %f Percent"), CurrentHealth);
+	//If for when the enemy is dying.
 	if (this->GetHealth() <= 0)
 	{
-		if (AnimInstance != nullptr)
+		if (AnimInstance != nullptr && AnimInstance->Montage_IsPlaying(DeathMontage))
 		{
-			if (AnimInstance->Montage_IsPlaying(DeathMontage))
-			{
-				float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
+			float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
 
-				if (MontageTimeStore >= 2.5f)
-				{
-					DecrementWaveEnemyAliveCount();
-					CubeStore->SetActorHiddenInGame(false);
-					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
-					Count = StartTime;
-					this->ResetEnemyOnDeath();
-					Sword->ResetSwordOnDeath();
-					bCanActorMove = false;
-					bDeathAnimFinished = true;
-				}
+			//We need to decrement their contribution to the wave count.
+			//Set all their componenets to be hidden.
+			//Reset all their values
+			if (MontageTimeStore >= 2.5f)
+			{
+				DecrementWaveEnemyAliveCount();
+				CubeStore->SetActorHiddenInGame(false);
+				CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+				Count = StartTime;
+				this->ResetEnemyOnDeath();
+				Sword->ResetSwordOnDeath();
+				bCanActorMove = false;
+				bDeathAnimFinished = true;
 			}
+			
 		}
 	}
 
+	//If the enemy is alive.
 	else
 	{
 		bDeathAnimFinished = false; 
@@ -118,6 +121,7 @@ void AAICharTest::Tick(float DeltaTime)
 			Sword->ResetSwordOnRespawn();
 		}
 		
+		//We do the math to move the spline controller actor so that the nemy can follow it.
 		SoundCount = 0;
 		if (bCanActorMove == true && SplineControllerStore.Num() > 0)
 		{
@@ -193,6 +197,7 @@ void AAICharTest::Multicast_PlayAttackMontage_Implementation()
 	}
 }
 
+//Plays the death animation
 void AAICharTest::PlayDeathMontage()
 {
 	if (GetLocalRole() < ROLE_Authority)
@@ -206,6 +211,7 @@ void AAICharTest::PlayDeathMontage()
 	}
 }
 
+//Removing the enemy when they reach the throne.
 void AAICharTest::EnemyReachedBase()
 {
 	DecrementWaveEnemyAliveCount();

@@ -63,6 +63,7 @@ void ADemonAIController::OnPossess(APawn* InPawn)
 	AIPerception->OnTargetPerceptionForgotten.AddDynamic(this, &ADemonAIController::HandleTargetPerceptionForgotten);
 }
 
+//Checks the distance to the tower that has been seen via math.
 void ADemonAIController::DistanceToTower()
 {
 	FVector TowerLocStore;
@@ -100,13 +101,16 @@ void ADemonAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Always checking death because if the enemy dies we need to stop their AI behaviour
 	CheckDeath();
 
+	//If the tower is seen we need to check the enemies disatnce to them. 
 	if (GetBlackboardComponent()->GetValueAsBool(TEXT("bTowerSeen")) == true)
 	{
 		DistanceToTower();
 	}
 	
+	//If we can see the tower but are not in range we move towards the tower.
 	if (GetBlackboardComponent()->GetValueAsBool(TEXT("bTowerSeen")) == true && GetBlackboardComponent()->GetValueAsBool(TEXT("bInRange")) == false)
 	{
 		GetBlackboardComponent()->SetValueAsVector(TEXT("TowerLocation"), TowerStore->GetActorLocation());
@@ -114,7 +118,7 @@ void ADemonAIController::Tick(float DeltaTime)
 	}
 
 	
-	
+	//Their default is to move to the the spline movement actor which is moving along the spline.
 	GetBlackboardComponent()->SetValueAsObject(TEXT("SplineMovementActor"), CubeStore);
 	
 }
@@ -124,11 +128,9 @@ void ADemonAIController::HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus
 	
 	if (Actor != nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Actor is not null")));
-
+		//If AI Perception see's the tower we set the blackboard component to true.
 		if (Stim.WasSuccessfullySensed())
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Seen Tower")));
 			GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), true);
 
 			if (TowerStore == nullptr)
@@ -146,7 +148,6 @@ void ADemonAIController::HandleTargetPerceptionUpdate(AActor* Actor, FAIStimulus
 void ADemonAIController::HandleTargetPerceptionForgotten(AActor* Actor)
 {
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.0F, FColor::Red, FString::Printf(TEXT("Forgotten Tower")));
 	GetBlackboardComponent()->SetValueAsBool(TEXT("bTowerSeen"), false);
 	GetBlackboardComponent()->SetValueAsBool(TEXT("bInRange"), false);
 	TowerStore = nullptr;
@@ -156,6 +157,7 @@ void ADemonAIController::HandleTargetPerceptionForgotten(AActor* Actor)
 
 void ADemonAIController::CheckDeath()
 {
+	//If the enemy dies we need to play their death animation and disable their behaviour tree.
 	if (Demon->GetHealth() <= 0)
 	{
 		GetBlackboardComponent()->SetValueAsBool(TEXT("bIsDead"), true);
@@ -171,6 +173,7 @@ void ADemonAIController::CheckDeath()
 		
 	}
 
+	//Once they get respawned we need to re-enable their behaviour tree.
 	else if(Demon->getHasBeenReset() == true)
 	{
 		RunBehaviorTree(AIBehavior);

@@ -40,6 +40,7 @@ void ADemonFists::Tick(float DeltaTime)
 
 void ADemonFists::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	//On overlap with a tower we apply damage to them.
 	if (Cast<ATowerBase>(OtherActor))
 	{
 		if (bHit == false)
@@ -52,6 +53,7 @@ void ADemonFists::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AAct
 	}
 }
 
+//Once the overlap is done we don't want to be hitting the tower anymore so we won't apply the damage.
 void ADemonFists::OnOverLapEnd(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (Cast<ATowerBase>(OtherActor))

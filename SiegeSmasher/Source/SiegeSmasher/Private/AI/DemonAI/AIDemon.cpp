@@ -35,7 +35,6 @@ void AAIDemon::BeginPlay()
 		LeftFist->SetOwner(this);
 	}
 
-	/*AIPerception->OnPerceptionUpdated.AddDynamic(this, &AAIDemon::HandlePerceptionUpdate);*/
 	//Spline controller stuff.
 	//Get all the spline controllers in the scene.
 	TArray<AActor*> SplineControllerAsActor;
@@ -91,32 +90,35 @@ bool AAIDemon::getDeathAnimFinsihed()
 void AAIDemon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Demon tick enabled")));
 	UE_LOG(LogTemp, Warning, TEXT("Demon Current Health: %f Percent"), CurrentHealth);
+
+	//If for when the enemy is dying.
 	if (this->GetHealth() <= 0)
 	{
-		if (AnimInstance != nullptr)
+		if (AnimInstance != nullptr && AnimInstance->Montage_IsPlaying(DeathMontage))
 		{
-			if (AnimInstance->Montage_IsPlaying(DeathMontage))
-			{
-				float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
+			//We need to decrement their contribution to the wave count.
+			//Set all their componenets to be hidden.
+			//Reset all their values
+			float MontageTimeStore = AnimInstance->Montage_GetPosition(DeathMontage);
 
-				if (MontageTimeStore >= 4.0f)
-				{
-					DecrementWaveEnemyAliveCount();
-					CubeStore->SetActorHiddenInGame(false);
-					CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
-					Count = StartTime;
-					this->ResetEnemyOnDeath();
-					RightFist->ResetFistsOnDeath();
-					LeftFist->ResetFistsOnDeath();
-					bCanActorMove = false;
-					bDeathAnimFinished = true;
-				}
+			if (MontageTimeStore >= 4.0f)
+			{
+				DecrementWaveEnemyAliveCount();
+				CubeStore->SetActorHiddenInGame(false);
+				CubeStore->SetActorTransform(SplineControllerStore[SplineNum]->getSpline()->GetComponentTransform());
+				Count = StartTime;
+				this->ResetEnemyOnDeath();
+				RightFist->ResetFistsOnDeath();
+				LeftFist->ResetFistsOnDeath();
+				bCanActorMove = false;
+				bDeathAnimFinished = true;
+				
 			}
 		}
 	}
 
+	//The enemy is alive. We do the math to move the spline controller actor so that the nemy can follow it
 	else
 	{
 		bDeathAnimFinished = false;
@@ -163,6 +165,7 @@ void AAIDemon::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+//Play attack animation
 void AAIDemon::PlayAttack()
 {
 	if (GetLocalRole() < ROLE_Authority)
@@ -203,6 +206,7 @@ void AAIDemon::Multicast_PlayAttackMontage_Implementation()
 	}
 }
 
+//Play death animation
 void AAIDemon::PlayDeathMontage()
 {
 	if (GetLocalRole() < ROLE_Authority)
@@ -216,6 +220,7 @@ void AAIDemon::PlayDeathMontage()
 	}
 }
 
+//Demon has reached the end of the level and needs to be reset.
 void AAIDemon::EnemyReachedBase()
 {
 	DecrementWaveEnemyAliveCount();
