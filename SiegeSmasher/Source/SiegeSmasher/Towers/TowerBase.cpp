@@ -465,26 +465,18 @@ FGenericTeamId ATowerBase::GetGenericTeamId() const
 // Called every frame
 void ATowerBase::Tick(float DeltaTime)
 {
-
-
-
 	Super::Tick(DeltaTime); 
 	// if the tower should be in the active state
 	if (CurrentyActive) {
-	 
-		// call the overideen tower active method implemented in the child class 
+		// call the overidden tower active method implemented in the child class 
 		TowerActive(DeltaTime); 
-		
-		
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("wait time to reset %f"), WaitTimeToReset));
-		// if we are the authoriative tower and have hit a point in the active state where a reset is required 
+		// if we are the authoritative tower and have hit a point in the active state where a reset is required 
 		if (HasAuthority() && RequiresReset && (WaitTimeToReset -= DeltaTime) <= 0.0f) {
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("reset called  wait time to reset %f"), WaitTimeToReset));
 			// set requires reset to false 
 			RequiresReset = false;
 			// set the wait time for resetting back to the max set in the child via blueprint 
 			WaitTimeToReset = MaxWaitTimeToReset;
-			// call the reset method overriden by the child tower class  
+			// call the reset method overidden by the child tower class  
 			TowerReset();
 				
 		}

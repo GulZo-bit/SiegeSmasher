@@ -24,7 +24,7 @@ void ASpawnPoint::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
+// get a ranomd amount of time that will be allocated to the spawn point for it to spawn enemies
 float ASpawnPoint::GetNewSpawnTime()
 {
 	return random.FRandRange(AllocatedSpawnTimeMin, AllocatedSpawnTimeMax);
@@ -32,38 +32,42 @@ float ASpawnPoint::GetNewSpawnTime()
 
 AEnemyBase* ASpawnPoint::SpawnEnemy(AEnemyBase* EnemyRef)
 {
+	// spawning an new instance of an enemy ensuring that they always spawn despite collision to avoid any null reference cases 
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	return GetWorld()->SpawnActor<AEnemyBase>(EnemyRef->GetClass(), GetActorTransform(), spawnParameters);
 
 }
 
+// reset an existing enemy and set their location to the spawn point
 AEnemyBase* ASpawnPoint::SpawnAndResetExistingEnemyInstance(AEnemyBase* EnemyRef)
 {
+	
 	EnemyRef->ResetOnSpawn();
 	EnemyRef->SetActorLocation(GetActorLocation());
 	return EnemyRef;
 }
 
+// spawn points have a cool down timer to avoid enemies overlapping each other when they get set to the spawn points location
 void ASpawnPoint::ResetCoolDownTimer()
 {
 
 	CoolDownTimer = random.FRandRange(CoolDownTimerMin, CoolDownTimerMax);
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("reseting cool donw timer inside of spawn point new value is %f"), CoolDownTimer));
-	//GLog->Log(FString::Printf(TEXT("reseting cool donw timer inside of spawn point new value is %f"), CoolDownTimer));
-
-
+	
 
 }
 
+// get if the spawn point is available and not on cooldown 
 bool ASpawnPoint::IsAvailable()
 {
 
+	// if the cool down timer has reached 0
 	if (CoolDownTimer <= 0.0f) {
+		// reset the cool down timer
 		ResetCoolDownTimer();
 	}
+	// subtract delta time(differnce in time between last and current frame) from the spawn point coold down timer ensuring it is synced when running on different machines
 	CoolDownTimer -= GetWorld()->GetDeltaSeconds();
-	//GLog->Log(FString::Printf(TEXT("current cool donw timer inside of current spawn point is %f"), CoolDownTimer));
 
 	return CoolDownTimer <= 0.0f;
 }

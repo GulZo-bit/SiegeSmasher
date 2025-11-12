@@ -206,7 +206,7 @@ void AServerObject::LogMap()
 
 void AServerObject::OnRep_LeaderBoardState(FLeaderboardItems Old)
 {
-	// when we recive a replciation call back for our TArray that is storing the leaderboard state
+	// when we recive a replication call back for our TArray that is storing the leaderboard state
 	// we track if the Array size increased meaning a player was added on the server side 
 	// so we update the player UI using the player ref that is assigned on begin play 
 	// (this being the locally controlled player for this server object on the client) 
@@ -214,17 +214,14 @@ void AServerObject::OnRep_LeaderBoardState(FLeaderboardItems Old)
 	// which player they are
 	if (Old.Items.Num() < LeaderBoardInfo.Items.Num() && PlayerRef->GetPlayerWidget()) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Green, FString::Printf(TEXT("Refreshing client leaderboard new player was added %d"),CurrentPlayerCount));
-
+		// update the players leaderboard info as we a new player has joined
 		PlayerRef->GetPlayerWidget()->RefreshPlayerLeaderboardInfo();
-
+		// ensure that the players tag is highlighted for them on the leaderboard so they
+		// can easily find where they are on the leaderboard and know which player they are 
 		PlayerRef->HighlightPlayerTagOnLeaderboard();
 
 
 	}
-
-	
-
 }
 
 void AServerObject::IncrementPlayerWaveNumber()

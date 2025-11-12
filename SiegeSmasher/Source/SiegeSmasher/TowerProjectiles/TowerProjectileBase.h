@@ -56,7 +56,6 @@ public:
 	void SetInitialPitch(float Pitch); 
 	
 	void SetPlayerRef(AMainCharacterTest* PlayerPtr);
-	void IncrementPlayerScore(int Increment);
 private:
 	
 };
