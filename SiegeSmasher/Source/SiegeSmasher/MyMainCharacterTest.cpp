@@ -1290,20 +1290,30 @@ void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
 
 }
 // used to increment the players individual score 
+
 void AMainCharacterTest::IncrementPlayerScore(int Increment)
 {
-	
-	if (HasAuthority()) { 
 
+	if (HasAuthority()) {
 
-		PlayerPoints += Increment;  
-		if (IsLocallyControlled()) {
-			UpdatePlayerScoreUi();
-		}
+		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Updtaing leaderboard on server")));
+
+		PlayerPoints += Increment;
+		UpdateLeaderBoardInfo();
+		UpdatePlayerScoreUi();
+		
+
+	}
+	else if (IsLocallyControlled()) {
+		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("updating leaderboard on client")));
+
+		Server_IncrementPlayerScore(Increment);
+
 	}
 
 
 }
+
 
 // used to decrement the players individual score 
 
@@ -1326,6 +1336,16 @@ void AMainCharacterTest::DecrementPlayerScore(int Increment)
 
 }
 
+
+void AMainCharacterTest::Server_IncrementPlayerScore_Implementation(int increment)
+{
+
+	PlayerPoints += increment;
+	UpdateLeaderBoardInfo();
+
+
+}
+
 // increment player kills on server and braodcasted it to the associated client object 
 void AMainCharacterTest::IncrementPlayerKills()
 {
@@ -1333,16 +1353,50 @@ void AMainCharacterTest::IncrementPlayerKills()
 	
 	if (HasAuthority()) {
 		PlayerKills++; 
+
+		UpdateLeaderBoardInfo(); 
+	}
+	else if (IsLocallyControlled()) {
+		Server_UpdatePlayerInfoKills();
 	}
 
 }
+
+void AMainCharacterTest::Server_UpdatePlayerInfoKills_Implementation()
+{
+
+	PlayerKills++;
+	UpdateLeaderBoardInfo();
+
+
+}
+
+
 // overload of incrementing player kills to pass in a value rather than incrementing by one
 void AMainCharacterTest::IncrementPlayerKills(int Increment)
 {
 	if (HasAuthority()) {
+		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Updtaing leaderboard on server")));
 		PlayerKills += Increment;
+		UpdateLeaderBoardInfo();
 	}
+	else if(IsLocallyControlled())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Updtaing leaderboard on client")));
+
+		Server_UpdatePlayerInfoKillsInc(Increment);
+	}
+
 }
+
+
+
+void AMainCharacterTest::Server_UpdatePlayerInfoKillsInc_Implementation(int inc)
+{
+	PlayerKills += inc;
+	UpdateLeaderBoardInfo();
+}
+
 /// get the players hud widget 
 UChargeWidget* AMainCharacterTest::GetPlayerWidget()
 {

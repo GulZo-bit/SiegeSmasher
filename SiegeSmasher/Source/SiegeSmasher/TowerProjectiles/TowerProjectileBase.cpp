@@ -47,8 +47,9 @@ void ATowerProjectileBase::OnOverLapBegin(UPrimitiveComponent* OverlappedComp, c
 		if (AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor)) {
 
 			// call the generic damage functionn across all enemies which will dmaage the enemy on the server side and replciate to all clients
-			Enemy->DamageEnemy(Damage,PlayerRef);
-			
+			if (HasAuthority()) {
+				Enemy->DamageEnemy(Damage, PlayerRef);
+			}
 
 
 

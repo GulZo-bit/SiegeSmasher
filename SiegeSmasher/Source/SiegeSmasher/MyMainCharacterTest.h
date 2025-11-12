@@ -135,8 +135,20 @@ public:
 
 	void IncrementPlayerScore(int Increment);
 	void DecrementPlayerScore(int Increment);
-	void IncrementPlayerKills(); 
+	UFUNCTION(Server,Reliable)
+	void Server_IncrementPlayerScore(int increment);
+	void Server_IncrementPlayerScore_Implementation(int increment);
+	void IncrementPlayerKills();
+	UFUNCTION(Server,Reliable)
+	void Server_UpdatePlayerInfoKills();
+	void Server_UpdatePlayerInfoKills_Implementation();
+
 	void IncrementPlayerKills(int Increment);
+
+	UFUNCTION(Server,Reliable)
+	void Server_UpdatePlayerInfoKillsInc(int inc);
+	void Server_UpdatePlayerInfoKillsInc_Implementation(int inc);
+
 	UChargeWidget* GetPlayerWidget();
 
 	//input for triggering the shooting action

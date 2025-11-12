@@ -58,11 +58,10 @@ void AEnemyBase::DamageEnemy(float Damage, AMainCharacterTest* PlayerRef)
 	if (HasAuthority() && PlayerRef != nullptr) {
 		CurrentHealth -= Damage;
 		bool BelowZero = CurrentHealth <= 0.0f;
-		PlayerRef->IncrementPlayerScore(ScoreIncrementOnKill * BelowZero);
+		PlayerRef->IncrementPlayerScore(ScoreIncrementOnKill * BelowZero );
 		PlayerRef->IncrementPlayerKills(1 * BelowZero);
 		PlayerRef->IncrementPlayerScore(ScoreIncrementOnHit);
 	   
-		PlayerRef->UpdateLeaderBoardInfo();
 
 	}
 

@@ -123,7 +123,6 @@ void AMCArrow::IncrementPlayerPointsRef(int ScoreIncrement)
 	if (PlayerRef != nullptr ) {
 
 		PlayerRef->IncrementPlayerScore(ScoreIncrement);
-	    PlayerRef->UpdateLeaderBoardInfo();
 	}
 }
 //increases player kills count variable
@@ -132,7 +131,6 @@ void AMCArrow::IncrementPlayerKillsRef()
 	if (PlayerRef != nullptr) {
 
 		PlayerRef->IncrementPlayerKills();
-		PlayerRef->UpdateLeaderBoardInfo();
 
 
 	}

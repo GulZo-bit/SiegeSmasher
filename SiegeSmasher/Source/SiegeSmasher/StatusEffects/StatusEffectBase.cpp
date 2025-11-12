@@ -71,10 +71,9 @@ void UStatusEffectBase::SetPlayerRef(AMainCharacterTest* PlayerScorePtr)
 void UStatusEffectBase::IncrementAssignedPlayerScore(int Increment,float EnemyHealth)
 {
 	// determine if the player should gain points based on hit or kill for the status effect child class calling this method 
-	if (PlayerRef != nullptr && PlayerRef->HasAuthority()) {
+	if (PlayerRef != nullptr ) {
 		PlayerRef->IncrementPlayerScore(Increment); 
 		PlayerRef->IncrementPlayerKills(1 * (EnemyHealth <= 0.0f));
-		PlayerRef->UpdateLeaderBoardInfo();
 	}
 
 

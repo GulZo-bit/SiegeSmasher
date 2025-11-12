@@ -530,7 +530,6 @@ void ATowerBase::IncrementAssignedPlayersScore(int increment)
 
 	if (HasAuthority() && PlayerRef != nullptr) {
 		PlayerRef->IncrementPlayerScore(increment);
-		PlayerRef->UpdateLeaderBoardInfo();
 
 
 	}
