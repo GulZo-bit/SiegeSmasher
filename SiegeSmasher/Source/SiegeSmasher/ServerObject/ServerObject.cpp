@@ -119,20 +119,6 @@ void AServerObject::UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKill
 		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
 
 	}
-	/*try {
-	    LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints;
-		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
-	
-	}
-	catch (...) {
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID FOR LEADER BOARD INFO FOR SERVER OBJECT WAS NULL %d"), PlayerId));
-	}*/
-
-
-
-	
-
 	
 
 }
@@ -145,19 +131,7 @@ bool AServerObject::HasPlayerInfo(int PlayerId)
 
 
 	return PlayerId >= 0 && PlayerId < LeaderBoardInfo.Items.Num();
-	//try {
-
-	//	LeaderBoardInfo.Items[PlayerId]; 
-
-	//	return true;
-
-
-	//}
-	//catch (...) {
-
-	//	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("Player id did not exists %d"), PlayerId));
-	//	return false;
-	//}
+	
 }
 // used to check if the server object has a particualr player id on the leaderboard 
 FPlayerLeaderBoardInfo AServerObject::GetPlayerInfo(int PlayerId)
@@ -168,7 +142,6 @@ FPlayerLeaderBoardInfo AServerObject::GetPlayerInfo(int PlayerId)
 
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("COULD NOT FIND PLAYER ID WHEN REFRESHING LEADERBOARD ID: %d"), PlayerId)); 
 	
 	return FPlayerLeaderBoardInfo();
 
@@ -223,7 +196,7 @@ void AServerObject::OnRep_LeaderBoardState(FLeaderboardItems Old)
 
 	}
 }
-
+// used to set the wave number for across server and client 
 void AServerObject::IncrementPlayerWaveNumber()
 {
 	PlayerWaveNumber += 1; 

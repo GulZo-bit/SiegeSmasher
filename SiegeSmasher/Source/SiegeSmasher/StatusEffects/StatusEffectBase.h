@@ -10,6 +10,7 @@
 
 
 class AMainCharacterTest;
+// base class for tower status effects that can be applied to enemies 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SIEGESMASHER_API UStatusEffectBase : public UActorComponent
 {
@@ -22,7 +23,7 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-    
+    // properties for the status effect shared across all status effect child classes
 	float CurrentDuration = 0.0f; 
 	AEnemyBase* EnemyRef = nullptr;
 	EnemyStatusEffect StatusEffectId;

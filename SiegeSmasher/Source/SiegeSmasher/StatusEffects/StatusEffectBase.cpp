@@ -11,7 +11,7 @@ UStatusEffectBase::UStatusEffectBase()
 	PrimaryComponentTick.bCanEverTick = true;
 	
 
-	// ...
+	
 }
 
 
@@ -19,8 +19,7 @@ UStatusEffectBase::UStatusEffectBase()
 void UStatusEffectBase::BeginPlay()
 {
 	Super::BeginPlay();
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Status effect base begin play called")));
-	// ...
+	
 	SetComponentTickEnabled(false);
 
 	
@@ -31,10 +30,11 @@ void UStatusEffectBase::BeginPlay()
 // Called every frame
 void UStatusEffectBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction); 
+	// decrement the current duration of the status effect
 	CurrentDuration -= DeltaTime;
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f,FColor::Red,FString::Printf(TEXT("Bleed status effect duration %f"), CurrentDuration));
 	if (CurrentDuration <= 0.0f) {
+		/// if the duration for the status effect hit 0 
 		SetComponentTickEnabled(false); 
 
 		EnemyRef->RemoveTowerStatusEffect(StatusEffectId);
@@ -49,7 +49,6 @@ void UStatusEffectBase::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 void UStatusEffectBase::IncreaseDuration(float Increment)
 {
 	CurrentDuration += Increment;
-	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, FString::Printf(TEXT("Status effect duration increased to %f by %f"), CurrentDuration, Increment));
 
 }
 
@@ -71,7 +70,7 @@ void UStatusEffectBase::SetPlayerRef(AMainCharacterTest* PlayerScorePtr)
 
 void UStatusEffectBase::IncrementAssignedPlayerScore(int Increment,float EnemyHealth)
 {
-
+	// determine if the player should gain points based on hit or kill for the status effect child class calling this method 
 	if (PlayerRef != nullptr && PlayerRef->HasAuthority()) {
 		PlayerRef->IncrementPlayerScore(Increment); 
 		PlayerRef->IncrementPlayerKills(1 * (EnemyHealth <= 0.0f));

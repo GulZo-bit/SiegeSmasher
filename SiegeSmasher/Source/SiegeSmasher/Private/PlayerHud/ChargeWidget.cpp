@@ -12,13 +12,13 @@ void UChargeWidget::NativeConstruct() {
 	LeaderboardGrid = WidgetTree->FindWidget<UGridPanel>(FName(LeaderBoardGridPanelName));
 	LeaderboardHeader = WidgetTree->FindWidget<UBorder>(FName(LeaderBoardHeaderName));
 	if (LeaderboardGrid && LeaderboardHeader && LeaderboardBorder) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Leaderboard border found")));
+		GLog->Log(FString::Printf(TEXT("Leaderboard border found")));
 		
 		GenerateLeaderBoard();
 	}
 		
 	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("NO LEADER BOARD border ")));
+		GLog->Log(FString::Printf(TEXT("NO LEADER BOARD border ")));
 
 	}
 	
@@ -42,64 +42,50 @@ void UChargeWidget::GenerateLeaderBoard()
 	
 
 
-
+	// get the canavs slot of the leaderboard border that is created in the widget ui
 	if (UCanvasPanelSlot* LeaderboardCanvasSlot = Cast<UCanvasPanelSlot>(LeaderboardGrid->Slot)) {
-
+		// get the top left of the canavas slot of the leaderboard 
 		FVector2D LeaderboardTopLeft = LeaderboardCanvasSlot->GetPosition();
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT(" max player num %d"), MaxPlayerNum));
 		FVector2D LeaderboardSize = LeaderboardCanvasSlot->GetSize();
 		for (int i = 0; i < MaxPlayerNum; i++) {
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Itertaing max player num")));
+		    // get a position based on the defined padding for each element that will be added to the leaderboard for each possible player
 			FVector2D TextPosition = FVector2D(LeaderboardTopLeft.X, (LeaderboardTopLeft.Y + LeaderboardTextPadding * i) + LeaderboardTopPadding);
 			FString PlayerTag = LeaderBoardTagName + FString::FromInt(i + 1);
 			UTextBlock* Text = CreateText(PlayerTag);
 
 			UScaleBox* TextScaleBox = CreateScaleBox(FString("Scale " + FString::FromInt(i)));
 			LeaderboardGrid->GetParent()->AddChild(TextScaleBox);
-
+			// get the canavas slot of the textscalebox after the parenting it to the top element within the widget tree
 			UCanvasPanelSlot* TextScaleCanvasSlot = Cast<UCanvasPanelSlot>(TextScaleBox->Slot);
-
+			// set the size to the defined scale box hight within the blueprint and adjust the size to be the leaderboardsize but with padding to the right 
 			TextScaleCanvasSlot->SetSize(FVector2D(LeaderboardSize.X - LeaderboardScaleBoxRightPadding, LeaderboardScaleBoxHeight));
-
+			// set anchors to be the same as the leaderboard border so that the text remains relative to the same part of the screen
 			TextScaleCanvasSlot->SetAnchors(LeaderboardCanvasSlot->GetAnchors());
 			TextScaleCanvasSlot->SetPosition(TextPosition);
 			TextScaleBox->AddChild(Text);
 
-
-			/*Text->SetFont(LeaderboardFont);
-			Text->SetColorAndOpacity(LeaderboardTextColour);
-			Text->SetText(FText::FromString(PlayerTag));*/
-
-			/*Text->SetFont(LeaderboardFont);
-			Text->SetColorAndOpacity(LeaderboardTextColour);
-			Text->SetText(FText::FromString(PlayerTag));*/
-
-
-
-		/*	LeaderboardGrid->GetParent()->AddChild(Text);*/
-			//UCanvasPanelSlot* TextCanvasSlot = Cast<UCanvasPanelSlot>(Text->Slot);
-			// 
-
-			////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("canvas text slot is null %d "), (int)(TextCanvasSlot == nullptr)));
-			//TextCanvasSlot->SetAnchors(LeaderboardCanvasSlot->GetAnchors());
-			//TextCanvasSlot->SetPosition(TextPosition);
+			// set the visiblty of the text and the opacity 
 			Text->SetVisibility(ESlateVisibility::Visible);
 
 			Text->SetOpacity(0.0f);
+			// add the text to the tracked leaderboard items
 			LeaderBoardItems.Add(Text);
 
 		
 
 			
 		}
+		// hide every other element associated with the leaderboard 
 		 LeaderboardBorder->SetRenderOpacity(0.0f); 
          LeaderboardHeader->SetRenderOpacity(0.0f); 
 		 LeaderboardGrid->SetRenderOpacity(0.0f);
 	}
 
 }
-
+// create a text box and add it to the widget tree
 UTextBlock* UChargeWidget::CreateText(FString TextContent)
 {
 	UTextBlock* Text = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(TextContent));
@@ -110,17 +96,12 @@ UTextBlock* UChargeWidget::CreateText(FString TextContent)
 	return Text;
 }
 	
-
+// create a scale box and add it to the widget tree
 UScaleBox* UChargeWidget::CreateScaleBox(FString Name)
 {
 	UScaleBox* ScaleBox = WidgetTree->ConstructWidget<UScaleBox>(UScaleBox::StaticClass(), FName(Name));
 
 	ScaleBox->SetStretch(EStretch::ScaleToFit); 
-
-	
-
-
-
 	return ScaleBox;
 }
 
@@ -151,15 +132,16 @@ float UChargeWidget::GetHealthPercent()
 
 void UChargeWidget::HideLeaderBoard(bool ShouldHide)
 {
+	// go through all elements on the leaderboard and set their opacity based on the past in boolean
 	float NewOpacity = ((float)ShouldHide); 
-	GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Cyan, FString::Printf(TEXT("Should hide %f"), NewOpacity));
+	GLog->Log(FString::Printf(TEXT("Should hide %f"), NewOpacity));
 	LeaderboardBorder->SetRenderOpacity(NewOpacity);
 	LeaderboardHeader->SetRenderOpacity(NewOpacity); 
 	LeaderboardGrid->SetRenderOpacity(NewOpacity);
 
 	if (ServerobjectRef != nullptr) {
 		int CurrentPlayerCount = ServerobjectRef->GetPlayerCurrentCount(); 
-		GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Emerald, FString::Printf(TEXT("Server object player count %d"), CurrentPlayerCount));
+		GLog->Log((FString::Printf(TEXT("Server object player count %d"), CurrentPlayerCount)));
 		for (int i = 0; i < CurrentPlayerCount; i++) {
 			GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Emerald, FString::Printf(TEXT("Server object player count %d"), i));
 
@@ -198,7 +180,7 @@ void UChargeWidget::UpdatePlayerLeaderBoardInfo(int Points, int Kills, int Playe
 		LeaderBoardItems[PlayerId]->SetOpacity((LeaderboardBorder->GetRenderOpacity() > 0.0f));
 		return;
 	}
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID WAS NULL WHEN TRYING TO UPDATE SLOT ON LEADERBOARD")));
+    GLog->Log(FString::Printf(TEXT("PLAYER ID WAS NULL WHEN TRYING TO UPDATE SLOT ON LEADERBOARD")));
 
 	
 }
@@ -208,14 +190,11 @@ void UChargeWidget::RefreshPlayerLeaderboardInfo()
 	
 	
 	FPlayerLeaderBoardInfo info = FPlayerLeaderBoardInfo();
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), ServerobjectRef->GetPlayerCurrentCount()));
-
+	// referesh a players leaderboard adding and updating any infomration that has changed since the last update 
 	for (int i = 0; i < ServerobjectRef->GetPlayerCurrentCount(); i++) {
 
-		GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), i));
 		info = ServerobjectRef->GetPlayerInfo(i);
         
-
 		FString LeaderboardTxt = LeaderBoardTagName + FString::FromInt(i + 1) + " " + "Points:" + FString::FromInt(info.LeaderboardPlayerScore) + " Kills:" + FString::FromInt(info.LeaderboardPlayerKills);
 
 		LeaderBoardItems[i]->SetText(FText::FromString(LeaderboardTxt)); 
@@ -224,31 +203,20 @@ void UChargeWidget::RefreshPlayerLeaderboardInfo()
 
 	}
 
-	
-
-
-
-
-
 
 }
 
 
 
-
+// used to hligh a specifc players tag on the leadboard using the defined highlight colour in the blueprint 
 void UChargeWidget::HighlightPlayerTag(int PlayerIdForTag)
 {
-	try {
-		LeaderBoardItems[PlayerIdForTag]->SetColorAndOpacity(LeaderboardHighlightColour); 
+	if (PlayerIdForTag >= 0 && PlayerIdForTag < LeaderBoardItems.Num()) {
+		LeaderBoardItems[PlayerIdForTag]->SetColorAndOpacity(LeaderboardHighlightColour);
 		LeaderBoardItems[PlayerIdForTag]->SetOpacity(((float)(LeaderboardHeader->GetRenderOpacity() > 0.0f)));
 
+
 	}
-	catch (...) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID WAS NULL WHEN TRYING TO HIGHLIGH PLAYER %d"), PlayerIdForTag));
-	}
-
-
-
 
 }
 
