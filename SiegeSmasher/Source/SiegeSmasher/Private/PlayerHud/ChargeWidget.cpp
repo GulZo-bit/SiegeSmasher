@@ -12,14 +12,8 @@ void UChargeWidget::NativeConstruct() {
 	LeaderboardGrid = WidgetTree->FindWidget<UGridPanel>(FName(LeaderBoardGridPanelName));
 	LeaderboardHeader = WidgetTree->FindWidget<UBorder>(FName(LeaderBoardHeaderName));
 	if (LeaderboardGrid && LeaderboardHeader && LeaderboardBorder) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Leaderboard border found")));
 		
 		GenerateLeaderBoard();
-	}
-		
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("NO LEADER BOARD border ")));
-
 	}
 	
 	
@@ -37,7 +31,6 @@ void UChargeWidget::NativeConstruct() {
 void UChargeWidget::GenerateLeaderBoard()
 {
 	LeaderBoardItems = {};
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Bound leader board grid pannel sucessfully")));
 
 	
 
@@ -46,11 +39,9 @@ void UChargeWidget::GenerateLeaderBoard()
 	if (UCanvasPanelSlot* LeaderboardCanvasSlot = Cast<UCanvasPanelSlot>(LeaderboardGrid->Slot)) {
 
 		FVector2D LeaderboardTopLeft = LeaderboardCanvasSlot->GetPosition();
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT(" max player num %d"), MaxPlayerNum));
 		FVector2D LeaderboardSize = LeaderboardCanvasSlot->GetSize();
 		for (int i = 0; i < MaxPlayerNum; i++) {
 
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Emerald, FString::Printf(TEXT("Itertaing max player num")));
 			FVector2D TextPosition = FVector2D(LeaderboardTopLeft.X, (LeaderboardTopLeft.Y + LeaderboardTextPadding * i) + LeaderboardTopPadding);
 			FString PlayerTag = LeaderBoardTagName + FString::FromInt(i + 1);
 			UTextBlock* Text = CreateText(PlayerTag);
@@ -66,24 +57,6 @@ void UChargeWidget::GenerateLeaderBoard()
 			TextScaleCanvasSlot->SetPosition(TextPosition);
 			TextScaleBox->AddChild(Text);
 
-
-			/*Text->SetFont(LeaderboardFont);
-			Text->SetColorAndOpacity(LeaderboardTextColour);
-			Text->SetText(FText::FromString(PlayerTag));*/
-
-			/*Text->SetFont(LeaderboardFont);
-			Text->SetColorAndOpacity(LeaderboardTextColour);
-			Text->SetText(FText::FromString(PlayerTag));*/
-
-
-
-		/*	LeaderboardGrid->GetParent()->AddChild(Text);*/
-			//UCanvasPanelSlot* TextCanvasSlot = Cast<UCanvasPanelSlot>(Text->Slot);
-			// 
-
-			////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("canvas text slot is null %d "), (int)(TextCanvasSlot == nullptr)));
-			//TextCanvasSlot->SetAnchors(LeaderboardCanvasSlot->GetAnchors());
-			//TextCanvasSlot->SetPosition(TextPosition);
 			Text->SetVisibility(ESlateVisibility::Visible);
 
 			Text->SetOpacity(0.0f);
@@ -152,16 +125,13 @@ float UChargeWidget::GetHealthPercent()
 void UChargeWidget::HideLeaderBoard(bool ShouldHide)
 {
 	float NewOpacity = ((float)ShouldHide); 
-	GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Cyan, FString::Printf(TEXT("Should hide %f"), NewOpacity));
 	LeaderboardBorder->SetRenderOpacity(NewOpacity);
 	LeaderboardHeader->SetRenderOpacity(NewOpacity); 
 	LeaderboardGrid->SetRenderOpacity(NewOpacity);
 
 	if (ServerobjectRef != nullptr) {
 		int CurrentPlayerCount = ServerobjectRef->GetPlayerCurrentCount(); 
-		GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Emerald, FString::Printf(TEXT("Server object player count %d"), CurrentPlayerCount));
 		for (int i = 0; i < CurrentPlayerCount; i++) {
-			GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Emerald, FString::Printf(TEXT("Server object player count %d"), i));
 
 			LeaderBoardItems[i]->SetOpacity(NewOpacity );
 	    }
@@ -198,7 +168,6 @@ void UChargeWidget::UpdatePlayerLeaderBoardInfo(int Points, int Kills, int Playe
 		LeaderBoardItems[PlayerId]->SetOpacity((LeaderboardBorder->GetRenderOpacity() > 0.0f));
 		return;
 	}
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID WAS NULL WHEN TRYING TO UPDATE SLOT ON LEADERBOARD")));
 
 	
 }
@@ -208,11 +177,8 @@ void UChargeWidget::RefreshPlayerLeaderboardInfo()
 	
 	
 	FPlayerLeaderBoardInfo info = FPlayerLeaderBoardInfo();
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), ServerobjectRef->GetPlayerCurrentCount()));
 
 	for (int i = 0; i < ServerobjectRef->GetPlayerCurrentCount(); i++) {
-
-		GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Cyan, FString::Printf(TEXT("Iterrating through player leader board info %d"), i));
 		info = ServerobjectRef->GetPlayerInfo(i);
         
 
@@ -244,7 +210,6 @@ void UChargeWidget::HighlightPlayerTag(int PlayerIdForTag)
 
 	}
 	catch (...) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("PLAYER ID WAS NULL WHEN TRYING TO HIGHLIGH PLAYER %d"), PlayerIdForTag));
 	}
 
 

@@ -96,38 +96,28 @@ void AMCArrow::Tick(float DeltaTime)
 //called when the projectile hits something
 void AMCArrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	/*if (ImpactSound != nullptr)
+	//plays the hit sound on the player, the arrow can't play it because it gets destroyed
+	if (PlayerRef != nullptr) 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, FString::Printf(TEXT("Arrow Hit Sound Played")));
-
 		PlayerRef->PlayImpactSound();
-	}*/
+	}
 	Destroy();
 }
 
 void AMCArrow::ArrowOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//if (!HasAuthority()) 
-	//{
-	//	if (WhooshingSound != nullptr)
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, FString::Printf(TEXT("Arrow Overlapped Player")));
-	//		UGameplayStatics::PlaySoundAtLocation(this, WhooshingSound, GetActorLocation());
-	//	}
-	//}
+	//Old code that does nothing
 }
-
+//sets the arrow speed, damage and direction
 void AMCArrow::FireInDirection(const FVector& ShootDirection, float Charge)
 {
 	float ArrowSpeed = ArrowMovement->InitialSpeed * (Charge / 100);
 	ArrowDamage = ArrowDamage * (Charge/10);
-	//UE_LOG(LogTemp, Warning, TEXT("ArrowSpeed: %f"), ArrowSpeed);
-	//UE_LOG(LogTemp, Warning, TEXT("Arrow Function FireInDirection called"));
 	ArrowMovement->Velocity = ShootDirection * ArrowSpeed;
 }
 
 
-
+//increases player point when hitting an enemy
 void AMCArrow::IncrementPlayerPointsRef(int ScoreIncrement)
 {
 	if (PlayerRef != nullptr ) {
@@ -135,10 +125,8 @@ void AMCArrow::IncrementPlayerPointsRef(int ScoreIncrement)
 		PlayerRef->IncrementPlayerScore(ScoreIncrement);
 	    PlayerRef->UpdateLeaderBoardInfo();
 	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER ARROW WAS NULL WHEN INCREASING POINTS")));
-	}
 }
+//increases player kills count variable
 void AMCArrow::IncrementPlayerKillsRef()
 {
 	if (PlayerRef != nullptr) {
@@ -150,16 +138,15 @@ void AMCArrow::IncrementPlayerKillsRef()
 	}
 
 }
-
+//gives the arrow a reference to the player that fired it
 void AMCArrow::SetPlayerRef(AMainCharacterTest* PlayerPtr)
 {
 	PlayerRef = PlayerPtr;
 
 }
-
+//gets arrow damage
 float AMCArrow::getDamage()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, FString::Printf(TEXT("Arrow Damage: %f"), ArrowDamage));
 	return ArrowDamage;
 }
 

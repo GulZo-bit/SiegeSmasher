@@ -16,7 +16,7 @@ AThrone::AThrone()
 	{
 		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ThroneSceneComponent"));
 	}
-
+	//sets the mech and the material of the base
 	if (!ThroneMesh)
 	{
 		//sets the static mesh to the Arrow static mesh
@@ -56,7 +56,7 @@ AThrone::AThrone()
 void AThrone::BeginPlay()
 {
 	Super::BeginPlay();
-
+	//the material is set in the begin play because unreal sometimes just doesn't let you save when you do it in the constructor
 	ThroneMesh->SetMaterial(0, ThroneMaterialInstance);
 	
 }
@@ -65,35 +65,26 @@ void AThrone::BeginPlay()
 void AThrone::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//if (PlayerRef != nullptr) 
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("PlayerRef isn't null"));
-	//}
 
 }
-
+//replicates the health variable
 void AThrone::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AThrone, ThroneHealth);
 }
-
+//decreases health by 1
 void AThrone::DecrementThroneHealth()
 {
 	ThroneHealth -= 1;
-
-	if (ThroneHealth <= 0) 
-	{
-
-
-	}
 }
-
+//gets called on clients whenever the health variable gets changed on the server
 void AThrone::UpdateThroneHealth()
 {
 	if (PlayerRef != nullptr)
 	{
+		//updates the widget and if it fell to 0, calls game over
 		PlayerRef->SetBaseHealth(ThroneHealth);
 		if (ThroneHealth <= 0)
 		{
@@ -101,14 +92,15 @@ void AThrone::UpdateThroneHealth()
 		}
 	}
 }
-
+//gets player reference
 void AThrone::SetPlayerRef(AMainCharacterTest* PlayerPtr)
 {
 	PlayerRef = PlayerPtr;
 }
-
+//if enemy overlapps
 void AThrone::EnemyOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	//On the server we just take away the health and then check if its 0, this will call the update throne health function on the clients
 	if (HasAuthority())
 	{
 		if (PlayerRef != nullptr)
@@ -122,11 +114,11 @@ void AThrone::EnemyOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 		}
 	}
 
+	//cast to enemy, set their variables to be the same as if they had died
 	AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor);
 
 	if (Enemy) 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Enemy cast success")));
 		Enemy->EnemyReachedBase();
 	}
 }
