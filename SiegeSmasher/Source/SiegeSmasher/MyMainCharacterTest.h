@@ -259,10 +259,7 @@ public:
 	void Server_PushSelected(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
 	void Server_PushSelected_Implementation(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
 
-	UFUNCTION(NetMulticast,Unreliable) 
-	void Multicast_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
-	void Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
-
+	
 	
 
 	void SpawnSelected();

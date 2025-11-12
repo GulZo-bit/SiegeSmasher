@@ -621,7 +621,7 @@ void AMainCharacterTest::ToggleTowerPlacement()
 
 
 
-
+// display the selected tower for the player when they are looking at a placing surface 
 void AMainCharacterTest::DisplaySelected()
 {
 	if (HasAuthority()) {
@@ -630,7 +630,7 @@ void AMainCharacterTest::DisplaySelected()
 	}
 
 }
-
+// hide the current selected tower when the player toggles placing towers or when they are not hitting a placing surface 
 void AMainCharacterTest::HideSelected()
 {
 	
@@ -642,6 +642,9 @@ void AMainCharacterTest::HideSelected()
 void AMainCharacterTest::ClientSwitchTower()
 {
 
+	// here we use the adanced inout system to check which key the player pressed when switching to a tower 
+	// and access the correct slot in the array used for selecting towers since the keys used to select towers are
+	// in the same number 
 	int index = 0;
 	TArray<FKey> InputKeysToSwitchTower = InputSubsystem->QueryKeysMappedToAction(SwitchTowerAction);
 	for (int i = 0; i < InputKeysToSwitchTower.Num(); i++) {
@@ -656,7 +659,7 @@ void AMainCharacterTest::ClientSwitchTower()
 
 	
 
-
+	// switch the index we stopped at when the client pressed a key on the server so the switch is displayed for all players
 	Server_SwitchTower(index,TogglePlacingTowers);
 
 
@@ -665,8 +668,10 @@ void AMainCharacterTest::ClientSwitchTower()
 
 void AMainCharacterTest::HandleTowerPlacement()
 {
-
+	// if we have toggled placing a tower and the tower we selected isnt nuull
 	if (TogglePlacingTowers && Selected != nullptr) {
+
+		// get the forward vector of the camera as that is the direction the player is looking
 		FVector PlayerCameForward = TPSCameraComponent->GetForwardVector();
 
 		FHitResult PlacementSurfaceResult = FHitResult();
@@ -675,27 +680,27 @@ void AMainCharacterTest::HandleTowerPlacement()
 
 		FVector end = start + PlayerCameForward * PlayerPlacementDistances;
 		IsPlacingTower = false;
-
+		// if the ray cast from the camera hits a placing surface 
 		if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
 		{ 
-			DrawDebugLine(World, start, end, FColor::Blue);
-			DisplaySelected();
 
+			// display the selected tower for players 
+			DisplaySelected();
+			// get the collider of the surface we hit 
 			UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
 
 			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
 			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
 			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
 			FVector CamPos = TPSCameraComponent->GetComponentLocation();
-			DrawDebugLine(World, start, end, FColor::Blue);
-			DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
+
+		    // we are placing a tower if the placement can be resolved for the surface and if the surface is correct for the tower 
 			IsPlacingTower = Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCameForward, CamPos, SurfaceTransform);
 
-			//Selected->SetActorHiddenInGame(IsPlacingTower);
 
 			return;
 		} 
-
+		// other wise if ray doesnt hit hide the tower the player has selected 
 		HideSelected();
 	}
 }
@@ -710,6 +715,8 @@ void AMainCharacterTest::InitialiseTowers()
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	GLog->Log(FString::Printf(TEXT("towers types to spawn count:%d"), TowerTypesToSpawn.Num()));
+
+	// spawn all fo the tower plavement object helpers that will be used to determine if the player can place a tower
 	for (TSubclassOf<ATowePrePlaceObjectHelper>& towerType : TowerPrePlacementObjectsToSpawn) {
 
 		currentInstance = world->SpawnActor<ATowePrePlaceObjectHelper>(towerType, SpawnTransForm, SpawnParameters);
@@ -720,18 +727,14 @@ void AMainCharacterTest::InitialiseTowers()
 
 
 	}
-	/*if (TowerPrePlacementObjects.Num() > 0) {
 
-		Selected = TowerPrePlacementObjects[0];
-		DisplaySelected();
-
-	}*/
 }
 
 void AMainCharacterTest::ClientTowerPlacment()
 {
-
+	// used to place towers on the client if toggling placing towers is true and selectd is not null
 	if (TogglePlacingTowers && Selected != nullptr) {
+		
 		FVector PlayerCamForward = TPSCameraComponent->GetForwardVector();
 
 		FHitResult PlacementSurfaceResult = FHitResult();
@@ -741,18 +744,19 @@ void AMainCharacterTest::ClientTowerPlacment()
 		FVector end = start + PlayerCamForward * PlayerPlacementDistances;
 		
 
-
+		// we cast a ray to see if we hit a placing surface first on the client and then validate that ray cast on the server 
 		if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
 		{
 
+			//  display the selected on the server initially
 			Server_DisplaySelected();
 
-			
+			// reslove the selected towers placement on the server 
 			Server_PushSelected(Selected->GetActorTransform(),start,end,PlayerCamForward);
 
 			return;
 		}
-
+		// hide the selected tower on the server if we dont get a hit on the placing ray
 		Server_HideSelected();
 	}
 
@@ -1046,6 +1050,7 @@ void AMainCharacterTest::TowerPlacementHandle()
 
 void AMainCharacterTest::Server_HandleTowerPlacement_Implementation(FVector CamFoward, FVector CamPosition)
 {
+	// if the server has aselected tower
 	if (Selected != nullptr) {
 		
 		FVector PlayerCamForward = CamFoward;
@@ -1056,22 +1061,23 @@ void AMainCharacterTest::Server_HandleTowerPlacement_Implementation(FVector CamF
 
 		FVector end = start + PlayerCamForward * PlayerPlacementDistances;
 
-
+		// cast aray form the cmaera and see if it can place the selected tower 
 		if (World->LineTraceSingleByChannel(PlacementSurfaceResult, start, end, PlacingSurface, TraceParams))
 		{
-			DrawDebugLine(World, start, end, FColor::Blue);
-
+			
+			// get the collider  of the object the ray hit 
 			UPrimitiveComponent* HitComponent = PlacementSurfaceResult.GetComponent();
-
+			
 			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
 			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
 			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
-			DrawDebugLine(World, start, end, FColor::Blue);
-			DrawDebugSphere(World, PlacementSurfaceResult.ImpactPoint, 15.0f, 8, FColor::Green);
+
+			// set if the player is placing the tower on the server to ensure it is synced across the clients
 		    Server_SetPlaceTower(  Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, PlacementSurfaceResult.ImpactPoint, PlayerCamForward, CamPosition, SurfaceTransform));
 
 			return;
 		}
+		// other wise set placing tower on the server to false 
 		Server_SetPlaceTower(false);
 
 	}
@@ -1088,18 +1094,23 @@ void AMainCharacterTest::Server_SetPlaceTower_Implementation(bool PlaceTower)
 
 void AMainCharacterTest::SpawnSelected()
 {
-
+	// if the player has authoirty and they are locally controlled 
 	if (HasAuthority() && IsLocallyControlled()) {
 		if (TogglePlacingTowers 
 			&& IsPlacingTower 
 			&& Selected->GetCanPlaceTower() 
 			&& PlayerPoints >= Selected->GetTowerCost()) 
 		{
+			// get the selected tower and spawn specifc type of the tower 
 			ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
 			if (TowerRef) {
+				
 				TowerRef->SetOwner(Controller); 
+				//set the player ref for this tower
 				TowerRef->SetPlayerRef(this);
+				// decrement the players score on the server after placing the tower
 				DecrementPlayerScore(Selected->GetTowerCost());
+				// update the players leaderboard info and cast to client
 				UpdateLeaderBoardInfo();
 
 
@@ -1114,10 +1125,10 @@ void AMainCharacterTest::SpawnSelected()
 }
 void AMainCharacterTest::Server_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd,FVector SelectedRayDir)
 {
-
+	// if selected is no null meaning that the client has a selcted tower
 	if (Selected != nullptr) {
 		FHitResult result = FHitResult(); 
-		
+		// cast ray on server to validate raycast form client 
 		if (World->LineTraceSingleByChannel(result, SelectRayStart, SelectRayEnd, PlacingSurface)) {
 
 			DrawDebugLine(World, SelectRayStart, SelectRayEnd, FColor::Magenta);
@@ -1127,11 +1138,12 @@ void AMainCharacterTest::Server_PushSelected_Implementation(FTransform ClientSel
 			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
 			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
 			DrawDebugSphere(World, result.ImpactPoint, 15.0f, 8, FColor::Green);
+			// set is placing tower on the server 
 			IsPlacingTower = Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, result.ImpactPoint, SelectedRayDir, SelectRayStart, SurfaceTransform);
 
 			return;
 		}
-		
+		// hide the selected on the server if the ray on the client didnt actaully hit on object it can place on on  sever 
 		HideSelected();
 		
 
@@ -1139,42 +1151,21 @@ void AMainCharacterTest::Server_PushSelected_Implementation(FTransform ClientSel
 	}
 
 }
-void AMainCharacterTest::Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir)
-{
-	
-	if (Selected != nullptr) {
-		FHitResult result = FHitResult();
-		if (World->LineTraceSingleByChannel(result, SelectRayStart, SelectRayEnd, PlacingSurface)) {
 
-			DrawDebugLine(World, SelectRayStart, SelectRayEnd, FColor::Magenta);
-			UPrimitiveComponent* HitComponent = result.GetComponent();
-
-			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
-			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
-			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
-			DrawDebugSphere(World, result.ImpactPoint, 15.0f, 8, FColor::Green);
-			IsPlacingTower = Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, result.ImpactPoint, SelectedRayDir, SelectRayStart, SurfaceTransform);
-
-
-		}
-
-
-
-	}
-
-
-}
 void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,bool ToggleTower)
 {
-	
+    // spawn selected if the player is able to place the tower on the server 	
 	if (ToggleTower && IsPlacingTower && 
 		Selected->GetCanPlaceTower() && 
 		PlayerPoints >= Selected->GetTowerCost() ) 
 	{
 		ATowerBase* TowerRef = World->SpawnActor<ATowerBase>(TowerTypesToSpawn[SelectedTowerIndex], Selected->GetTransform(), TowerSpawnParameters);
 		if (TowerRef) {
+			// set tower player ref on server
 			TowerRef->SetPlayerRef(this);
-			DecrementPlayerScore(Selected->GetTowerCost());
+			// decrement player score indivual 
+			DecrementPlayerScore(Selected->GetTowerCost()); 
+			// update players score across all clients 
 			UpdateLeaderBoardInfo();
 		}
 	}
@@ -1187,7 +1178,7 @@ void AMainCharacterTest::Server_RefreshLeaderboard_Implementation()
 
 
 }
-
+// // refresh the leadboard for all players associated with this server object with the player 
 void AMainCharacterTest::Multicast_RefreshLeaderboard_Implementation()
 {
 
@@ -1203,7 +1194,7 @@ void AMainCharacterTest::Multicast_RefreshLeaderboard_Implementation()
 
 void AMainCharacterTest::RefreshLeaderBoard()
 {
-	
+	// if we have authority on this player character then we can multicast to update this players leadboard info on all clients and this player on the server
 	if (HasAuthority() ) {
 		
 		Multicast_RefreshLeaderboard();
@@ -1212,6 +1203,7 @@ void AMainCharacterTest::RefreshLeaderBoard()
 		
 	}
 	else {
+		// otherwise we need to call the multicast on the server for the leadberoard info to be broadcasted across all client 
 		Server_RefreshLeaderboard();
 
 	}
@@ -1221,7 +1213,7 @@ void AMainCharacterTest::RefreshLeaderBoard()
 
 
 
-
+// switch the index of the tower the client has selected on the server 
 void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex, bool ToggleTower)
 {
 	 
@@ -1264,7 +1256,7 @@ void AMainCharacterTest::Server_AssignPlayerId_Implementation(int Id)
 
 
 
-
+// increment the logged player count of the server object assigned to this player 
 void AMainCharacterTest::Server_IncrementLoggedPlayerCount_Implementation()
 {
 	if ( HasAuthority() && ServerObjectRef != nullptr) {
@@ -1286,7 +1278,7 @@ int AMainCharacterTest::GetKills()
 {
 	return PlayerKills;
 }
-
+// hide the players tower on the server
 void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
 {
 	if (Selected != nullptr && !ToggleTower) {
@@ -1297,6 +1289,7 @@ void AMainCharacterTest::Server_ToggleTowers_Implementation(bool ToggleTower)
 
 
 }
+// used to increment the players individual score 
 void AMainCharacterTest::IncrementPlayerScore(int Increment)
 {
 	
@@ -1312,7 +1305,7 @@ void AMainCharacterTest::IncrementPlayerScore(int Increment)
 
 }
 
-
+// used to decrement the players individual score 
 
 void AMainCharacterTest::DecrementPlayerScore(int Increment)
 {
@@ -1333,7 +1326,7 @@ void AMainCharacterTest::DecrementPlayerScore(int Increment)
 
 }
 
-
+// increment player kills on server and braodcasted it to the associated client object 
 void AMainCharacterTest::IncrementPlayerKills()
 {
 
@@ -1343,14 +1336,14 @@ void AMainCharacterTest::IncrementPlayerKills()
 	}
 
 }
-
+// overload of incrementing player kills to pass in a value rather than incrementing by one
 void AMainCharacterTest::IncrementPlayerKills(int Increment)
 {
 	if (HasAuthority()) {
 		PlayerKills += Increment;
 	}
 }
-
+/// get the players hud widget 
 UChargeWidget* AMainCharacterTest::GetPlayerWidget()
 {
 	return ChargeWidget;
