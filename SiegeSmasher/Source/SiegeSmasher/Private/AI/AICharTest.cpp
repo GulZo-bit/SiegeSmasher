@@ -113,10 +113,13 @@ void AAICharTest::Tick(float DeltaTime)
 
 	else
 	{
-		bDeathAnimFinished = false;
-		Sword->ResetSwordOnRespawn();
+		bDeathAnimFinished = false; 
+		if (Sword != nullptr) {
+			Sword->ResetSwordOnRespawn();
+		}
+		
 		SoundCount = 0;
-		if (bCanActorMove == true)
+		if (bCanActorMove == true && SplineControllerStore.Num() > 0)
 		{
 			//How long the current spline has been going for.
 			float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();

@@ -28,6 +28,7 @@ void AWaveManager::BeginPlay()
 	{
 		
 		EnemiesToSpawn[i]->SetActorTickEnabled(false); 
+		EnemiesToSpawn[i]->DisablePrimaryTick();
 		
 	}
 
@@ -45,7 +46,12 @@ void AWaveManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
    // update the wave state and cycle through the enemies that we need to spawn based on timers and their enemy types
-	UpdateCurrentWave(DeltaTime);
+	if (HasAuthority()) 
+	{
+		UpdateCurrentWave(DeltaTime);
+	}
+
+
 
 }
 
@@ -74,7 +80,7 @@ void AWaveManager::UpdateCurrentWave(float DeltaTime)
 bool AWaveManager::CheckWaveEnd() {
 
 	// if we have reached are total to spawn for the wave and all enemies associated with the wave are dead 
-	if (WaveEnemyCount == TotalEnemiesSpawned && AliveEnemyCount == 0) {
+	if (HasAuthority() && WaveEnemyCount == TotalEnemiesSpawned && AliveEnemyCount == 0) {
 
 		if (HasAuthority() && ServerObjectRef != nullptr) {
 			// update the state of the wave which gets broadcated across all clients and updated on the server 
@@ -253,7 +259,7 @@ void AWaveManager::EvaluateEnemySpawning()
 	// we only spawn the enemies on the server as they are replicated and synced witht the client 
 	// we also check that the current spawn point doesnt have a cool down applied so that we are not spawning 
 	// enemies on top of one another
-	if (HasAuthority() && CurrentSpawnPoint->IsAvailable()) {
+	if (HasAuthority() && CurrentSpawnPoint->IsAvailable() ) {
 
 		// select a random enemy type to spawn within range of the current available enemy index and the 
 		// last index this is done to keep track of the enemy types that we should currenlty select by shifting 
@@ -277,6 +283,8 @@ void AWaveManager::EvaluateEnemySpawning()
 				// give the enemy a refernce to the current wave alive count so it can decrement it when it dies 
 				PotentialEnemyInstance->SetEnemyAliveCountref(&AliveEnemyCount);
 				// add the newly spawned enemy to the specifc pool associated with its enemy type
+
+				PotentialEnemyInstance->SetActorTickEnabled(true);
 				EnemyPools[CurrentEnemyToSpawn->GetEnemyWaveType()].Add(PotentialEnemyInstance);
 			}
 			

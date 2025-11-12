@@ -97,7 +97,7 @@ public:
 	TSubclassOf<ASword> SwordClass;
 
 	UPROPERTY()
-	ASword* Sword;
+	ASword* Sword = nullptr;
 
 	//The public function that other classes will call to play the attack animation.
 	void PlayAttackMontage();

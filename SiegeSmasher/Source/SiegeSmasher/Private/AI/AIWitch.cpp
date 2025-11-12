@@ -284,7 +284,7 @@ void AAIWitch::Tick(float DeltaTime)
 	{
 		bDeathAnimFinished = false;
 		SoundCount = 0;
-		if (bCanActorMove == true)
+		if (bCanActorMove == true && SplineControllerStore.Num() > 0)
 		{
 			//How long the current spline has been going for.
 			float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();

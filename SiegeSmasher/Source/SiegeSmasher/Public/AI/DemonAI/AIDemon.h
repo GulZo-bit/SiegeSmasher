@@ -76,10 +76,10 @@ public:
 	TSubclassOf<ADemonFists> DemonFistClass;
 
 	UPROPERTY()
-	ADemonFists* RightFist;
+	ADemonFists* RightFist = nullptr;
 
 	UPROPERTY()
-	ADemonFists* LeftFist;
+	ADemonFists* LeftFist = nullptr;
 
 	virtual void EnemyReachedBase() override;
 

@@ -129,6 +129,7 @@ protected:
 
 	
 public:
+	void DisablePrimaryTick();
 	int32 CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect);
 	void ApplyTowerStatusEffect(EnemyStatusEffect  StatusEffect); 
 	void RemoveTowerStatusEffect(EnemyStatusEffect StatusEffect);
@@ -188,6 +189,8 @@ private:
 	
 	
 	void InitialiseBleedStatusEffect();
+
+
 	
 
 

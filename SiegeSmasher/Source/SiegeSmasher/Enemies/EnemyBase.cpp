@@ -10,10 +10,9 @@
 AEnemyBase::AEnemyBase()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	StatusEffectTest = CreateDefaultSubobject<UStatusEffectBase>("StatusEffectTest");
 	BleedStatusEffect = CreateDefaultSubobject<UBleedStatusEffect>("BleedStatusEffect");
-
 	bAlwaysRelevant = true;
 	NetCullDistanceSquared = 0;
 }
@@ -35,27 +34,9 @@ void AEnemyBase::BeginPlay()
 	InitialiseBleedStatusEffect();
 
 	AnimIsDead = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
-	HurtBoxRef = FindComponentByTag<UCapsuleComponent>(FName("EnemyHurtBox"));
 
-	//UChildActorComponent* HealAuraChildActor = Cast<UChildActorComponent>(FindComponentByTag(UChildActorComponent::StaticClass(), FName("HealAuraLight")));
-	/*TArray<UChildActorComponent*> Temp;
-	this->GetComponents(Temp, true);
 
-	for (int i = 0; i < Temp.Num(); i++)
-	{
-		
-		if (Temp[i]->ComponentHasTag(FName(TEXT("HealAuraLight"))))
-		{
-			GLog->Log("Found Heal aura child actor");
-		}
-	}*/
-	//if (HealAuraChildActor == nullptr)
-	//{
-	//	//GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Found Heal aura child actor")));
-	//	GLog->Log("Found Heal aura child actor");
-	//	//HealAura = Cast<AHealAuraLight>(HealAuraChildActor->GetChildActor());
-	//}
-	
+
 }
 
 int AEnemyBase::EnemyTest()
@@ -126,7 +107,7 @@ void AEnemyBase::Multicast_ResetOnDeath_Implementation()
 {
 	SetActorHiddenInGame(true);
 	//SetActorEnableCollision(false);
-	HurtBoxRef->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetActorEnableCollision(false);
 	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast for reset death")));
 	//SetActorTickEnabled(false);
 	SetTick(false);
@@ -208,9 +189,9 @@ void AEnemyBase::ResetOnSpawn()
 void AEnemyBase::Multicast_ResetOnSpawn_Implementation()
 {
 	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+
 	//SetActorEnableCollision(true);
-	HurtBoxRef->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//HurtBoxRef->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Magenta, FString::Printf(TEXT("Multi cast for reset on spawn")));
 	//SetActorTickEnabled(true);
 	SetTick(true);
@@ -423,4 +404,13 @@ void AEnemyBase::InitialiseBleedStatusEffect()
 }
 
 
+void AEnemyBase::DisablePrimaryTick()
+{
+    
+	PrimaryActorTick.bCanEverTick = false;
 
+
+
+
+
+}

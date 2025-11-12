@@ -91,7 +91,7 @@ bool AAIDemon::getDeathAnimFinsihed()
 void AAIDemon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Demon tick enabled")));
 	UE_LOG(LogTemp, Warning, TEXT("Demon Current Health: %f Percent"), CurrentHealth);
 	if (this->GetHealth() <= 0)
 	{
@@ -127,11 +127,13 @@ void AAIDemon::Tick(float DeltaTime)
 			LeftFist->SetActorEnableCollision(false);
 		}
 		
-		if (bCanActorMove == true)
+		if (bCanActorMove == true && SplineControllerStore.Num() > 0)
 		{
-
-			RightFist->ResetFistsOnSpawn();
-			LeftFist->ResetFistsOnSpawn();
+			if (RightFist != nullptr && LeftFist != nullptr) {
+				RightFist->ResetFistsOnSpawn();
+				LeftFist->ResetFistsOnSpawn();
+			}
+			
 			//How long the current spline has been going for.
 			float CurrentSplineTime = (Count - StartTime) / SplineControllerStore[SplineNum]->getTotalPathTimeController();
 
