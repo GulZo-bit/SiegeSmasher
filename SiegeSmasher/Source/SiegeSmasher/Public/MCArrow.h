@@ -30,7 +30,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
+	//on hit event for the arrow
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION()
@@ -51,25 +51,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* WhooshingSound;
 
-	/*UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* ImpactSound;*/
-
-
 	// Projectile material
 	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
 	UMaterialInstanceDynamic* ArrowMaterialInstance;
 	//function that initialises the arrow in the shoot direction
 	void FireInDirection(const FVector& ShootDirection, float Charge);
-	
+	//increments player stats
 	void IncrementPlayerPointsRef(int ScoreIncrement);
 	void IncrementPlayerKillsRef();
-
+	//sets player ref
 	void SetPlayerRef(AMainCharacterTest* PlayerPtr);
 
 	
 
 	float ArrowDamage = 20.0f;
-
+	//getter for damage
 	float getDamage(); 
 
 

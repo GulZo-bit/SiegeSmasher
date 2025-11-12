@@ -220,17 +220,6 @@ public:
 	void Server_ChargeShot_Implementation(float DeltaTime);
 	bool Server_ChargeShot_Validate(float DeltaTime);
 
-	//UFUNCTION(NetMulticast, Reliable, WithValidation)
-	//void Multi_SpawnProjectile(FRotator CamRotation, FRotator BowRot);
-	//void Multi_SpawnProjectile_Implementation(FRotator CamRotation, FRotator BowRot);
-	//bool Multi_SpawnProjectile_Validate(FRotator CamRotation, FRotator BowRot);
-
-
-	//UFUNCTION(NetMulticast, Reliable, WithValidation)
-	//void Multi_UpdateCharge();
-	//void Multi_UpdateCharge_Implementation();
-	//bool Multi_UpdateCharge_Validate();
-
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_UpdateCharge(float ClientCharge);
 	void Server_UpdateCharge_Implementation(float ClientCharge);
@@ -265,9 +254,6 @@ public:
 	UFUNCTION(Server,Reliable) 
 	void Server_SetPlaceTower(bool PlaceTower); 
 	void Server_SetPlaceTower_Implementation(bool PlaceTower);
-	UFUNCTION(Server, Reliable)
-	void Server_LogPlaceTower();
-	void Server_LogPlaceTower_Implementation();
 
 	UFUNCTION(Server, Unreliable) 
 	void Server_PushSelected(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
