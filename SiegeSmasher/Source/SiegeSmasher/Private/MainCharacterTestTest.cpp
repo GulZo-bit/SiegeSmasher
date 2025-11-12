@@ -485,7 +485,6 @@ void AMainCharacterTestTest::Multicast_SetPlayerOwnerShip_Implementation(AActor*
 void AMainCharacterTestTest::PlaceTower()
 {
 
-	Server_LogPlaceTower();
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Input to place tower called")));
 	SpawnSelected();
@@ -547,6 +546,7 @@ void AMainCharacterTestTest::ClientSwitchTower()
 			break;
 		}
 	}
+
 
 
 
@@ -838,10 +838,8 @@ void AMainCharacterTestTest::SpawnSelected()
 	}
 
 }
-void AMainCharacterTestTest::Server_LogPlaceTower_Implementation()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("is placing tower %d"), (int)IsPlacingTower));
-}
+
+
 void AMainCharacterTestTest::Server_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir)
 {
 
@@ -860,7 +858,6 @@ void AMainCharacterTestTest::Server_PushSelected_Implementation(FTransform Clien
 			IsPlacingTower = Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, result.ImpactPoint, SelectedRayDir, SelectRayStart, SurfaceTransform);
 
 
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("line trace hit server")));
 
 			return;
 		}
@@ -870,43 +867,13 @@ void AMainCharacterTestTest::Server_PushSelected_Implementation(FTransform Clien
 
 
 	}
-	//Multicast_PushSelected(ClientSelectedTransform, SelectRayStart, SelectRayEnd, SelectedRayDir);
 
 
 
 }
-void AMainCharacterTestTest::Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir)
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("multi cast push selected")));
 
-	if (Selected != nullptr) {
-		FHitResult result = FHitResult();
-		if (World->LineTraceSingleByChannel(result, SelectRayStart, SelectRayEnd, PlacingSurface)) {
-
-			DrawDebugLine(World, SelectRayStart, SelectRayEnd, FColor::Magenta);
-			UPrimitiveComponent* HitComponent = result.GetComponent();
-
-			FVector SurfaceOrigin = HitComponent->GetComponentLocation();
-			FTransform SurfaceTransform = HitComponent->GetComponentToWorld();
-			FVector SurfaceLocalExtents = HitComponent->GetLocalBounds().GetBox().GetExtent() * SurfaceTransform.GetScale3D();
-			DrawDebugSphere(World, result.ImpactPoint, 15.0f, 8, FColor::Green);
-			IsPlacingTower = Selected->ResolvePlacement(SurfaceLocalExtents, SurfaceOrigin, result.ImpactPoint, SelectedRayDir, SelectRayStart, SurfaceTransform);
-
-
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("line trace hit server")));
-
-
-		}
-
-
-
-	}
-
-
-}
 void AMainCharacterTestTest::Server_SpawnSelected_Implementation(bool PlacingTower, bool ToggleTower)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower selected get can place tower %d"), (int)IsPlacingTower));
 
 	if (ToggleTower && IsPlacingTower && Selected->GetCanPlaceTower()) {
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("client Placing tower")));

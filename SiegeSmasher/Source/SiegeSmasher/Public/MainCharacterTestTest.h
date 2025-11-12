@@ -240,17 +240,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_SetPlaceTower(bool PlaceTower);
 	void Server_SetPlaceTower_Implementation(bool PlaceTower);
-	UFUNCTION(Server, Reliable)
-	void Server_LogPlaceTower();
-	void Server_LogPlaceTower_Implementation();
+	
 
 	UFUNCTION(Server, Unreliable)
 	void Server_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 	void Server_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void Multicast_PushSelected(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
-	void Multicast_PushSelected_Implementation(FTransform ClientSelectedTransform, FVector SelectRayStart, FVector SelectRayEnd, FVector SelectedRayDir);
 
 	void SpawnSelected();
 	UFUNCTION(Server, Reliable)
