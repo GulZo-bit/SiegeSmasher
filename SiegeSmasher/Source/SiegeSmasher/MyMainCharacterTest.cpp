@@ -70,13 +70,22 @@ void AMainCharacterTest::BeginPlay()
 	{
 		InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(AssignedPlayerController->GetLocalPlayer());
 		
-		if (InputSubsystem)
+		
+
+		if (InputSubsystem && DefaultContext != nullptr)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 60, FColor::Blue, FString::Printf(TEXT("Using Keyboard")));
 			//Adding our defaultcontext to the input subsystem that each local player has.
 			//The zero refers to its priority. With zero being the lowest priority.
 			//If we had multiple we would assign them differnt priority with asscending giving them higher priority.
-			InputSubsystem->AddMappingContext(DefaultContext, 0);
+			InputSubsystem->AddMappingContext(DefaultContext, 1);
 		}
+
+		/*else if (InputSubsystem && ControllerContext != nullptr && Controller != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 60, FColor::Blue, FString::Printf(TEXT("Using Controller")));
+			InputSubsystem->AddMappingContext(ControllerContext, 0);
+		}*/
 	}
 	//Reference for The Server Object and The Base that are placed in the level
 	ServerObjectRef = Cast<AServerObject>(UGameplayStatics::GetActorOfClass(World,AServerObject::StaticClass()));

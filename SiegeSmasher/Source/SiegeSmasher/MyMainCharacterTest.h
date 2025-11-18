@@ -78,6 +78,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputMappingContext* DefaultContext; //The defult input mapping context. This will change depending on what context the player is in such as driving.
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	class UInputMappingContext* ControllerContext;
+
 	//Jump Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* JumpAction;
