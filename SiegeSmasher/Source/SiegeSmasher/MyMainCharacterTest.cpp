@@ -1363,7 +1363,7 @@ void AMainCharacterTest::Server_IncrementPlayerScore_Implementation(int incremen
 void AMainCharacterTest::IncrementPlayerKills()
 {
 
-	
+	// check if has authority and increment kills
 	if (HasAuthority()) {
 		PlayerKills++; 
 
