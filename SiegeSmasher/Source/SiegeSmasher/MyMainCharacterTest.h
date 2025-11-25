@@ -132,7 +132,7 @@ public:
 	void ToggleLeaderboard();
 	void SetPlayerId(int Id);
 	void UpdateLeaderboardInfo(int NewPlayerPoints, int NewPlayerKills, int PlayerIdToUpdate);
-
+	void UpdateLeaderboard();
 	void IncrementPlayerScore(int Increment);
 	void DecrementPlayerScore(int Increment);
 	UFUNCTION(Server,Reliable)
