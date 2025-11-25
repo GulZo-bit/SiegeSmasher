@@ -557,7 +557,7 @@ void AMainCharacterTest::PlayerDeath()
 {
 	SetActorLocation(PlayerRespawnPoint);
 	DecrementPlayerScore(100);
-	UpdateLeaderBoardInfo();
+	//UpdateLeaderBoardInfo();
 	
 	Health = 100.0f;
 
@@ -819,6 +819,19 @@ void AMainCharacterTest::UpdateLeaderboardInfo(int NewPlayerPoints, int NewPlaye
 	if (ChargeWidget != nullptr) {
 
 	   ChargeWidget->UpdatePlayerLeaderBoardInfo(NewPlayerPoints, NewPlayerKills, PlayerIdToUpdate);
+
+
+	}
+
+}
+
+void AMainCharacterTest::UpdateLeaderboard()
+{
+
+	if (HasAuthority() && ServerObjectRef != nullptr) {
+
+
+		ServerObjectRef->UpdateStoredLeaderBoardInfo(PlayerPoints, PlayerKills, PlayerId);
 
 
 	}
@@ -1111,7 +1124,7 @@ void AMainCharacterTest::SpawnSelected()
 				// decrement the players score on the server after placing the tower
 				DecrementPlayerScore(Selected->GetTowerCost());
 				// update the players leaderboard info and cast to client
-				UpdateLeaderBoardInfo();
+				//UpdateLeaderBoardInfo();
 
 
 			}
@@ -1166,7 +1179,7 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,b
 			// decrement player score indivual 
 			DecrementPlayerScore(Selected->GetTowerCost()); 
 			// update players score across all clients 
-			UpdateLeaderBoardInfo();
+			//UpdateLeaderBoardInfo();
 		}
 	}
 	
@@ -1326,7 +1339,7 @@ void AMainCharacterTest::DecrementPlayerScore(int Increment)
 		PlayerPoints -= Increment; 
 
 		PlayerPoints *= ((int)(PlayerPoints > 0));
-
+		UpdateLeaderboard();
 		if (IsLocallyControlled()) {
 
 			UpdatePlayerScoreUi();
@@ -1354,11 +1367,11 @@ void AMainCharacterTest::IncrementPlayerKills()
 	if (HasAuthority()) {
 		PlayerKills++; 
 
-		UpdateLeaderBoardInfo(); 
+		UpdateLeaderboard();
 	}
-	else if (IsLocallyControlled()) {
+	/*else if (IsLocallyControlled()) {
 		Server_UpdatePlayerInfoKills();
-	}
+	}*/
 
 }
 
@@ -1378,14 +1391,15 @@ void AMainCharacterTest::IncrementPlayerKills(int Increment)
 	if (HasAuthority()) {
 		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Updtaing leaderboard on server")));
 		PlayerKills += Increment;
-		UpdateLeaderBoardInfo();
+		//UpdateLeaderBoardInfo();
+		UpdateLeaderboard();
 	}
-	else if(IsLocallyControlled())
+	/*else if(IsLocallyControlled())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Updtaing leaderboard on client")));
 
 		Server_UpdatePlayerInfoKillsInc(Increment);
-	}
+	}*/
 
 }
 

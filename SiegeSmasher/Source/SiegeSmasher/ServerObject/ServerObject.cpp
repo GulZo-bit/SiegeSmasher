@@ -114,10 +114,18 @@ void AServerObject::SetPlayerStateToHandle(AMainCharacterTest* PlayerPtr)
 void AServerObject::UpdateStoredLeaderBoardInfo(int PlayerPoints, int PlayerKills, int PlayerId)
 {
 
-	if (HasPlayerInfo(PlayerId)) {
+	if (HasAuthority() &&  HasPlayerInfo(PlayerId)) {
+
+		GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Cyan, FString::Printf(TEXT("Updating stored leaderboard info")));
 		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerScore = PlayerPoints;
 		LeaderBoardInfo.Items[PlayerId].LeaderboardPlayerKills = PlayerKills;
+		LeaderBoardInfo.MarkItemDirty(LeaderBoardInfo.Items[PlayerId]);
 
+		if (Host != nullptr && Host->GetPlayerWidget()) {
+			GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Cyan, FString::Printf(TEXT("Updating stored leaderboard info for local host")));
+
+			Host->GetPlayerWidget()->RefreshPlayerLeaderboardInfo();
+		}
 	}
 	
 
@@ -142,7 +150,6 @@ FPlayerLeaderBoardInfo AServerObject::GetPlayerInfo(int PlayerId)
 
 	}
 
-	
 	return FPlayerLeaderBoardInfo();
 
 
@@ -163,8 +170,6 @@ void AServerObject::OnRep_PlayerWaveNumber()
 
 
 
-
-
 void AServerObject::LogMap()
 {
 
@@ -180,12 +185,12 @@ void AServerObject::LogMap()
 void AServerObject::OnRep_LeaderBoardState(FLeaderboardItems Old)
 {
 	// when we recive a replication call back for our TArray that is storing the leaderboard state
-	// we track if the Array size increased meaning a player was added on the server side 
-	// so we update the player UI using the player ref that is assigned on begin play 
+	// we track if the Array size increased meaning a player was added on the server side or the data stored for the leaderboard was updated
+	// we then update the player UI using the player ref that is assigned on begin play 
 	// (this being the locally controlled player for this server object on the client) 
 	// and we also ensure to refresh the players highlight on the leaderboard ensuring they know
 	// which player they are
-	if (Old.Items.Num() < LeaderBoardInfo.Items.Num() && PlayerRef->GetPlayerWidget()) {
+	if (PlayerRef != nullptr && PlayerRef->GetPlayerWidget()) {
 
 		// update the players leaderboard info as we a new player has joined
 		PlayerRef->GetPlayerWidget()->RefreshPlayerLeaderboardInfo();
