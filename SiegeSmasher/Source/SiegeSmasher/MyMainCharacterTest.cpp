@@ -1312,17 +1312,17 @@ void AMainCharacterTest::IncrementPlayerScore(int Increment)
 		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("Updtaing leaderboard on server")));
 
 		PlayerPoints += Increment;
-		UpdateLeaderBoardInfo();
+		UpdateLeaderboard();
 		UpdatePlayerScoreUi();
 		
 
 	}
-	else if (IsLocallyControlled()) {
+	/*else if (IsLocallyControlled()) {
 		GEngine->AddOnScreenDebugMessage(-1, 60.0f, FColor::Red, FString::Printf(TEXT("updating leaderboard on client")));
 
 		Server_IncrementPlayerScore(Increment);
 
-	}
+	}*/
 
 
 }
