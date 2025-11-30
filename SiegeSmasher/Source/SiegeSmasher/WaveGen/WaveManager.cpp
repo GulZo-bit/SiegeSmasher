@@ -258,7 +258,7 @@ void AWaveManager::EvaluateEnemySpawning()
 	// we only spawn the enemies on the server as they are replicated and synced witht the client 
 	// we also check that the current spawn point doesnt have a cool down applied so that we are not spawning 
 	// enemies on top of one another
-	if (HasAuthority() && CurrentSpawnPoint->IsAvailable() ) {
+	if (HasAuthority() && AliveEnemyCount != MAX_ENEMY_NUM && CurrentSpawnPoint->IsAvailable() ) {
 
 		// select a random enemy type to spawn within range of the current available enemy index and the 
 		// last index this is done to keep track of the enemy types that we should currenlty select by shifting 
