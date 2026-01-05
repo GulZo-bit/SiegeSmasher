@@ -64,7 +64,7 @@ public:
 	FVector GetPlacementColliderHalfExtents();
 	UFUNCTION(BlueprintCallable, Category = "PlacementCollisionResolution")
   	bool ResolvePlacement(FVector& SurfaceHalfExtents, FVector& SurfacePos, FVector& PlacementPosition, FVector& CamDir,FVector& CamPos, FTransform& surfaceTransform);
-
+	virtual void HandleAppliedPlayerRotation(float AppliedPlayerRot);
 	//void SetPlayerRef(AMainCharacterTest* PlayerPtr);
 	// used to increment the players score who is assigned to a specifc tower 
 	// this refernce is created when the player creates and spawns a tower on the server  
@@ -158,6 +158,7 @@ protected:
 	virtual void TowerTimeLineInterp(float value); 
 
 	void SetHitBoxActive(bool HitBoxActive);
+	
 protected:
 
 	
@@ -171,6 +172,7 @@ protected:
 	virtual void OnOverlapHitBox(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	virtual void OnHitBoxHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 
 
 	virtual void HandleNewEnemy(AEnemyBase* EnemyBase); 

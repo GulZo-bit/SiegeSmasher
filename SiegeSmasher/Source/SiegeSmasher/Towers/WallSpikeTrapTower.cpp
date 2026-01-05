@@ -51,6 +51,7 @@ void AWallSpikeTrapTower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWallSpikeTrapTower, IsSwinging);
 	DOREPLIFETIME(AWallSpikeTrapTower, HasSwung);
+	DOREPLIFETIME(AWallSpikeTrapTower, SwingRotationAngle);
 
 }
 
@@ -188,3 +189,17 @@ void AWallSpikeTrapTower::ApplyDamage(AEnemyBase* Enemy) {
 }
 
 
+void AWallSpikeTrapTower::HandleAppliedPlayerRotation(float AppliedPlayerRot) 
+{
+     
+	 if(AppliedPlayerRot > 0.0f)
+	 {
+
+		
+		 SwingRotationAngle = -SwingRotationAngle;
+		 GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("swinign angle adjusted based on player rot %f"), SwingRotationAngle));
+	  
+	 }
+
+
+}

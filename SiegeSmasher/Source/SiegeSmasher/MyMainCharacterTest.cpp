@@ -217,7 +217,11 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		
 		EnhancedInputComponent->BindAction(ToggleTowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleTowerPlacement);
 		
-		EnhancedInputComponent->BindAction(ToggleLeaderboardAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleLeaderboard);
+		EnhancedInputComponent->BindAction(ToggleLeaderboardAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleLeaderboard); 
+		
+		EnhancedInputComponent->BindAction(RotateTower, ETriggerEvent::Triggered, this, &AMainCharacterTest::RotateSelectedTower);
+
+		
 	}
 }
 
@@ -762,6 +766,7 @@ void AMainCharacterTest::ClientTowerPlacment()
 
 
 
+
 }
 
 void AMainCharacterTest::CallCreateLobby()
@@ -1009,6 +1014,7 @@ void AMainCharacterTest::SwitchTowers()
 			AssignedPlayerController->WasInputKeyJustPressed(InputKeysToSwitchTower[i])) {
 
 			if (Selected != nullptr) {
+				Selected->SetPlayerRotationAngle(0.0);
 				HideSelected();
 			}
 
@@ -1025,6 +1031,26 @@ void AMainCharacterTest::SwitchTowers()
 	
 	if(!HasAuthority()) { 
 		ClientSwitchTower();
+	}
+	
+}
+
+void AMainCharacterTest::RotateSelectedTower()
+{
+	
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Rotate Tower Called")));
+
+	if (!HasAuthority() ) {
+
+		Server_IncrementTowerPlacementRot();
+		return;
+	}
+	
+	if (Selected != nullptr) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Rotate Tower Called Server")));
+
+		Selected->IncrementPlayerRotAngle();
 	}
 	
 }
@@ -1050,12 +1076,16 @@ void AMainCharacterTest::TowerPlacementHandle()
 	if (!HasAuthority() ) {
 		
 		ClientTowerPlacment();
+	
+		
+
 	}
 	else if(IsLocallyControlled()) {
 
 		HandleTowerPlacement();
 
 	}
+	
 
 
 
@@ -1105,6 +1135,21 @@ void AMainCharacterTest::Server_SetPlaceTower_Implementation(bool PlaceTower)
 }
 
 
+
+
+void AMainCharacterTest::Server_IncrementTowerPlacementRot_Implementation()
+{
+
+	if (Selected != nullptr) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Rotate Tower Called Client")));
+
+		Selected->IncrementPlayerRotAngle();
+
+	}
+
+
+}
+
 void AMainCharacterTest::SpawnSelected()
 {
 	// if the player has authoirty and they are locally controlled 
@@ -1121,6 +1166,8 @@ void AMainCharacterTest::SpawnSelected()
 				TowerRef->SetOwner(Controller); 
 				//set the player ref for this tower
 				TowerRef->SetPlayerRef(this);
+				TowerRef->HandleAppliedPlayerRotation(Selected->GetPlayerRot());
+
 				// decrement the players score on the server after placing the tower
 				DecrementPlayerScore(Selected->GetTowerCost());
 				// update the players leaderboard info and cast to client
@@ -1176,6 +1223,8 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,b
 		if (TowerRef) {
 			// set tower player ref on server
 			TowerRef->SetPlayerRef(this);
+			// set the applied player rotation and handle any adjustments needed based on it 
+			TowerRef->HandleAppliedPlayerRotation(Selected->GetPlayerRot());
 			// decrement player score indivual 
 			DecrementPlayerScore(Selected->GetTowerCost()); 
 			// update players score across all clients 
@@ -1231,6 +1280,7 @@ void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex,
 {
 	 
 	if (Selected != nullptr) {
+		Selected->SetPlayerRotationAngle(0.0);
 		HideSelected();
 	}
 	SelectedTowerIndex = NewSelectedIndex;

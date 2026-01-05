@@ -103,6 +103,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	class UInputAction* ToggleLeaderboardAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	class UInputAction* RotateTower;
 
 
 	//Calling for movement input
@@ -128,6 +130,8 @@ public:
 	void ToggleTowerPlacement();
 	// swicth towers using number keys 
 	void SwitchTowers();
+
+	void RotateSelectedTower();
 
 	void ToggleLeaderboard();
 	void SetPlayerId(int Id);
@@ -272,7 +276,9 @@ public:
 	void Server_PushSelected_Implementation(FTransform ClientSelectedTransform,FVector SelectRayStart,FVector SelectRayEnd,FVector SelectedRayDir);
 
 	
-	
+	UFUNCTION(Server, Reliable)
+	void Server_IncrementTowerPlacementRot();
+	void Server_IncrementTowerPlacementRot_Implementation();
 
 	void SpawnSelected();
 	UFUNCTION(Server, Reliable)
@@ -418,7 +424,6 @@ private:
 		TArray<ATowePrePlaceObjectHelper*> TowerPrePlacementObjects; 
 		
 		ATowePrePlaceObjectHelper* Selected = nullptr; 
-
 		UWorld* World = nullptr;
 		APlayerController* AssignedPlayerController = nullptr;
 		FActorSpawnParameters TowerSpawnParameters;

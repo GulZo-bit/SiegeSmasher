@@ -45,12 +45,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerSurfaceAlignmentAxis");
 	FVector AlignmentAxis = FVector::ZeroVector;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlayerRotationEulerAxis"); 
-	FVector TowerPlayerRotationAxis; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlayerRotationInc");
+	double PlayerAngleIncrement = 0.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerPlayerRotationIncrement");
-	float TowerPlayerRotationIncrement = 0.0f;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const;
+
+	UPROPERTY(Replicated);
+	double PlayerRotationAngle = 0.0f;
+
 
 public:	
 	// Called every frame
@@ -59,7 +61,12 @@ public:
 	void DisableTick();
 	virtual void Tick(float DeltaTime) override;
 	int GetTowerCost();
-	bool GetCanPlaceTower();
+	bool GetCanPlaceTower(); 
+	void IncrementPlayerRotAngle();
+	void SetPlayerRotationAngle(double Angle);
+	float GetPlayerRot();
+
+	
 
 private: 
 	FVector FacingDirSum; 
