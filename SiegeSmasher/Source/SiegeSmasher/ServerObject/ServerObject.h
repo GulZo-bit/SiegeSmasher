@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h" 
 #include "Kismet/GameplayStatics.h" 
 #include "Net/UnrealNetwork.h"
+#include "Kismet/KismetRenderingLibrary.h"
+
 #include "ServerObject.generated.h"
 
 // forward declare player class to avoid any circualr dependencies 
@@ -166,8 +168,8 @@ protected:
  private: 
 
 
-	int PlayerDefaultPoints = 1000;
-	TMap<int,FPlayerLeaderBoardInfo> LeaderBoardPlayerInfo;
+	 int PlayerDefaultPoints = 1000;
+	 TMap<int,FPlayerLeaderBoardInfo> LeaderBoardPlayerInfo;
 
 	
 

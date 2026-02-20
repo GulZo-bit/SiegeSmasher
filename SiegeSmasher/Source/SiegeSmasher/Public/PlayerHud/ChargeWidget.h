@@ -12,9 +12,17 @@
 #include  "Components/CanvasPanelSlot.h"   
 #include "Components/ScaleBox.h"
 #include "Components/Border.h" 
-#include "Components/BorderSlot.h"
+#include "Components/BorderSlot.h" 
+#include "Components/Image.h"
 #include "../ServerObject/ServerObject.h"
+#include "../MiniMapManager/MiniMapManager.h"
+#include "Kismet/KismetRenderingLibrary.h"
+#include "Engine/SceneCapture2D.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Kismet/GameplayStatics.h" 
+
 #include "ChargeWidget.generated.h"
+
 
 
 
@@ -28,7 +36,7 @@ public:
 
 	void NativeConstruct();
 	
-
+	
 	UPROPERTY(BlueprintReadOnly)
 	float Charge;
 
@@ -64,6 +72,8 @@ public:
 	int GetPoints();
 
 	void SetServerObjectRef(AServerObject* ServerObjectPtr);
+	void AssignMiniMap(AMiniMapManager* MiniMapManagerPtr);
+
 	void UpdatePlayerLeaderBoardInfo(int Points, int Kills, int PlayerId); 
 	
 	void RefreshPlayerLeaderboardInfo();
@@ -80,6 +90,9 @@ public:
 	int GetPlayerWaveNumber(); 
 
 	void SetPlayerWaveNumber(int WaveNumber);
+	
+	UFUNCTION(BlueprintCallable)
+	void ClearMiniMap();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MaxPlayerNum", meta = (ClampMin = "1", ClampMax = "4"))
@@ -95,6 +108,13 @@ protected:
 	float LeaderboardTextPadding;  
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardVerticalPadding");
 	float LeaderboardTopPadding;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MiniMapName");
+	FString MiniMapName;
+
+
+
 	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderBoardVerticalPadding");
@@ -113,25 +133,43 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LeaderboardScaleBoxHeight");
 	float LeaderboardScaleBoxRightPadding = 0.0f;
 
-
-
+	
 
 private:
+	ASceneCapture2D * SceneCapture; 
 	void GenerateLeaderBoard();
 	TArray<UTextBlock*> LeaderBoardItems; 
 	TArray<UScaleBox*> TagScaleBoxes;
 	TArray<UScaleBox*> ScoreScaleBoxes; 
 	TArray<UScaleBox*> KillsScaleBoxes;
-	
+
+
+
+	UPROPERTY(Transient);
+	UTexture2D* MiniMapSceneTexture = nullptr;
+
 	UBorder* LeaderboardBorder = nullptr; 
 	UBorder* LeaderboardHeader = nullptr;
 	UGridPanel* LeaderboardGrid = nullptr; 
 	AServerObject* ServerobjectRef = nullptr;
+	AMiniMapManager* MiniMapManagerRef = nullptr;
+	TArray<FColor> MiniMapColBuffer {};
+	UPROPERTY();
+	UImage* MiniMapRef = nullptr; 
+	
+	int32 MiniMapWidth = 0;
+	int32 MiniMapHeight = 0;
+	UPROPERTY(Transient);
+	UMaterialInstanceDynamic* MiniMapDisplayMat;
 
+
+	
+	
+	
+	
 	UTextBlock* CreateText(FString Text);
-
 	int LoggedPlayerNumber = 0;
-
 	int DisplayedPlayerWaveNumber = 0;
-
+	bool MiniMapBufferSwap = false;
+	void DrawToMiniMapBuffer(UTextureRenderTarget2D* targetToDrawTo,UTexture2D* MiniMapIconTextureToUse);
 };

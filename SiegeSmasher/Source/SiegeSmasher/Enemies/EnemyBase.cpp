@@ -2,10 +2,15 @@
 
 
 #include "EnemyBase.h"
+#include "Camera/CameraActor.h"
 #include "../StatusEffects/BleedStatusEffect.h"  
 #include "../MyMainCharacterTest.h"
 #include "Components/ChildActorComponent.h"
 #include "MCArrow.h"
+#include "Engine/Canvas.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Math/Matrix.h"
+#include "Math/PerspectiveMatrix.h"
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
@@ -14,7 +19,10 @@ AEnemyBase::AEnemyBase()
 	StatusEffectTest = CreateDefaultSubobject<UStatusEffectBase>("StatusEffectTest");
 	BleedStatusEffect = CreateDefaultSubobject<UBleedStatusEffect>("BleedStatusEffect");
 	bAlwaysRelevant = true;
-	NetCullDistanceSquared = 0;
+	NetCullDistanceSquared = 0; 
+
+
+
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +42,21 @@ void AEnemyBase::BeginPlay()
 	InitialiseBleedStatusEffect();
 
 	AnimIsDead = Cast<UBoolAnimInstance>(GetMesh()->GetAnimInstance());
+	
+	MiniMapCameraRef = Cast<ACameraActor>( UGameplayStatics::GetActorOfClass(GetWorld(), ACameraActor::StaticClass()));
+	MiniMapManagerRef = Cast<AMiniMapManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AMiniMapManager::StaticClass()));
+	
+
+
+
+
+	UMaterial* parent = LoadObject<UMaterial>(nullptr, TEXT("/Script/Engine.Material'/Game/MiniMapMaterials/LocationMap.LocationMap'"));
+	MiniMapMat = UMaterialInstanceDynamic::Create(parent, this, FName("LocationMapInstance"));
+     
+
+
+
+
 
 
 
@@ -117,7 +140,7 @@ void AEnemyBase::Multicast_ResetOnDeath_Implementation()
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	WriteToMiniMap();
 	/*GLog->Log(FString::Printf(TEXT("Current health for enemy %f"), CurrentHealth));
 	GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Red, FString::Printf(TEXT("Current health for enemy %f"),CurrentHealth));*/
 
@@ -185,6 +208,8 @@ void AEnemyBase::Multicast_ResetOnSpawn_Implementation()
 	bHasBeenReset = true;
 }
 
+
+
 int AEnemyBase::GetCurrentWaveContribution()
 {
 	return CurrentWaveContribution;
@@ -251,6 +276,24 @@ int AEnemyBase::GetScoreIncOnHit()
 	return ScoreIncrementOnHit;
 }
 
+FVector2D AEnemyBase::CalcMiniMapCoords()
+{
+    
+	  
+
+
+
+	return FVector2D();
+}
+
+
+void AEnemyBase::WriteToMiniMap()
+{
+	MiniMapMat->SetScalarParameterValue("EnemyMiniMapRadi", EnemyMiniMapRadius);
+	MiniMapManagerRef->WriteToMiniMap(GetActorLocation(),0.0, EnemyMiniMapSectionRadius, MiniMapMat);
+	
+} 
+
 void AEnemyBase::setHasBeenReset(bool bResetStore)
 {
 	bHasBeenReset = bResetStore;
@@ -260,6 +303,8 @@ bool AEnemyBase::getHasBeenReset()
 {
 	return bHasBeenReset;
 }
+
+
 
 //Decreases the amount of enemies in the wave.
 void AEnemyBase::DecrementWaveEnemyAliveCount()
@@ -304,7 +349,7 @@ void AEnemyBase::Multicast_AnimIsDead_Implementation(bool bStore)
 
 int32 AEnemyBase::CheckHasTowerStatusEffect(EnemyStatusEffect StatusEffect)
 {
-	return (CurrentStatusEffects & StatusEffect)  ;
+	return (CurrentStatusEffects & StatusEffect);
 }
 
 //Applies the status effect associated with a tower to the enemy.

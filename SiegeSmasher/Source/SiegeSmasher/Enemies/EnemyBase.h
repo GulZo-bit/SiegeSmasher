@@ -7,6 +7,9 @@
 #include "Components/CapsuleComponent.h"
 #include "AI/BoolAnimInstance.h"
 #include "AI/HealAuraLight.h"
+#include "Kismet/KismetRenderingLibrary.h"  
+#include "../ServerObject/ServerObject.h"
+#include "../MiniMapManager/MiniMapManager.h"
 #include "EnemyBase.generated.h"
 #ifndef MAX_ENEMY_NUM
  #define MAX_ENEMY_NUM 150
@@ -69,7 +72,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyVariables")
 	int EnemyStartingCount = 8;
 	
-
+	double EnemyMiniMapRadius =  0.2f;
+	double EnemyMiniMapSectionRadius = 0.05f;
 	float WavePolynomialConstantOne = 0.7f;
 	float WavePolynomialConstantTwo = 0.2f;
 	int CurrentWaveContribution = 0;
@@ -94,12 +98,12 @@ protected:
 	float MaxHealth = 100.0f;
 
 	int StartingWave = 0; // wave 0 = 1(starts counting from 0) 
-	
+	void WriteToMiniMap();
 	void DecrementWaveEnemyAliveCount();
 	bool Disabled = false;
 
 	UBoolAnimInstance* AnimIsDead;
-
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_AnimIsDead(bool bStore);
 	void Multicast_AnimIsDead_Implementation(bool bStore);
@@ -116,6 +120,7 @@ protected:
 	bool bHasBeenReset = false;
 
 	UCapsuleComponent* HurtBoxRef;
+
 
 	//UFUNCTION(NetMulticast, Reliable)
 	//void Multicast_PlayTimeLine();
@@ -160,6 +165,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "default")
 	UCapsuleComponent* CapsuleStore;
 
+
+
+
 	UFUNCTION()
 	void OnOverLapBegin(UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UPROPERTY(Replicated);
@@ -169,20 +177,22 @@ public:
 
 	int GetScoreIncOnKill(); 
 	int GetScoreIncOnHit();
-
+	FVector2D CalcMiniMapCoords();
 	void setHasBeenReset(bool bResetStore);
 	bool getHasBeenReset();
-
+	ACameraActor* MiniMapCameraRef = nullptr;
 	/*void PlayHealTimeLine();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealAura")
 	AHealAuraLight* HealAura;*/
 private:
 	int* WaveEnemyAliveCountRef;
-
-	
-	
+	AMiniMapManager * MiniMapManagerRef = nullptr;
+	int32 MiniMapWidth = 0;
+	int32 MiniMapHeight = 0;
 	void InitialiseBleedStatusEffect();
+	UPROPERTY();
+	UMaterialInstanceDynamic* MiniMapMat;
 
 
 	

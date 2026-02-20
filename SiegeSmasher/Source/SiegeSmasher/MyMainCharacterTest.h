@@ -20,6 +20,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h" 
 #include "Throne.h"
+#include "../MiniMapManager/MiniMapManager.h"
 #include "MyMainCharacterTest.generated.h"
 
 UCLASS()
@@ -408,6 +409,7 @@ protected:
 
 	
 	AServerObject* ServerObjectRef = nullptr;
+	AMiniMapManager* miniMapManagertRef = nullptr;
 
 	AThrone* ThroneRef = nullptr;
 
@@ -447,4 +449,9 @@ private:
 		void InitialiseTowers(); 
 
 		void ClientTowerPlacment();
+		void WriteToMiniMap();
+		double MiniMapSectionRadius = 0.05;
+		UPROPERTY();
+		UMaterialInstanceDynamic* MiniMapMat;
+
 };

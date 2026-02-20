@@ -80,9 +80,11 @@ void AMainCharacterTest::BeginPlay()
 	}
 	//Reference for The Server Object and The Base that are placed in the level
 	ServerObjectRef = Cast<AServerObject>(UGameplayStatics::GetActorOfClass(World,AServerObject::StaticClass()));
+	miniMapManagertRef = Cast<AMiniMapManager>(UGameplayStatics::GetActorOfClass(World, AMiniMapManager::StaticClass()));
 	ThroneRef = Cast<AThrone>(UGameplayStatics::GetActorOfClass(World, AThrone::StaticClass()));
+	UMaterial* parent = LoadObject<UMaterial>(nullptr, TEXT("/Script/Engine.Material'/Game/MiniMapMaterials/PlayerMiniMapMat.PlayerMiniMapMat'"));
 
-
+	MiniMapMat = UMaterialInstanceDynamic::Create(parent, this, FName("PlayerMiniMapMat"));
 
 	//checks if the reference to the player hud is not empty
 
@@ -101,7 +103,7 @@ void AMainCharacterTest::BeginPlay()
 			//if the widget was created successfully, add it to viewport
 
 			//checks if the widgets are not null to avoid crashes due to null reference
-			if (ChargeWidget != nullptr && ServerObjectRef != nullptr)
+			if (ChargeWidget != nullptr && ServerObjectRef != nullptr && miniMapManagertRef != nullptr)
 			{
 				//Charge widget is the players UI, it gets added to the viewport on begin play and sets the health bar to the correct amount
 				ChargeWidget->AddToViewport();
@@ -110,6 +112,8 @@ void AMainCharacterTest::BeginPlay()
 				//Gives the charge widget reference to the server object and server object the reference to this player
 				ChargeWidget->SetServerObjectRef(ServerObjectRef);
 				ServerObjectRef->SetPlayerStateToHandle(this);
+				ChargeWidget->AssignMiniMap(miniMapManagertRef);
+
 				//sets the base health to the correct value at begin play
 				ChargeWidget->SetThroneHealth(ThroneRef->ThroneHealth);
 
@@ -179,7 +183,7 @@ void AMainCharacterTest::Tick(float DeltaTime)
 
 	}
 	
-
+	WriteToMiniMap();
 
 	TowerPlacementHandle();
 
@@ -1000,6 +1004,14 @@ void AMainCharacterTest::Multicast_HighlightPlayerId_Implementation(int PlayerSe
 
 
 
+void AMainCharacterTest::WriteToMiniMap() 
+{
+
+	miniMapManagertRef->WriteToMiniMap(GetActorLocation(), GetActorRotation().Yaw ,MiniMapSectionRadius,MiniMapMat);
+
+
+
+}
 
 
 
