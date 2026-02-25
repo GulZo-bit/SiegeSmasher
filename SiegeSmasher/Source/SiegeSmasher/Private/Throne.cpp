@@ -50,6 +50,10 @@ AThrone::AThrone()
 		ThroneArea->OnComponentBeginOverlap.AddDynamic(this, &AThrone::EnemyOverlap);
 	}
 
+
+
+
+
 }
 
 // Called when the game starts or when spawned
@@ -58,14 +62,33 @@ void AThrone::BeginPlay()
 	Super::BeginPlay();
 	//the material is set in the begin play because unreal sometimes just doesn't let you save when you do it in the constructor
 	ThroneMesh->SetMaterial(0, ThroneMaterialInstance);
-	
+	MiniMapManagerRef = Cast<AMiniMapManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AMiniMapManager::StaticClass()));
+
+
+
+	UMaterial* parent = LoadObject<UMaterial>(nullptr, TEXT("/Script/Engine.Material'/Game/MiniMapMaterials/ThroneMiniMapMat.ThroneMiniMapMat'"));
+	MiniMapMat = UMaterialInstanceDynamic::Create(parent, this, FName("ThroneMiniMapMat"));
+
+	MiniMapMat->SetVectorParameterValue("ThroneMiniMapCol", ThroneDefaultColour);
+
+	miniMapSectionRadius = defaultMiniMapSectionRadius;
+
+}
+
+void AThrone::WriteToMinMap(double DeltaTime)
+{
+	    ThroneHitMiniMapAnim(DeltaTime);
+		MiniMapManagerRef->WriteToMiniMap(GetActorLocation(), 0, miniMapSectionRadius, MiniMapMat);
+		  
+
+
 }
 
 // Called every frame
 void AThrone::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	WriteToMinMap(DeltaTime);
 }
 //replicates the health variable
 void AThrone::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -100,10 +123,16 @@ void AThrone::SetPlayerRef(AMainCharacterTest* PlayerPtr)
 //if enemy overlapps
 void AThrone::EnemyOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//On the server we just take away the health and then check if its 0, this will call the update throne health function on the clients
-	if (HasAuthority())
-	{
-		if (PlayerRef != nullptr)
+	
+	
+	
+	AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor);
+	if (Enemy)
+	{//cast to enemy, set their variables to be the same as if they had died
+		Enemy->EnemyReachedBase();
+		//On the server we just take away the health and then check if its 0, this will call the update throne health function on the clients
+		ThronePlayHitAnim = true;
+		if (HasAuthority() && PlayerRef != nullptr)
 		{
 			DecrementThroneHealth();
 			PlayerRef->SetBaseHealth(ThroneHealth);
@@ -114,12 +143,61 @@ void AThrone::EnemyOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 		}
 	}
 
-	//cast to enemy, set their variables to be the same as if they had died
-	AEnemyBase* Enemy = Cast<AEnemyBase>(OtherActor);
+	
 
-	if (Enemy) 
-	{
-		Enemy->EnemyReachedBase();
-	}
+	
+}
+
+void AThrone::ThroneHitMiniMapAnim(double DeltaTime)
+{
+
+	 if(ThronePlayHitAnim && !ThroneHitAnimreverse )
+	 {
+		 
+		ThroneAnimHitInterp += DeltaTime;
+		
+		float animPercent = (ThroneAnimHitInterp / ThroneAnimHitTimeMax);
+		float lerpSize = (miniMapSectionRadiusMax - miniMapSectionRadius) * animPercent;
+		 
+		miniMapSectionRadius = miniMapSectionRadius + lerpSize;
+		ThronePlayHitAnim = !(ThroneAnimHitInterp >= ThroneAnimHitTimeMax);
+		ThroneAnimHitInterp *= ThronePlayHitAnim;
+		ThroneHitAnimreverse = !ThronePlayHitAnim;
+
+		return;
+	 }
+	   
+	 
+	 if(ThroneHitAnimreverse)
+	 {
+		 ThronePlayHitAnim = false;
+	 
+		 ThroneAnimHitInterp += DeltaTime;
+
+		 float animPercent = (ThroneAnimHitInterp / ThroneAnimHitTimeMax);
+		 float lerpSize = (defaultMiniMapSectionRadius - miniMapSectionRadius) * animPercent;
+		
+		 miniMapSectionRadius = miniMapSectionRadius + lerpSize;
+		 ThroneHitAnimreverse = !(ThroneAnimHitInterp >= ThroneAnimHitTimeMax);
+		 ThroneAnimHitInterp *= ThroneHitAnimreverse;
+
+
+	 
+	 }
+	   
+	  
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 

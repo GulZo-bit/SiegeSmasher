@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
 #include "Components//PrimitiveComponent.h"
+#include "../MiniMapManager/MiniMapManager.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Throne.generated.h"
 
@@ -22,10 +24,14 @@ public:
 	AThrone();
 	AMainCharacterTest* PlayerRef = nullptr;
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void WriteToMinMap(double DeltaTime);
 
+	UPROPERTY();
+	UMaterialInstanceDynamic* MiniMapMat = nullptr;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -54,5 +60,27 @@ public:
 	//overlapp event that takes away throne health when an enemy overlaps with it
 	UFUNCTION()
 	void EnemyOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+  
+
+	void ThroneHitMiniMapAnim(double deltaTime);
+
+private:
+	AMiniMapManager* MiniMapManagerRef = nullptr;
+	double defaultMiniMapSectionRadius = 0.04f;
+	double miniMapSectionRadius = 0.0f;
+	double miniMapSectionRadiusMax = 0.06f;
+	FVector4 ThroneDefaultColour = FVector4(0.0, 0.0, 1.0, 1.0);
+	FVector4 ThroneHitColour = FVector4(1.0, 0.0, 0.0, 1.0);
+
+	double ThroneAnimHitTimeMax = 1.12f;
+
+	double ThroneAnimHitInterp = 0.0f;
+
+	bool ThronePlayHitAnim = false;
+	bool ThroneHitAnimreverse = false;
+
+
+
+
 
 };

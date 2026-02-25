@@ -116,19 +116,18 @@ void AMiniMapManager::WriteToMiniMap(FVector WorldPosition, double rotAngle, dou
 		FVector2D screenSize = FVector2D(MiniMapFrontBuffer->GetSurfaceWidth(), MiniMapFrontBuffer->GetSurfaceHeight());
 		FVector2D radi = FVector2D(MiniMapSectionRadius);
 
-		FVector2D centre = (normalisedCooridnates)*screenSize;
+		FVector2D centre = (normalisedCooridnates) * screenSize;
 		 
 
 		FVector2D topLeft = (centre - (radi * screenSize));
 
 		FVector2D bottomRight = ((radi * 2.0) * screenSize);
 
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("screen centre %f %f   screen top %f %f"), centre.X, centre.Y, topLeft.X, topLeft.Y));
 
 		canvas->K2_DrawMaterial(Material, topLeft, bottomRight, FVector2D(0.0), FVector2D(1.0), rotAngle, FVector2D(0.5, 0.5));
 
 		UKismetRenderingLibrary::EndDrawCanvasToRenderTarget(this, context);
-		return;
+		
 	}
 
 
@@ -144,7 +143,6 @@ FVector2D AMiniMapManager::CalcMiniMapPos(FVector WorldPosition)
 	{
 		float VerticalPercent = (WorldPosition.X - m_miniMapAnchorTop->GetActorLocation().X) / (m_miniMapAnchorBottom->GetActorLocation().X - m_miniMapAnchorTop->GetActorLocation().X);
 		float HorizontalPercent = (WorldPosition.Y - m_miniMapAnchorTop->GetActorLocation().Y) / (m_miniMapAnchorBottom->GetActorLocation().Y - m_miniMapAnchorTop->GetActorLocation().Y);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("MINI MAP COORDS V: %f MINI MAP COORDS U: %f"),VerticalPercent,HorizontalPercent));
 
 		return FVector2D(HorizontalPercent,1.0 - VerticalPercent);
 	}
