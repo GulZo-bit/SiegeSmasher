@@ -43,8 +43,9 @@ AEnemyBase* ASpawnPoint::SpawnEnemy(AEnemyBase* EnemyRef)
 AEnemyBase* ASpawnPoint::SpawnAndResetExistingEnemyInstance(AEnemyBase* EnemyRef)
 {
 	
-	EnemyRef->ResetOnSpawn();
+	
 	EnemyRef->SetActorLocation(GetActorLocation());
+	EnemyRef->ResetOnSpawn();
 	return EnemyRef;
 }
 

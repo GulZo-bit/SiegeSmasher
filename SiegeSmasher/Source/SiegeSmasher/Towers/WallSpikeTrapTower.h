@@ -21,10 +21,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WallTrapMesh")
 	UStaticMeshComponent* WallTrapSpikes; 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SwingAngle")
+	UPROPERTY(Replicated,EditAnywhere, BlueprintReadWrite, Category = "SwingAngle")
 	float SwingRotationAngle = 90.0f;
 
-	
+	void HandleAppliedPlayerRotation(float AppliedPlayerRot);
 	
 	
 protected:
@@ -36,7 +36,9 @@ protected:
 	void HandleNewEnemy(AEnemyBase* Enemy);
 	void TowerTimeLineInterp(float value);
 	void ApplyDamage(AEnemyBase* Enemy);
+	
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
 	UPROPERTY(Replicated);
 	bool HasSwung = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SwingPlayBackSpeed"); 

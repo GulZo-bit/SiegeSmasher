@@ -29,7 +29,13 @@ void ATowePrePlaceObjectHelper::BeginPlay()
 	
 }
 
+void ATowePrePlaceObjectHelper::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const {
 
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ATowePrePlaceObjectHelper, PlayerRotationAngle);
+
+
+}
 
 // Called every frame
 void ATowePrePlaceObjectHelper::Tick(float DeltaTime)
@@ -50,6 +56,25 @@ bool ATowePrePlaceObjectHelper::GetCanPlaceTower()
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("Attemted to place tower number of towers overlapping %d"), OverlappedTowers.Num()));
 	return OverlappedTowers.Num() == 0;
 }
+
+void ATowePrePlaceObjectHelper::IncrementPlayerRotAngle()
+{
+	PlayerRotationAngle += PlayerAngleIncrement ; 
+
+	PlayerRotationAngle *= (PlayerRotationAngle < 359.0 && PlayerRotationAngle > -359.0); 
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("player rotation angle %f"), PlayerRotationAngle));
+}
+
+
+void ATowePrePlaceObjectHelper::SetPlayerRotationAngle(double Angle)
+{
+
+	PlayerRotationAngle = Angle;
+
+}
+
+
 
 FVector ATowePrePlaceObjectHelper::GetPlacementColliderHalfExtents()
 {
@@ -217,11 +242,13 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 		double FinalAngleForAlignment = atan2(anglePitchCross, anglePicthDot);
 
 
+		FQuat PlayerRotation = FQuat(AlignmentVector, FMath::DegreesToRadians( PlayerRotationAngle));
+
 		FQuat FinalRotationForAlignment = FQuat(AlignmentAxisCros, abs(FinalAngleForAlignment));
 		
 		// once the alignement is taken care of all we need to do is rotate the tower in the left over axis
 		// which could be pitch yaw or roll depending on what the alignment axis and alignemnt vector was
-		SetActorRotation(AligmentRotation.Rotator() + FinalRotationForAlignment.Rotator() );
+		SetActorRotation(AligmentRotation.Rotator() + FinalRotationForAlignment.Rotator() + PlayerRotation.Rotator() );
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Is correct surface %d"), (int)IsCorrectSurfaceDir));
 			
@@ -304,6 +331,16 @@ bool ATowePrePlaceObjectHelper::ResolvePlacement(FVector& SurfaceBoxExtents, FVe
 	SetActorRotation(RotatorPitch + YawRot.Rotator()  );
 	return true;
 } 
+
+
+float ATowePrePlaceObjectHelper::GetPlayerRot() {
+
+
+
+	return PlayerRotationAngle;
+
+
+}
 
 void ATowePrePlaceObjectHelper::DisableTick() {
 

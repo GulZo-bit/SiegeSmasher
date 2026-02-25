@@ -3,14 +3,52 @@
 
 #include "PlayerHud/ChargeWidget.h"
 #include "../MyMainCharacterTest.h"
+#include "ImageUtils.h"
+#include "Engine/Canvas.h"
+
+
+
 void UChargeWidget::NativeConstruct() {
 
 	Super::NativeConstruct();
-
+	
+	
+	SceneCapture =  Cast<ASceneCapture2D>( UGameplayStatics::GetActorOfClass(GetWorld(), ASceneCapture2D::StaticClass()));
 	
 	LeaderboardBorder = WidgetTree->FindWidget<UBorder>(FName(LeaderBoardBorderName));
 	LeaderboardGrid = WidgetTree->FindWidget<UGridPanel>(FName(LeaderBoardGridPanelName));
 	LeaderboardHeader = WidgetTree->FindWidget<UBorder>(FName(LeaderBoardHeaderName));
+	MiniMapRef = WidgetTree->FindWidget<UImage>(FName(MiniMapName));
+
+	if (!MiniMapRef || !SceneCapture ) {
+		GLog->Log(FString::Printf(TEXT("MINIMAP NO SCENE CAPTURE IN LEVEL OR MINI MAP IMAGE IN PLAYER IMAGE ")));
+		GLog->Log(FString::Printf(TEXT("MINIMAP NO SCENE CAPTURE IN LEVEL OR MINI MAP IMAGE IN PLAYER WIDGET  ")));
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("MINIMAP NOT FOUND IN PLAYER WIDGET OR SCENE CAPTURE 2D NOT IN SCENE ")));
+	}
+	else 
+	{
+	  
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("MINIMAP  FOUND IN PLAYER WIDGET")));
+
+		UCanvasPanelSlot* MiniMapSlot = Cast<UCanvasPanelSlot>(MiniMapRef->Slot);
+		MiniMapWidth = MiniMapSlot->GetSize().X; 
+		MiniMapHeight = MiniMapSlot->GetSize().Y;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("MINIMAP  WIDTH %d"),MiniMapWidth));
+
+		FCreateTexture2DParameters params = FCreateTexture2DParameters();
+		
+		UKismetRenderingLibrary::ReadRenderTarget(this, SceneCapture->GetCaptureComponent2D()->TextureTarget, MiniMapColBuffer,false);
+		MiniMapSceneTexture = FImageUtils::CreateTexture2D(MiniMapWidth, MiniMapHeight, MiniMapColBuffer, this, FString("MiniMapSceneTex"), EObjectFlags::RF_Transient, params);
+
+		UMaterial* parent = LoadObject<UMaterial>(nullptr, TEXT("/Script/Engine.Material'/Game/MiniMapMaterials/MiniMapSceneDisplay.MiniMapSceneDisplay'"));
+		MiniMapDisplayMat = UMaterialInstanceDynamic::Create(parent, this, FName("SceneMapDisplayInstance"));
+		  
+		MiniMapDisplayMat->SetTextureParameterValue("LevelTex", MiniMapSceneTexture);
+		MiniMapRef->SetBrushFromMaterial(MiniMapDisplayMat);
+
+	} 
+	
 	if (LeaderboardGrid && LeaderboardHeader && LeaderboardBorder) {
 
 		GLog->Log(FString::Printf(TEXT("Leaderboard border found")));
@@ -24,7 +62,8 @@ void UChargeWidget::NativeConstruct() {
 	}
 
 	
-	
+
+
 
 
 
@@ -32,8 +71,17 @@ void UChargeWidget::NativeConstruct() {
 }
 
 
-
-
+// ui updates in unreal come after the main update loop(where all the mini map data is written) 
+// so we know the mini map data will have been established, so for now we can call this within a tick event 
+// within the player ui blueprint to tell the mini map manager that the ui update has been reached and that
+// it can clear next frame, could have a more robust solution for the mini map to do this itself(counting number 
+// of potential writes so that we know when to set the clear flag to true within the mini map ) but this 
+// would require more coupling with the wave manager and the server object which is not required by 
+// just using the fact ui updates after main game loop updates(where objects write to to the mini map manager)
+void UChargeWidget::ClearMiniMap()
+{			
+		MiniMapManagerRef->ShouldClearNextFrame(true);
+}
 
 
 void UChargeWidget::GenerateLeaderBoard()
@@ -97,6 +145,26 @@ UTextBlock* UChargeWidget::CreateText(FString TextContent)
 	Text->SetColorAndOpacity(LeaderboardTextColour);
 	Text->SetText(FText::FromString(TextContent));
 	return Text;
+}
+
+void UChargeWidget::DrawToMiniMapBuffer(UTextureRenderTarget2D* targetToDrawTo,UTexture2D* MiniMapIconTextureToUse)
+{
+
+	UCanvas* canvas;
+	FVector2D canvasSize;
+	FDrawToRenderTargetContext context;
+
+	MiniMapDisplayMat->SetTextureParameterValue("IconsTexture", MiniMapIconTextureToUse);
+
+	UKismetRenderingLibrary::BeginDrawCanvasToRenderTarget(this, targetToDrawTo, canvas, canvasSize, context);
+
+
+	canvas->K2_DrawMaterial(MiniMapDisplayMat, FVector2D(0.0), canvasSize, FVector2D(0.0), FVector2D(1.0));
+
+
+	UKismetRenderingLibrary::EndDrawCanvasToRenderTarget(this, context);
+
+
 }
 	
 // create a scale box and add it to the widget tree
@@ -173,6 +241,18 @@ int UChargeWidget::GetPoints()
 void UChargeWidget::SetServerObjectRef(AServerObject* ServerObjectPtr)
 {
 	ServerobjectRef = ServerObjectPtr;
+	
+}
+
+void UChargeWidget::AssignMiniMap(AMiniMapManager* MiniMapManagerPtr)
+{
+	 MiniMapManagerRef = MiniMapManagerPtr;
+	 MiniMapManagerRef->SetMiniMapParams(MiniMapWidth, MiniMapHeight);
+	 MiniMapDisplayMat->SetTextureParameterValue("IconsTexture", MiniMapManagerRef->GetMiniMapBuffer());
+
+	 
+
+
 }
 
 

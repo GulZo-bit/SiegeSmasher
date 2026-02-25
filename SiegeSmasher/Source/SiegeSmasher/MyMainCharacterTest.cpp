@@ -80,9 +80,11 @@ void AMainCharacterTest::BeginPlay()
 	}
 	//Reference for The Server Object and The Base that are placed in the level
 	ServerObjectRef = Cast<AServerObject>(UGameplayStatics::GetActorOfClass(World,AServerObject::StaticClass()));
+	miniMapManagertRef = Cast<AMiniMapManager>(UGameplayStatics::GetActorOfClass(World, AMiniMapManager::StaticClass()));
 	ThroneRef = Cast<AThrone>(UGameplayStatics::GetActorOfClass(World, AThrone::StaticClass()));
+	UMaterial* parent = LoadObject<UMaterial>(nullptr, TEXT("/Script/Engine.Material'/Game/MiniMapMaterials/PlayerMiniMapMat.PlayerMiniMapMat'"));
 
-
+	MiniMapMat = UMaterialInstanceDynamic::Create(parent, this, FName("PlayerMiniMapMat"));
 
 	//checks if the reference to the player hud is not empty
 
@@ -101,7 +103,7 @@ void AMainCharacterTest::BeginPlay()
 			//if the widget was created successfully, add it to viewport
 
 			//checks if the widgets are not null to avoid crashes due to null reference
-			if (ChargeWidget != nullptr && ServerObjectRef != nullptr)
+			if (ChargeWidget != nullptr && ServerObjectRef != nullptr && miniMapManagertRef != nullptr)
 			{
 				//Charge widget is the players UI, it gets added to the viewport on begin play and sets the health bar to the correct amount
 				ChargeWidget->AddToViewport();
@@ -110,6 +112,8 @@ void AMainCharacterTest::BeginPlay()
 				//Gives the charge widget reference to the server object and server object the reference to this player
 				ChargeWidget->SetServerObjectRef(ServerObjectRef);
 				ServerObjectRef->SetPlayerStateToHandle(this);
+				ChargeWidget->AssignMiniMap(miniMapManagertRef);
+
 				//sets the base health to the correct value at begin play
 				ChargeWidget->SetThroneHealth(ThroneRef->ThroneHealth);
 
@@ -179,7 +183,7 @@ void AMainCharacterTest::Tick(float DeltaTime)
 
 	}
 	
-
+	WriteToMiniMap();
 
 	TowerPlacementHandle();
 
@@ -217,7 +221,11 @@ void AMainCharacterTest::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		
 		EnhancedInputComponent->BindAction(ToggleTowerPlacementAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleTowerPlacement);
 		
-		EnhancedInputComponent->BindAction(ToggleLeaderboardAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleLeaderboard);
+		EnhancedInputComponent->BindAction(ToggleLeaderboardAction, ETriggerEvent::Triggered, this, &AMainCharacterTest::ToggleLeaderboard); 
+		
+		EnhancedInputComponent->BindAction(RotateTower, ETriggerEvent::Triggered, this, &AMainCharacterTest::RotateSelectedTower);
+
+		
 	}
 }
 
@@ -762,6 +770,7 @@ void AMainCharacterTest::ClientTowerPlacment()
 
 
 
+
 }
 
 void AMainCharacterTest::CallCreateLobby()
@@ -995,6 +1004,14 @@ void AMainCharacterTest::Multicast_HighlightPlayerId_Implementation(int PlayerSe
 
 
 
+void AMainCharacterTest::WriteToMiniMap() 
+{
+
+	miniMapManagertRef->WriteToMiniMap(GetActorLocation(), GetActorRotation().Yaw ,MiniMapSectionRadius,MiniMapMat);
+
+
+
+}
 
 
 
@@ -1009,6 +1026,7 @@ void AMainCharacterTest::SwitchTowers()
 			AssignedPlayerController->WasInputKeyJustPressed(InputKeysToSwitchTower[i])) {
 
 			if (Selected != nullptr) {
+				Selected->SetPlayerRotationAngle(0.0);
 				HideSelected();
 			}
 
@@ -1025,6 +1043,26 @@ void AMainCharacterTest::SwitchTowers()
 	
 	if(!HasAuthority()) { 
 		ClientSwitchTower();
+	}
+	
+}
+
+void AMainCharacterTest::RotateSelectedTower()
+{
+	
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Rotate Tower Called")));
+
+	if (!HasAuthority() ) {
+
+		Server_IncrementTowerPlacementRot();
+		return;
+	}
+	
+	if (Selected != nullptr) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Rotate Tower Called Server")));
+
+		Selected->IncrementPlayerRotAngle();
 	}
 	
 }
@@ -1050,12 +1088,16 @@ void AMainCharacterTest::TowerPlacementHandle()
 	if (!HasAuthority() ) {
 		
 		ClientTowerPlacment();
+	
+		
+
 	}
 	else if(IsLocallyControlled()) {
 
 		HandleTowerPlacement();
 
 	}
+	
 
 
 
@@ -1105,6 +1147,21 @@ void AMainCharacterTest::Server_SetPlaceTower_Implementation(bool PlaceTower)
 }
 
 
+
+
+void AMainCharacterTest::Server_IncrementTowerPlacementRot_Implementation()
+{
+
+	if (Selected != nullptr) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Rotate Tower Called Client")));
+
+		Selected->IncrementPlayerRotAngle();
+
+	}
+
+
+}
+
 void AMainCharacterTest::SpawnSelected()
 {
 	// if the player has authoirty and they are locally controlled 
@@ -1121,6 +1178,8 @@ void AMainCharacterTest::SpawnSelected()
 				TowerRef->SetOwner(Controller); 
 				//set the player ref for this tower
 				TowerRef->SetPlayerRef(this);
+				TowerRef->HandleAppliedPlayerRotation(Selected->GetPlayerRot());
+
 				// decrement the players score on the server after placing the tower
 				DecrementPlayerScore(Selected->GetTowerCost());
 				// update the players leaderboard info and cast to client
@@ -1176,6 +1235,8 @@ void AMainCharacterTest::Server_SpawnSelected_Implementation(bool PlacingTower,b
 		if (TowerRef) {
 			// set tower player ref on server
 			TowerRef->SetPlayerRef(this);
+			// set the applied player rotation and handle any adjustments needed based on it 
+			TowerRef->HandleAppliedPlayerRotation(Selected->GetPlayerRot());
 			// decrement player score indivual 
 			DecrementPlayerScore(Selected->GetTowerCost()); 
 			// update players score across all clients 
@@ -1231,6 +1292,7 @@ void AMainCharacterTest::Server_SwitchTower_Implementation(int NewSelectedIndex,
 {
 	 
 	if (Selected != nullptr) {
+		Selected->SetPlayerRotationAngle(0.0);
 		HideSelected();
 	}
 	SelectedTowerIndex = NewSelectedIndex;

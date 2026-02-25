@@ -381,6 +381,8 @@ void ATowerBase::OnHitBoxHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 
 }
 
+void ATowerBase::HandleAppliedPlayerRotation(float AppliedPlayerRot){}
+
 // methods to be inherited and overriden by  child classes unreal does have a macro for defining 
 // null implemented(abstract methods) inside UObjects but all it does is create the methods for you 
 // and implement them as stubs anyway as unreal needs to create an instance for UObjects to see them

@@ -63,7 +63,7 @@ APlayerArrow::APlayerArrow()
 			ArrowMaterialInstance =
 				UMaterialInstanceDynamic::Create(Material.Object, ArrowMesh);
 		}
-
+		
 		ArrowMesh->SetMaterial(0, ArrowMaterialInstance);
 		ArrowMesh->SetupAttachment(RootComponent);
 		ArrowMesh->SetRelativeLocation(FVector(-70.0f, 0.0f, 0.0f));
