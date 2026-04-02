@@ -1,1 +1,8 @@
 # SiegeSmasher
+Third Person Multiplayer Tower Defense Demo.
+Developed in Unreal Engine 5. Coded in C++ by a team of three, myself included.
+Has a LAN implementation for the multiplayer but there is a branch with a WIP of using Steam’s multiplayer service.
+Allows for up to 4 players to play at one time on 4 different machines.
+
+Gameplay Demonstration:
+[WATCH THIS](https://drive.google.com/file/d/1EHXPOIMH9tWux6rCrVsQgR2O4HTc3kpd/view?usp=sharing)
