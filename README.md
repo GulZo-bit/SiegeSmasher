@@ -5,4 +5,5 @@ Has a LAN implementation for the multiplayer but there is a branch with a WIP of
 Allows for up to 4 players to play at one time on 4 different machines.
 
 Gameplay Demonstration:
-[WATCH THIS](https://drive.google.com/file/d/1EHXPOIMH9tWux6rCrVsQgR2O4HTc3kpd/view?usp=sharing)
+[![Watch the Demo](<img width="1280" height="720" alt="SiegeSmasher Thumbnail" src="https://github.com/user-attachments/assets/50abd308-8c58-4bca-8cb3-9c4e55685b5c" />
+)](https://drive.google.com/file/d/1EHXPOIMH9tWux6rCrVsQgR2O4HTc3kpd/view?usp=sharing)
