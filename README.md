@@ -1,4 +1,9 @@
-# SiegeSmasher
+# Siege Smasher
+
+### Play the game
+[Download the latest Windows build](../../releases/latest)
+
+
 Third Person Multiplayer Tower Defense Demo.
 Developed in Unreal Engine 5. Coded in C++ by a team of three, myself included.
 Has a LAN implementation for the multiplayer but there is a branch with a WIP version using Steam’s multiplayer service.
